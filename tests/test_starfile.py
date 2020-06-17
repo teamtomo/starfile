@@ -28,7 +28,7 @@ class test_StarFile(TestCase):
 
     def test_find_data_block_starts(self):
         s = StarFile(self.postprocess)
-        db_starts = s._find_data_block_starts()
+        db_starts = s.data_block_starts
         self.assertTrue(db_starts == [4, 14, 75])
 
     def test_n_data_blocks(self):
@@ -56,6 +56,6 @@ class test_StarFile(TestCase):
         self.assertTrue(all([isinstance(s.dataframes[i], pd.DataFrame) for i in range(3)]))
         self.assertTrue(s.dataframes[0].shape == (1, 6))
         self.assertTrue(s.dataframes[1].shape == (49, 7))
-        self.assertTrie(s.dataframes[2].shape == (49, 3))
+        self.assertTrue(s.dataframes[2].shape == (49, 3))
 
 
