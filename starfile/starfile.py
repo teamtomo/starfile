@@ -303,10 +303,10 @@ class StarFile:
         return
 
     def _write_data_block_loop(self, dataframe: pd.DataFrame, filename: str):
-        # write loopheader
+        # new loopheader
         self._write_loopheader(dataframe, filename)
 
-        # write main block
+        # new main block
         dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, float_format='%.5f')
         return
 

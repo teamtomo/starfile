@@ -7,7 +7,7 @@ import starfile
 
 class TestFunctions(TestCase):
     def test_read(self):
-        df = starfile.read(Path('data', 'one_loop.star'))
+        df = starfile.open(Path('data', 'one_loop.star'))
         self.assertIsInstance(df, pd.DataFrame)
 
     def test_write(self):
@@ -16,4 +16,4 @@ class TestFunctions(TestCase):
                 }
 
         test_df = pd.DataFrame(cars, columns=['Brand', 'Price'])
-        starfile.write(test_df, Path('data', 'test_write.star'))
+        starfile.new(test_df, Path('data', 'test_write.star'))

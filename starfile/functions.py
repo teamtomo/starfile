@@ -6,21 +6,21 @@ from .starfile import StarFile
 from .version import VERSION
 
 
-def read(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+def open(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
     Read a star file into a pandas dataframe or list of pandas dataframes
-    :param filename:
+    :param filename: file from which to read data
     :return:
     """
     df = StarFile(filename).dataframes
     return df
 
 
-def write(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
+def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
     """
     Write data from pandas dataframe(s) to a star file
     :param data: data in pandas dataframe(s) to be written to file
-    :param filename: filename in which to write data
+    :param filename: filename in which to new data
     :return:
     """
     star = StarFile(data=data)
