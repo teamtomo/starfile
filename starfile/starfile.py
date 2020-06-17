@@ -231,7 +231,7 @@ class StarFile:
             # Write header
             now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             file.write(f'# Created by the starfile python package (version {VERSION}) on {now}\n')
-        self._write_blank_lines(filename, 2)
+        self._write_blank_lines(filename, 1)
 
         # Write each data block
         for df in self.iterable_dataframes:
@@ -255,7 +255,7 @@ class StarFile:
         data_block_name = 'data_' + getattr(dataframe, 'name', '')
 
         with open(filename, 'a') as file:
-            file.write(f'{data_block_name}\n')
+            file.write(f'{data_block_name}\n\n')
 
         if dataframe.shape[0] == 1:
             self._write_data_block_simple(dataframe, filename)

@@ -70,3 +70,7 @@ class test_StarFile(TestCase):
     def test_write_loop(self):
         s = StarFile(self.loop_simple)
         s._write_file(Path('data', 'loop_block.star'))
+
+    def test_write_multiblock(self):
+        s = StarFile(self.postprocess)
+        s._write_file(Path('data', 'multiblock.star'))
