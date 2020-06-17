@@ -223,7 +223,10 @@ class StarFile:
     def _to_numeric(self):
         iterable_df = self.iterable_dataframes
         for idx, df in enumerate(iterable_df):
+            name = getattr(df, 'name', None)
             iterable_df[idx] = df.apply(pd.to_numeric, errors='ignore')
+            if name is not None:
+                iterable_df[idx].name = name
         self.dataframes = iterable_df
 
     def _write_file(self, filename: str):

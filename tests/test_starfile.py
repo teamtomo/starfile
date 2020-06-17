@@ -73,4 +73,5 @@ class test_StarFile(TestCase):
 
     def test_write_multiblock(self):
         s = StarFile(self.postprocess)
+        self.assertTrue(s.dataframes[0].name == 'general')
         s._write_file(Path('data', 'multiblock.star'))
