@@ -194,7 +194,7 @@ class StarFile:
         df.name = data_block_name
         return df
 
-    def _to_excel(self, filename: str):
+    def to_excel(self, filename: str):
         # Sanitise filename
         if not str(filename).endswith('.xlsx'):
             filename += '.xlsx'

@@ -28,6 +28,18 @@ def write(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
     return
 
 
+def star2excel(star_file: str, excel_filename: str):
+    """
+    Converts a star file to an excel (.xlsx) file
+    :param star_file: STAR file
+    :param excel_filename: filename (should end in '.xlsx')
+    :return:
+    """
+    star = StarFile(star_file)
+    star.to_excel(excel_filename)
+    return
+
+
 def version():
     """
     Returns the current version of starfile

@@ -64,7 +64,7 @@ class test_StarFile(TestCase):
 
     def test_write_excel(self):
         s = StarFile(self.postprocess)
-        s._to_excel(Path('data', 'star2excel.xlsx'))
+        s.to_excel(Path('data', 'star2excel.xlsx'))
 
 
     def test_write_simple_block(self):
