@@ -62,3 +62,11 @@ class test_StarFile(TestCase):
         s._to_excel(Path('data', 'star2excel.xlsx'))
 
 
+    def test_write_simple_block(self):
+        s = StarFile(self.postprocess)
+        s.dataframes = s.dataframes[0]
+        s._write_file(Path('data', 'basic_block.star'))
+
+    def test_write_loop(self):
+        s = StarFile(self.loop_simple)
+        s._write_file(Path('data', 'loop_block.star'))
