@@ -70,16 +70,16 @@ class test_StarFile(TestCase):
     def test_write_simple_block(self):
         s = StarFile(self.postprocess)
         s.dataframes = s.dataframes[0]
-        s._write_file(Path('data', 'basic_block.star'))
+        s.write_star_file(Path('data', 'basic_block.star'))
 
     def test_write_loop(self):
         s = StarFile(self.loop_simple)
-        s._write_file(Path('data', 'loop_block.star'))
+        s.write_star_file(Path('data', 'loop_block.star'))
 
     def test_write_multiblock(self):
         s = StarFile(self.postprocess)
         self.assertTrue(s.dataframes[0].name == 'general')
-        s._write_file(Path('data', 'multiblock.star'))
+        s.write_star_file(Path('data', 'multiblock.star'))
 
     def test_create_from_dataframe(self):
         s = StarFile(data=self.test_df)

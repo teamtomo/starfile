@@ -244,9 +244,13 @@ class StarFile:
                 iterable_df[idx].name = name
         self.dataframes = iterable_df
 
-    def _write_file(self, filename: str):
+    def write_star_file(self, filename: str = None):
+        # Set filename
+        if filename is None:
+            filename = self.filename
+
+        # Write header
         with open(filename, 'w') as file:
-            # Write header
             now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
             file.write(f'# Created by the starfile python package (version {VERSION}) on {now}\n')
         self._write_blank_lines(filename, 1)

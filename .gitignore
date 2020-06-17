@@ -2,3 +2,4 @@
 /tests/data/loop_block.star
 /tests/data/basic_block.star
 /tests/data/multiblock.star
+/tests/data/test_write.star
