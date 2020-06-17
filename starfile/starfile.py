@@ -109,7 +109,8 @@ class StarFile:
             df = pd.read_csv(self.filename, skiprows=header_length, delim_whitespace=True, header=None)
         else:
             footer_length = self.n_lines - end_line_number
-            df = pd.read_csv(self.filename, skiprows=header_length, skipfooter=footer_length, delim_whitespace=True, header=None)
+            df = pd.read_csv(self.filename, skiprows=header_length, skipfooter=footer_length, delim_whitespace=True,
+                             header=None, engine='python')
         return df
 
     def _read_loop_header(self, start_line_number: int) -> Tuple[list, int]:
