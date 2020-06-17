@@ -57,4 +57,8 @@ class test_StarFile(TestCase):
         self.assertTrue(s.dataframes[1].shape == (49, 7))
         self.assertTrue(s.dataframes[2].shape == (49, 3))
 
+    def test_write_excel(self):
+        s = StarFile(self.postprocess)
+        s._to_excel(Path('data', 'star2excel.xlsx'))
+
 

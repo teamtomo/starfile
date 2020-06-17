@@ -10,12 +10,10 @@ class StarFile:
         self.filename = Path(filename)
         self.dataframes = []
 
-        # if self.filename.exists():
-        #     self._read_file()
-        #
-        # if data is not None:
-        #     df = pd.DataFrame(data)
-        #     self.dataframes.append()
+        if self.filename.exists():
+            self._read_file()
+
+        self._to_numeric()
 
     @property
     def dataframes(self):
@@ -92,6 +90,7 @@ class StarFile:
 
             if current_line.startswith('loop_'):
                 data_block = self._read_loop_block(line_number, data_block_end)
+                data_block.name = data_block_name
                 return data_block
             else:
                 data_block.append(current_line)
@@ -176,6 +175,54 @@ class StarFile:
         df = pd.DataFrame(data_clean, index=['value'])
         df.name = data_block_name
         return df
+
+    def _to_excel(self, filename: str):
+        # Sanitise filename
+        if not str(filename).endswith('.xlsx'):
+            filename += '.xlsx'
+
+        # Initialise sheet naming
+        used_sheet_names = []
+        sheet_index = 1
+
+
+        iterable_df = self.iterable_df
+
+        with pd.ExcelWriter(filename) as writer:
+            for df in iterable_df:
+                df_name = getattr(df, 'name', None)
+
+                # Set sheet name
+                if df_name in (None, '') or df_name in used_sheet_names:
+                    sheet_name = f'sheet{sheet_index}'
+                    sheet_index += 1
+                else:
+                    sheet_name = df_name
+
+                # Transpose 1 row dataframes for cleanness
+                if df.shape[0] == 1:
+                    df = df.transpose()
+
+                # Write df into sheet
+                df.to_excel(writer, sheet_name=sheet_name)
+                used_sheet_names.append(sheet_name)
+
+        return
+
+    @property
+    def iterable_df(self):
+        if isinstance(self.dataframes, pd.DataFrame):
+            iterable_df = [self.dataframes]
+        else:
+            iterable_df = self.dataframes
+        return iterable_df
+
+    def _to_numeric(self):
+        iterable_df = self.iterable_df
+        for idx, df in enumerate(iterable_df):
+            iterable_df[idx] = df.apply(pd.to_numeric, errors='ignore')
+        self.dataframes = iterable_df
+
 
 
 
