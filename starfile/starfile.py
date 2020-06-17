@@ -9,14 +9,29 @@ import pandas as pd
 from .version import VERSION
 
 class StarFile:
-    def __init__(self, filename: str, data: dict = None):
-        self.filename = Path(filename)
+    def __init__(self, filename: str = None, data: dict = None):
+        self.filename = filename
         self.dataframes = []
 
         if self.filename.exists():
             self._read_file()
 
+        if isinstance(data, pd.DataFrame) or isinstance(data, list):
+            self._append_data(data)
+
         self._to_numeric()
+
+    @property
+    def filename(self):
+        return self._filename
+
+    @filename.setter
+    def filename(self, filename: str):
+        if filename is not None:
+            self._filename = Path(filename)
+        else:
+            self._filename = Path('starfile_auto.star')
+        return
 
     @property
     def dataframes(self):
@@ -290,6 +305,15 @@ class StarFile:
         # write main block
         dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, float_format='%.5f')
         return
+
+    def _append_data(self, data: pd.DataFrame):
+        self.dataframes = self.iterable_dataframes
+        if isinstance(data, pd.DataFrame):
+            data = [data]
+        self.dataframes += data
+        return
+
+
 
 
 

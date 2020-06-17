@@ -10,6 +10,11 @@ class test_StarFile(TestCase):
         super().__init__(*args, **kwargs)
         self.loop_simple = Path().joinpath('data', 'one_loop.star')
         self.postprocess = Path().joinpath('data', 'postprocess.star')
+        cars = {'Brand': ['Honda Civic', 'Toyota Corolla', 'Ford Focus', 'Audi A4'],
+                'Price': [22000, 25000, 27000, 35000]
+                }
+
+        self.test_df = pd.DataFrame(cars, columns=['Brand', 'Price'])
 
     def test_instantiation(self):
         s = StarFile(self.loop_simple)
@@ -75,3 +80,13 @@ class test_StarFile(TestCase):
         s = StarFile(self.postprocess)
         self.assertTrue(s.dataframes[0].name == 'general')
         s._write_file(Path('data', 'multiblock.star'))
+
+    def test_create_from_dataframe(self):
+        s = StarFile(data=self.test_df)
+        self.assertIsInstance(s.dataframes, pd.DataFrame)
+
+    def test_create_from_dataframes(self):
+        df = [self.test_df, self.test_df]
+        s = StarFile(data=df)
+        self.assertTrue(len(s.dataframes) == 2)
+        self.assertIsInstance(s.dataframes[0], pd.DataFrame)
