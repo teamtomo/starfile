@@ -45,9 +45,8 @@ class test_StarFile(TestCase):
     def test_read_file_loop(self):
         s = StarFile(self.loop_simple)
         s._read_file()
-        self.assertTrue(len(s.dataframes) == 1)
-        self.assertIsInstance(s.dataframes[0], pd.DataFrame)
-        self.assertTrue(s.dataframes[0].shape == (1365, 12))
+        self.assertIsInstance(s.dataframes, pd.DataFrame)
+        self.assertTrue(s.dataframes.shape == (1365, 12))
 
     def test_read_file_multiblock(self):
         s = StarFile(self.postprocess)
