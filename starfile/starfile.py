@@ -19,6 +19,8 @@ class StarFile:
 
     @property
     def dataframes(self):
+        if len(self._dataframes) == 1:
+            return self._dataframes[0]
         return self._dataframes
 
     @dataframes.setter
