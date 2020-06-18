@@ -1,5 +1,5 @@
-/tests/data/star2excel.xlsx
-/tests/data/loop_block.star
-/tests/data/basic_block.star
-/tests/data/multiblock.star
-/tests/data/test_write.star
+/test/data/star2excel.xlsx
+/test/data/loop_block.star
+/test/data/basic_block.star
+/test/data/multiblock.star
+/test/data/test_write.star

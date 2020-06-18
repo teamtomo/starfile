@@ -5,11 +5,11 @@ from starfile.starfile import StarFile
 import pandas as pd
 
 
-class test_StarFile(TestCase):
+class TestStarFile(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.loop_simple = Path().joinpath('data', 'one_loop.star')
-        self.postprocess = Path().joinpath('data', 'postprocess.star')
+        self.loop_simple = Path().joinpath('test', 'data', 'one_loop.star')
+        self.postprocess = Path().joinpath('test', 'data', 'postprocess.star')
         cars = {'Brand': ['Honda Civic', 'Toyota Corolla', 'Ford Focus', 'Audi A4'],
                 'Price': [22000, 25000, 27000, 35000]
                 }
@@ -64,22 +64,22 @@ class test_StarFile(TestCase):
 
     def test_write_excel(self):
         s = StarFile(self.postprocess)
-        s.to_excel(Path('data', 'star2excel.xlsx'))
+        s.to_excel(Path('test', 'data', 'star2excel.xlsx'))
 
 
     def test_write_simple_block(self):
         s = StarFile(self.postprocess)
         s.dataframes = s.dataframes[0]
-        s.write_star_file(Path('data', 'basic_block.star'))
+        s.write_star_file(Path('test', 'data', 'basic_block.star'))
 
     def test_write_loop(self):
         s = StarFile(self.loop_simple)
-        s.write_star_file(Path('data', 'loop_block.star'))
+        s.write_star_file(Path('test', 'data', 'loop_block.star'))
 
     def test_write_multiblock(self):
         s = StarFile(self.postprocess)
         self.assertTrue(s.dataframes[0].name == 'general')
-        s.write_star_file(Path('data', 'multiblock.star'))
+        s.write_star_file(Path('test', 'data', 'multiblock.star'))
 
     def test_create_from_dataframe(self):
         s = StarFile(data=self.test_df)

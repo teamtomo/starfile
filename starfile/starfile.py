@@ -1,6 +1,6 @@
 from pathlib import Path
 from linecache import getline
-from typing import Tuple, List
+from typing import Tuple, List, Union
 from io import TextIOBase
 from datetime import datetime
 
@@ -9,7 +9,7 @@ import pandas as pd
 from .version import VERSION
 
 class StarFile:
-    def __init__(self, filename: str = None, data: dict = None):
+    def __init__(self, filename: str = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
         self.filename = filename
         self.dataframes = []
 
