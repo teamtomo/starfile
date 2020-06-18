@@ -9,7 +9,7 @@ setup(
   author = 'Alister Burt',
   author_email = 'alisterburt@gmail.com',
   url = 'https://github.com/alisterburt/starfile',
-  download_url = 'https://github.com/alisterburt/starfile/archive/v0.1.tar.gz',
+  download_url = f'https://github.com/alisterburt/starfile/archive/v{VERSION}.tar.gz',
   keywords = ['io', 'STAR', 'star', 'starfile'],
   install_requires=[
           'pandas',
