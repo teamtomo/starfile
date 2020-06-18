@@ -15,13 +15,24 @@ Publication Date: May 1, 1991
 https://doi.org/10.1021/ci00002a020
 ```
 ## Features
-- Clean, simple API for access to STAR files
+- Clean, simple API for reading and writing of STAR files
 - Easy to install and use
 - Conversion to Excel speadsheet (.xlsx)
 
 
+## Installation
+Installation is available directly from the [Python package index](https://pypi.org/project/starfile/)
+```
+pip install starfile
+```
+As well as [conda-forge](https://anaconda.org/conda-forge/starfile)
+```
+conda install -c conda-forge starfile
+```
+
 
 ## Usage
+
 ### Reading STAR files
 To open a STAR file
 ```
@@ -137,17 +148,7 @@ Multi-block STAR files are written as multi-sheet Excel spreadsheets
 
 This functionality depends upon the `openpyxml` package
 
- 
 
-## Installation
-Installation is available directly from the [Python package index](https://pypi.org/project/starfile/)
-```
-pip install starfile
-```
-As well as [conda-forge](https://anaconda.org/conda-forge/starfile)
-```
-conda install -c conda-forge starfile
-```
 
 ## License
 The project is released under the BSD 3-Clause License
