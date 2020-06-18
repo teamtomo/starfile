@@ -1,6 +1,6 @@
 # starfile.py
 [![Build Status](https://travis-ci.com/alisterburt/starfile.svg?branch=master)](https://travis-ci.com/alisterburt/starfile)
-
+[![PyPI version](https://badge.fury.io/py/starfile.svg)](https://badge.fury.io/py/starfile)
 
 `starfile` is a Python implementation of the [STAR](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) file format.
 
