@@ -3,3 +3,5 @@
 /test/data/basic_block.star
 /test/data/multiblock.star
 /test/data/test_write.star
+/test/data/postprocess.xlsx
+/test/data/cars.star

@@ -10,11 +10,12 @@ class TestStarFile(TestCase):
         super().__init__(*args, **kwargs)
         self.loop_simple = Path().joinpath('test', 'data', 'one_loop.star')
         self.postprocess = Path().joinpath('test', 'data', 'postprocess.star')
-        cars = {'Brand': ['Honda Civic', 'Toyota Corolla', 'Ford Focus', 'Audi A4'],
+        cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
                 'Price': [22000, 25000, 27000, 35000]
                 }
 
         self.test_df = pd.DataFrame(cars, columns=['Brand', 'Price'])
+
 
     def test_instantiation(self):
         s = StarFile(self.loop_simple)

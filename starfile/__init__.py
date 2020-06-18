@@ -1,1 +1,1 @@
-from .functions import open, new, version, star2excel
+from .functions import open, read, new, write, version, star2excel

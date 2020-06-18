@@ -16,7 +16,29 @@ def open(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     return df
 
 
+def read(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+    """
+    Read a star file into a pandas dataframe or list of pandas dataframes
+    :param filename: file from which to read data
+    :return:
+    """
+    df = open(filename)
+    return df
+
+
 def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
+    """
+    Write data from pandas dataframe(s) to a star file
+    :param data: data in pandas dataframe(s) to be written to file
+    :param filename: filename in which to new data
+    :return:
+    """
+    star = StarFile(data=data)
+    star.write_star_file(filename)
+    return
+
+
+def write(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
     """
     Write data from pandas dataframe(s) to a star file
     :param data: data in pandas dataframe(s) to be written to file
