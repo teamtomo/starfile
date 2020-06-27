@@ -25,10 +25,6 @@ Installation is available directly from the [Python package index](https://pypi.
 ```
 pip install starfile
 ```
-As well as [conda-forge](https://anaconda.org/conda-forge/starfile)
-```
-conda install -c conda-forge starfile
-```
 
 
 ## Usage
