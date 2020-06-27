@@ -3,7 +3,7 @@ from typing import Union, List
 import pandas as pd
 
 from .starfile import StarFile
-from .version import VERSION
+from .version import __version__
 
 
 def open(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
@@ -67,4 +67,4 @@ def version():
     Returns the current version of starfile
     :return:
     """
-    return VERSION
+    return __version__

@@ -6,7 +6,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from .version import VERSION
+from .version import __version__
 
 class StarFile:
     def __init__(self, filename: str = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
@@ -256,7 +256,7 @@ class StarFile:
         # Write header
         with open(filename, 'w') as file:
             now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-            file.write(f'# Created by the starfile python package (version {VERSION}) on {now}\n')
+            file.write(f'# Created by the starfile python package (version {__version__}) on {now}\n')
         self._write_blank_lines(filename, 1)
 
         # Write each data block
