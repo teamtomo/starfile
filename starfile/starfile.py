@@ -110,6 +110,10 @@ class StarFile:
                 data_block = self._read_loop_block(line_number, data_block_end)
                 data_block.name = data_block_name
                 return data_block
+
+            elif current_line.startswith('#'):
+                continue
+
             else:
                 data_block.append(current_line)
 
@@ -125,11 +129,11 @@ class StarFile:
     def _read_loop_data(self, start_line_number: int, end_line_number: int = None) -> pd.DataFrame:
         header_length = start_line_number - 1
         if end_line_number is None:
-            df = pd.read_csv(self.filename, skiprows=header_length, delim_whitespace=True, header=None)
+            df = pd.read_csv(self.filename, skiprows=header_length, delim_whitespace=True, header=None, comment='#')
         else:
             footer_length = self.n_lines - end_line_number
             df = pd.read_csv(self.filename, skiprows=header_length, skipfooter=footer_length, delim_whitespace=True,
-                             header=None, engine='python')
+                             header=None, engine='python', comment='#')
         return df
 
     def _read_loop_header(self, start_line_number: int) -> Tuple[list, int]:

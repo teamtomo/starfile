@@ -10,6 +10,8 @@ class TestStarFile(TestCase):
         super().__init__(*args, **kwargs)
         self.loop_simple = Path().joinpath('test', 'data', 'one_loop.star')
         self.postprocess = Path().joinpath('test', 'data', 'postprocess.star')
+        self.pipeline = Path().joinpath('test', 'data', 'default_pipeline.star')
+        self.mmcif = Path().joinpath('test', 'data', '3ja6.cif')
         cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
                 'Price': [22000, 25000, 27000, 35000]
                 }
@@ -91,3 +93,12 @@ class TestStarFile(TestCase):
         s = StarFile(data=df)
         self.assertTrue(len(s.dataframes) == 2)
         self.assertIsInstance(s.dataframes[0], pd.DataFrame)
+
+    def test_read_pipeline(self):
+        s = StarFile(self.pipeline)
+        self.assertIsInstance(s.dataframes, list)
+        for i in range(5):
+            self.assertIsInstance(s.dataframes[i], pd.DataFrame)
+
+        # Check that comments are handled properly for blocks now and aren't included in df
+        self.assertTrue(s.dataframes[0].shape == (1, 1))
