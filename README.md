@@ -152,3 +152,6 @@ This functionality depends upon the `openpyxml` package
 
 ## License
 The project is released under the BSD 3-Clause License
+
+## Known Issues
+- Cannot handle more than one loop in a data block as found in mmCIF files
