@@ -13,7 +13,6 @@ setup(
   keywords = ['io', 'STAR', 'star', 'starfile'],
   install_requires=[
           'pandas',
-          'openpyxl',
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',
