@@ -12,7 +12,7 @@ setup(
   download_url = f'https://github.com/alisterburt/starfile/archive/v{__version__}.tar.gz',
   keywords = ['io', 'STAR', 'star', 'starfile'],
   install_requires=[
-          'pandas',
+          'pandas~=1.0.5',
       ],
   classifiers=[
     'Development Status :: 3 - Alpha',

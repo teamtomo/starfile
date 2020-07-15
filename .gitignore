@@ -6,3 +6,7 @@
 /test/data/postprocess.xlsx
 /test/data/cars.star
 /dist/
+/m2relion/
+package.sh
+setup.cfg
+setup.py
