@@ -112,6 +112,17 @@ Audi_A4	        35000
 
 This functionality is also exposed by `starfile.write` for convenience.
 
+Floating point numbers will be written with 5 digits after the decimal separator (%.5f) by default. 
+If you need to modify this behaviour, you can pass the keyword argument `float_format` to the function call.
+
+For example
+
+```
+starfile.new(df, 'test.star', float_format='%.12f')
+```
+
+Any keyword arguments to `starfile.new()` are passed through to pandas [DataFrame.to_csv()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html)
+
 ### Plotting
 One of the reasons for using DataFrame objects is that they provide some convenient data plotting tools
 ```
