@@ -1,12 +1,12 @@
-from pathlib import Path
 from linecache import getline
-from typing import Tuple, List, Union
-from io import TextIOBase
-from datetime import datetime
 
 import pandas as pd
+from datetime import datetime
+from pathlib import Path
+from typing import Tuple, List, Union
 
 from .version import __version__
+
 
 class StarFile:
     def __init__(self, filename: str = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
@@ -207,7 +207,6 @@ class StarFile:
         used_sheet_names = []
         sheet_index = 1
 
-
         iterable_df = self.iterable_dataframes
 
         with pd.ExcelWriter(filename) as writer:
@@ -248,7 +247,7 @@ class StarFile:
                 iterable_df[idx].name = name
         self.dataframes = iterable_df
 
-    def write_star_file(self, filename: str = None):
+    def write_star_file(self, filename: str = None, **kwargs):
         # Set filename
         if filename is None:
             filename = self.filename
@@ -261,7 +260,7 @@ class StarFile:
 
         # Write each data block
         for df in self.iterable_dataframes:
-            self._write_data_block(df, filename)
+            self._write_data_block(df, filename, **kwargs)
 
         # Write newline at end of file
         self._write_blank_lines(filename, 1)
@@ -277,7 +276,7 @@ class StarFile:
                 file.write(f'{line}\n')
         return
 
-    def _write_data_block(self, dataframe: pd.DataFrame, filename: str) -> List:
+    def _write_data_block(self, dataframe: pd.DataFrame, filename: str, **kwargs):
         data_block_name = 'data_' + getattr(dataframe, 'name', '')
 
         with open(filename, 'a') as file:
@@ -286,7 +285,7 @@ class StarFile:
         if dataframe.shape[0] == 1:
             self._write_data_block_simple(dataframe, filename)
         elif dataframe.shape[0] > 1:
-            self._write_data_block_loop(dataframe, filename)
+            self._write_data_block_loop(dataframe, filename, **kwargs)
         else:
             raise ValueError('DataFrame does not have at least 1 row')
         self._write_blank_lines(filename, 2)
@@ -306,12 +305,15 @@ class StarFile:
                 file.write('\n')
         return
 
-    def _write_data_block_loop(self, dataframe: pd.DataFrame, filename: str):
+    def _write_data_block_loop(self, dataframe: pd.DataFrame, filename: str, **kwargs):
         # new loopheader
         self._write_loopheader(dataframe, filename)
 
         # new main block
-        dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, float_format='%.5f')
+        if 'float_format' not in kwargs.keys():
+            dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, float_format='%.5f', **kwargs)
+        else:
+            dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, **kwargs)
         return
 
     def _append_data(self, data: pd.DataFrame):

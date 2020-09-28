@@ -5,6 +5,7 @@
 /test/data/test_write.star
 /test/data/postprocess.xlsx
 /test/data/cars.star
+/test/data/test_write_kwargs.star
 /build/
 /dist/
 /m2relion/

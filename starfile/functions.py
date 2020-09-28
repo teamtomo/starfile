@@ -26,7 +26,7 @@ def read(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     return df
 
 
-def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
+def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str, **kwargs):
     """
     Write data from pandas dataframe(s) to a star file
     :param data: data in pandas dataframe(s) to be written to file
@@ -34,7 +34,7 @@ def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
     :return:
     """
     star = StarFile(data=data)
-    star.write_star_file(filename)
+    star.write_star_file(filename, **kwargs)
     return
 
 
