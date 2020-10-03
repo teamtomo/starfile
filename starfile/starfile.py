@@ -1,4 +1,5 @@
 from linecache import getline
+from itertools import chain
 
 import pandas as pd
 from datetime import datetime
@@ -138,33 +139,18 @@ class StarFile:
     def _read_loop_data(self, start_line_number: int, end_line_number: int = None) -> pd.DataFrame:
         # Set amount of file to ignore before datablock
         header_length = start_line_number - 1
-        true_end_line_number = self._true_data_block_end(end_line_number)
 
         # Read data blocks with pandas
         if end_line_number is None:
             df = pd.read_csv(self.filename, skiprows=header_length, delim_whitespace=True, header=None, comment='#')
 
-        # workaround single line python engine problems
-        elif true_end_line_number - start_line_number == 1:
-            df = self._read_loop_data_single_line_python_engine(start_line_number, end_line_number)
-
         # case where footer is skipped
         else:
-            footer_length = self.n_lines - end_line_number
-            df = pd.read_csv(self.filename, skiprows=header_length, skipfooter=footer_length, delim_whitespace=True,
-                             engine='python', header=None, comment='#')
+            # create generator for row indices to be skipped
+            skiprows = chain(range(header_length), range(end_line_number, self.n_lines))
+            # read
+            df = pd.read_csv(self.filename, skiprows=skiprows, delim_whitespace=True, header=None, comment='#')
 
-        return df
-
-    def _read_loop_data_single_line_python_engine(self, start_line_number: int, end_line_number: int) -> pd.DataFrame:
-        """
-        workaround to avoid problems with reading single line loop blocks with the python engine of pandas.read_csv()
-        """
-        header_length = start_line_number - 1
-        footer_length = self.n_lines - end_line_number
-        data = pd.read_csv(self.filename, skiprows=header_length, skipfooter=footer_length, delim_whitespace=True,
-                             engine='python', header=0, comment='#').columns
-        df = pd.DataFrame(data).T
         return df
 
     def _read_loop_header(self, start_line_number: int) -> Tuple[list, int]:
