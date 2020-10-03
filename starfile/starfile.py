@@ -103,6 +103,7 @@ class StarFile:
         data_block = []
         line_number += 1
 
+        # iterate over lines in each block and process as keywords are reached
         for line_number in range(line_number, data_block_end):
             current_line = self._get_line(line_number)
 
@@ -121,19 +122,49 @@ class StarFile:
         return data_block
 
     def _read_loop_block(self, start_line_number: int, end_line_number: int):
+        # read header
         header, data_block_start = self._read_loop_header(start_line_number)
+
+        # get true data block endpoint
+        #end_line_number = self._true_data_block_end(end_line_number)
+
+        # read loop data into DataFrame
         df = self._read_loop_data(data_block_start, end_line_number)
+
+        # Apply headings
         df.columns = header
         return df
 
     def _read_loop_data(self, start_line_number: int, end_line_number: int = None) -> pd.DataFrame:
+        # Set amount of file to ignore before datablock
         header_length = start_line_number - 1
+        true_end_line_number = self._true_data_block_end(end_line_number)
+
+        # Read data blocks with pandas
         if end_line_number is None:
             df = pd.read_csv(self.filename, skiprows=header_length, delim_whitespace=True, header=None, comment='#')
+
+        # workaround single line python engine problems
+        elif true_end_line_number - start_line_number == 1:
+            df = self._read_loop_data_single_line_python_engine(start_line_number, end_line_number)
+
+        # case where footer is skipped
         else:
             footer_length = self.n_lines - end_line_number
             df = pd.read_csv(self.filename, skiprows=header_length, skipfooter=footer_length, delim_whitespace=True,
-                             header=None, engine='python', comment='#')
+                             engine='python', header=None, comment='#')
+
+        return df
+
+    def _read_loop_data_single_line_python_engine(self, start_line_number: int, end_line_number: int) -> pd.DataFrame:
+        """
+        workaround to avoid problems with reading single line loop blocks with the python engine of pandas.read_csv()
+        """
+        header_length = start_line_number - 1
+        footer_length = self.n_lines - end_line_number
+        data = pd.read_csv(self.filename, skiprows=header_length, skipfooter=footer_length, delim_whitespace=True,
+                             engine='python', header=0, comment='#').columns
+        df = pd.DataFrame(data).T
         return df
 
     def _read_loop_header(self, start_line_number: int) -> Tuple[list, int]:
@@ -322,6 +353,22 @@ class StarFile:
             data = [data]
         self.dataframes += data
         return
+
+    def _true_data_block_end(self, data_block_end: int) -> int:
+        """
+        trims unnecessary info from end of data block to ensure correct parsing when passed to pandas
+        """
+        current_line_number = data_block_end
+        current_line = self._get_line(current_line_number)
+
+        # step back over lines until you reach the true end of the data block
+        while current_line == "" or current_line.startswith('#'):
+            current_line_number -= 1
+            current_line = self._get_line(current_line_number)
+
+        # return new data block end
+        new_data_block_end = current_line_number + 1
+        return new_data_block_end
 
 
 
