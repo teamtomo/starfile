@@ -34,7 +34,7 @@ pip install starfile
 
 ### Reading STAR files
 To open a STAR file
-```
+```python
 >>> import starfile
 >>> df = starfile.open('test/data/one_loop.star')
 >>> df
@@ -55,7 +55,7 @@ To open a STAR file
 ```
 
 Opening STAR files containing multiple data blocks will return a list of DataFrame objects.
-```
+```python
 df = starfile.open('test/data/postprocess.star')
 >>> len(df)
 3
@@ -87,7 +87,7 @@ This functionality is also exposed by `starfile.read` for convenience.
 ### Writing STAR files
 DataFrame objects (or lists of dataframes) can be written to STAR files using `starfile.write`
 
-```
+```python
 >>> cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
                 'Price': [22000, 25000, 27000, 35000]
                 }
@@ -98,7 +98,7 @@ DataFrame objects (or lists of dataframes) can be written to STAR files using `s
 ```
 
 Produces a STAR file which looks like
-```
+```bash
 # Created by the starfile python package (version 0.1) on 18/06/2020 13:26:32
 
 data_cars
@@ -119,7 +119,7 @@ If you need to modify this behaviour, you can pass the keyword argument `float_f
 
 For example
 
-```
+```python
 starfile.new(df, 'test.star', float_format='%.12f')
 ```
 
@@ -135,7 +135,7 @@ One of the reasons for using DataFrame objects is that they provide some conveni
 
 This functionality depends on the `matplotlib` package, providing endless opportunity for customisation.
 
-```
+```python
 >>> bars
 <matplotlib.axes._subplots.AxesSubplot object at 0x7f3ed8f35640>
 ```
@@ -144,7 +144,7 @@ This functionality depends on the `matplotlib` package, providing endless opport
 Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw data for presented 
 figures as an excel spreadsheet. This is supported with the `star2excel` function.
 
-```
+```python
 >>> starfile.star2excel('test/data/postprocess.star', 'test/data/postprocess.xlsx')
 ```
 
