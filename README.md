@@ -2,6 +2,8 @@
 [![Build Status](https://travis-ci.com/alisterburt/starfile.svg?branch=master)](https://travis-ci.com/alisterburt/starfile)
 [![PyPI version](https://badge.fury.io/py/starfile.svg)](https://pypi.python.org/pypi/starfile/)
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/starfile.svg)](https://pypi.python.org/pypi/starfile/)
+[![DOI](https://zenodo.org/badge/273026988.svg)](https://zenodo.org/badge/latestdoi/273026988)
+
 
 `starfile` is a Python implementation of the [STAR](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) file format.
 
