@@ -75,9 +75,7 @@ value           16.363636  ...         32.727273
 [5 rows x 7 columns]
 
 >>> df[2].columns
-Index(['rlnResolutionSquared', 'rlnLogAmplitudesOriginal',
-'rlnLogAmplitudesWeighted'],
-      dtype='object')
+Index(['rlnResolutionSquared', 'rlnLogAmplitudesOriginal', 'rlnLogAmplitudesWeighted'], dtype='object')
 >>> df[2].name
 'guinier'
 ```
