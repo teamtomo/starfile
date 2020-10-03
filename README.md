@@ -127,7 +127,7 @@ Any keyword arguments to `starfile.new()` are passed through to pandas [DataFram
 
 ### Plotting
 One of the reasons for using DataFrame objects is that they provide some convenient data plotting tools
-```
+```python
 >>> bars = df.plot.barh(x='Brand', y='Price')
 ```
 
