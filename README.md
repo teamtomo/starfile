@@ -25,7 +25,7 @@ https://doi.org/10.1021/ci00002a020
 
 ## Installation
 Installation is available directly from the [Python package index](https://pypi.org/project/starfile/)
-```
+```bash
 pip install starfile
 ```
 
