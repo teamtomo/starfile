@@ -13,6 +13,7 @@ class StarFile:
     def __init__(self, filename: str = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
         self.filename = filename
         self.dataframes = []
+        self._n_lines = None
 
         if self.filename.exists():
             self._read_file()
@@ -46,14 +47,13 @@ class StarFile:
 
     @property
     def n_lines(self):
+        if self._n_lines:
+            return self._n_lines
+
         if self.filename.exists():
-
             with open(self.filename, 'r') as f:
-                n = sum(1 for line in f)
-            return n
-
-        else:
-            return None
+                self._n_lines = sum(1 for line in f)
+        return self._n_lines
 
     @property
     def data_block_starts(self):
