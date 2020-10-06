@@ -122,7 +122,7 @@ class StarFile:
             else:
                 data_block.append(current_line)
 
-        data_block = self._data_block_clean(data_block, data_block_name)
+        data_block = self._clean_data_block(data_block, data_block_name)
         return data_block
 
     def _read_loop_block(self, start_line_number: int, end_line_number: int):
@@ -197,7 +197,7 @@ class StarFile:
         starts_ends.append((self.data_block_starts[-1], self.n_lines))
         return starts_ends
 
-    def _data_block_clean(self, data_block, data_block_name):
+    def _clean_data_block(self, data_block, data_block_name):
         """
         Make a pandas dataframe from the names and info in a data block from a star file in a list of lists
         :param data_block:
@@ -260,13 +260,17 @@ class StarFile:
         return iterable_df
 
     def _to_numeric(self):
-        iterable_df = self.iterable_dataframes
-        for idx, df in enumerate(iterable_df):
+        for idx, df in enumerate(self.iterable_dataframes):
+            # applying pd.to_numeric loses name data of DataFrame, need to extract and reapply here
             name = getattr(df, 'name', None)
-            iterable_df[idx] = df.apply(pd.to_numeric, errors='ignore')
+
+            # to numeric
+            self.iterable_dataframes[idx] = df.apply(pd.to_numeric, errors='ignore')
+
+            # reapply name
             if name is not None:
-                iterable_df[idx].name = name
-        self.dataframes = iterable_df
+                self.iterable_dataframes[idx].name = name
+        self.dataframes = self.iterable_dataframes
 
     def write_star_file(self, filename: str = None, **kwargs):
         # Set filename
@@ -332,7 +336,7 @@ class StarFile:
 
         # new main block
         if 'float_format' not in kwargs.keys():
-            dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, float_format='%.5f', **kwargs)
+            dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, float_format='%.8f', **kwargs)
         else:
             dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, **kwargs)
         return
