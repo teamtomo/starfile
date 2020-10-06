@@ -65,16 +65,15 @@ class StarFile:
         if self._data_block_starts is not None:
             return self._data_block_starts
 
-        data_block_starts = []
+        self._data_block_starts = []
         with open(self.filename) as file:
             for idx, line in enumerate(file, 1):
                 if line.strip().startswith('data_'):
-                    data_block_starts.append(idx)
+                    self._data_block_starts.append(idx)
 
-        self._data_block_starts = data_block_starts
-
-        if len(data_block_starts) == 0:
+        if len(self.data_block_starts) == 0:
             raise ValueError(f"File with name '{self.filename}' has no valid STAR data blocks")
+
         return self._data_block_starts
 
     @property
@@ -87,7 +86,6 @@ class StarFile:
         return n_data_blocks
 
     def _read_file(self):
-        data_block_starts = self.data_block_starts
         starts_ends = self._starts_ends
         dataframes = []
 
