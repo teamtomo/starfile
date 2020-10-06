@@ -9,7 +9,8 @@
 
 It allows STAR files to be created and opened easily using a very simple API, exposing data blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) DataFrames.
 
-This library aims to allow users and developers to read and write STAR files in Python as easily as possible, and with pandas as the only dependency. You can use it interactively to inspect files, to plot data or in scripts and larger software packages to provide basic STAR file I/O functions.
+This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further data analysis in pandas. 
+You can use it interactively to inspect files, to plot data or in scripts and larger software packages to provide basic STAR file I/O functions.
 
 ```
 The STAR file: a new format for electronic data transfer and archiving
@@ -20,6 +21,7 @@ https://doi.org/10.1021/ci00002a020
 ## Features
 - Clean, simple API for reading and writing of STAR files
 - Easy to install and use
+- Uses pandas `DataFrame`s to encourage and facilitate data analysis
 - Conversion to Excel speadsheet (.xlsx)
 
 
