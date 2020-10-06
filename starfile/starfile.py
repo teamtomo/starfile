@@ -14,6 +14,7 @@ class StarFile:
         self.filename = filename
         self.dataframes = []
         self._n_lines = None
+        self._data_block_starts = None
 
         if self.filename.exists():
             self._read_file()
@@ -61,18 +62,23 @@ class StarFile:
         Return a list of indices in which line.strip() == 'data_'
         :return:
         """
+        if self._data_block_starts is not None:
+            return self._data_block_starts
+
         data_block_starts = []
         with open(self.filename) as file:
             for idx, line in enumerate(file, 1):
                 if line.strip().startswith('data_'):
                     data_block_starts.append(idx)
 
+        self._data_block_starts = data_block_starts
+
         if len(data_block_starts) == 0:
             raise ValueError(f"File with name '{self.filename}' has no valid STAR data blocks")
-        return data_block_starts
+        return self._data_block_starts
 
     @property
-    def n_data_blocks(self):
+    def _n_data_blocks(self):
         """
         Count the number of data blocks in the file
         :return:
@@ -81,9 +87,8 @@ class StarFile:
         return n_data_blocks
 
     def _read_file(self):
-        n_lines = self.n_lines
         data_block_starts = self.data_block_starts
-        starts_ends = self._starts_ends(data_block_starts, n_lines)
+        starts_ends = self._starts_ends
         dataframes = []
 
         for data_block_start, data_block_end in starts_ends:
@@ -184,13 +189,14 @@ class StarFile:
     def _get_line(self, line_number: int):
         return getline(str(self.filename), line_number).strip()
 
-    def _starts_ends(self, data_block_starts, n_lines):
+    @property
+    def _starts_ends(self):
         """
         tuple of start and end line numbers
         :return:
         """
-        starts_ends = [(start, end - 1) for start, end in zip(data_block_starts, data_block_starts[1:])]
-        starts_ends.append((data_block_starts[-1], n_lines))
+        starts_ends = [(start, end - 1) for start, end in zip(self.data_block_starts, self.data_block_starts[1:])]
+        starts_ends.append((self.data_block_starts[-1], self.n_lines))
         return starts_ends
 
     def _data_block_clean(self, data_block, data_block_name):
@@ -355,7 +361,6 @@ class StarFile:
         # return new data block end
         new_data_block_end = current_line_number + 1
         return new_data_block_end
-
 
 
 

@@ -45,7 +45,7 @@ class TestStarFile(TestCase):
 
     def test_n_data_blocks(self):
         s = StarFile(self.postprocess)
-        n_data_blocks = s.n_data_blocks
+        n_data_blocks = s._n_data_blocks
         self.assertTrue(n_data_blocks == 3)
 
     def test_read_data_block_simple(self):
