@@ -1,8 +1,10 @@
 from unittest import TestCase
 from pathlib import Path
 from starfile.starfile import StarFile
+import starfile
 
 import pandas as pd
+import numpy as np
 
 
 class TestStarFile(TestCase):
@@ -34,23 +36,13 @@ class TestStarFile(TestCase):
 
     def test_read_loop_block(self):
         s = StarFile(self.loop_simple)
-        df = s._read_loop_block(4, s.n_lines)
+        df, line_number = s._read_loop_block(5)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue(df.shape == (1365, 12))
 
-    def test_find_data_block_starts(self):
-        s = StarFile(self.postprocess)
-        db_starts = s.data_block_starts
-        self.assertTrue(db_starts == [4, 14, 75])
-
-    def test_n_data_blocks(self):
-        s = StarFile(self.postprocess)
-        n_data_blocks = s._n_data_blocks
-        self.assertTrue(n_data_blocks == 3)
-
     def test_read_data_block_simple(self):
         s = StarFile(self.postprocess)
-        df = s._read_data_block(4, 14)
+        df = s._read_data_block(4)
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue(df.shape == (1, 6))
 
@@ -118,18 +110,21 @@ class TestStarFile(TestCase):
             else:
                 self.assertTrue(df.shape == (2, 5))
 
-    def test_multi_line_c_engine(self):
+    def test_multi_line_end_of_file(self):
         sf = StarFile(self.multi_line_c_engine)
         for df in sf.dataframes:
             self.assertTrue(df.shape == (2, 5))
 
-    def test_single_line_c_engine(self):
+    def test_single_line_end_of_file(self):
         sf = StarFile(self.single_line_c_engine)
         df_last = sf.dataframes[-1]
         self.assertTrue(df_last.shape == (1, 5))
 
-    def test_single_line_python_engine(self):
+    def test_single_line_beginning_of_multiblock(self):
         sf = StarFile(self.single_line_python_engine)
         df_first = sf.dataframes[0]
         self.assertTrue(df_first.shape == (1, 5))
+
+
+
 

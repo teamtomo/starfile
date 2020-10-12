@@ -12,3 +12,4 @@
 package.sh
 setup.cfg
 MANIFEST
+/test/data/test_large_multiblock.star
