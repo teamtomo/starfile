@@ -1,26 +1,20 @@
 from linecache import getline
-from io import StringIO
 from itertools import chain
-from typing import Tuple, List, Union
-from functools import cached_property
 
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
-
+from typing import Tuple, List, Union
 
 from .version import __version__
 
 
 class StarFile:
-    def __init__(self, filename: str = 'test.star',
-                 data: Union[pd.DataFrame, List[pd.DataFrame]] = None,
-                 max_data_blocks: int = None):
+    def __init__(self, filename: str = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
         self.filename = filename
         self.dataframes = []
-        self.max_data_blocks = max_data_blocks
-        self._line_number = 1
-        self.line = ''
+        self._n_lines = None
+        self._data_block_starts = None
 
         if self.filename.exists():
             self._read_file()
@@ -36,22 +30,11 @@ class StarFile:
 
     @filename.setter
     def filename(self, filename: str):
-        self._filename = Path(filename)
-
-    @cached_property
-    def n_lines(self):
-        """
-        count number of lines in file
-        :return:
-        """
-        with open(self.filename, 'rb') as f:
-            lines = 0
-            buffer_size = 1024 * 1024
-            buffer = f.read(buffer_size)
-            while buffer:
-                lines += buffer.count(b'\n')
-                buffer = f.read(buffer_size)
-            return lines
+        if filename is not None:
+            self._filename = Path(filename)
+        else:
+            self._filename = Path('starfile_auto.star')
+        return
 
     @property
     def dataframes(self):
@@ -63,87 +46,158 @@ class StarFile:
     def dataframes(self, dataframes: List[pd.DataFrame]):
         self._dataframes = dataframes
 
-    def _read_file(self):
-        dataframes = []
-        with open(self.filename, 'r') as star_file:
-            while self._line_number <= self.n_lines + 1:
-                if self.line.startswith('data_'):
-                    dataframes.append(self._read_data_block())
+    @property
+    def n_lines(self):
+        if self._n_lines:
+            return self._n_lines
 
-                # don't read more of the file if the max number of dataframes has been reached
-                if len(dataframes) == self.max_data_blocks:
-                    break
-                self._next_line()
+        if self.filename.exists():
+            with open(self.filename, 'r') as f:
+                self._n_lines = sum(1 for line in f)
+        return self._n_lines
+
+    @property
+    def data_block_starts(self):
+        """
+        Return a list of indices in which line.strip() == 'data_'
+        :return:
+        """
+        if self._data_block_starts is not None:
+            return self._data_block_starts
+
+        self._data_block_starts = []
+        with open(self.filename) as file:
+            for idx, line in enumerate(file, 1):
+                if line.strip().startswith('data_'):
+                    self._data_block_starts.append(idx)
+
+        if len(self.data_block_starts) == 0:
+            raise ValueError(f"File with name '{self.filename}' has no valid STAR data blocks")
+
+        return self._data_block_starts
+
+    @property
+    def _n_data_blocks(self):
+        """
+        Count the number of data blocks in the file
+        :return:
+        """
+        n_data_blocks = len(self.data_block_starts)
+        return n_data_blocks
+
+    def _read_file(self):
+        starts_ends = self._starts_ends
+        dataframes = []
+
+        for data_block_start, data_block_end in starts_ends:
+            df = self._read_data_block(data_block_start, data_block_end)
+            dataframes.append(df)
 
         self.dataframes = dataframes
 
-    def _read_data_block(self):
-        # Get data block name and initialise data block
-        data_block_name = self.line[5:]
+    def _read_data_block(self, data_block_start: int, data_block_end: int):
+        line_number = data_block_start
+        current_line = self._get_line(line_number)
+
+        if not current_line.startswith('data_'):
+            raise ValueError(f'Cannot start reading loop from line which does not indicate start of data block')
+
+        data_block_name = current_line[5:]
+
         data_block = []
+        line_number += 1
 
         # iterate over lines in each block and process as keywords are reached
-        while self._line_number <= self.n_lines + 1:
-            if self.line.startswith('data_'):
-                break
+        for line_number in range(line_number, data_block_end):
+            current_line = self._get_line(line_number)
 
-            elif self.line.startswith('loop_'):
-                df = self._read_loop_block()
-                df.name = data_block_name
-                return df
-            self._next_line()
-            data_block.append(self.line)
+            if current_line.startswith('loop_'):
+                data_block = self._read_loop_block(line_number, data_block_end)
+                data_block.name = data_block_name
+                return data_block
 
+            elif current_line.startswith('#'):
+                continue
 
-        data_block = self._clean_simple_data_block(data_block, data_block_name)
+            else:
+                data_block.append(current_line)
+
+        data_block = self._clean_data_block(data_block, data_block_name)
         return data_block
 
-    def _read_loop_block(self):
+    def _read_loop_block(self, start_line_number: int, end_line_number: int):
         # read header
-        header = self._read_loop_header()
+        header, data_block_start = self._read_loop_header(start_line_number)
+
+        # get true data block endpoint
+        #end_line_number = self._true_data_block_end(end_line_number)
 
         # read loop data into DataFrame
-        df = self._read_loop_data()
+        df = self._read_loop_data(data_block_start, end_line_number)
 
         # Apply headings
         df.columns = header
         return df
 
-    def _read_loop_data(self) -> pd.DataFrame:
-        # Initialise loop data, line and line number
-        loop_data = """"""
+    def _read_loop_data(self, start_line_number: int, end_line_number: int = None) -> pd.DataFrame:
+        # Set amount of file to ignore before datablock
+        header_length = start_line_number - 1
 
-        while self._line_number <= self.n_lines + 1:
-            if self.line.startswith('data_'):
-                break
-            loop_data += self.line + '\n'
-            self._next_line()
+        # Read data blocks with pandas
+        if end_line_number is None:
+            df = pd.read_csv(self.filename, skiprows=header_length, delim_whitespace=True, header=None, comment='#')
 
-        df = pd.read_csv(StringIO(loop_data), delim_whitespace=True, header=None, comment='#')
+        # case where footer is skipped
+        else:
+            # create generator for row indices to be skipped
+            skiprows = chain(range(header_length), range(end_line_number, self.n_lines))
+            # read
+            df = pd.read_csv(self.filename, skiprows=skiprows, delim_whitespace=True, header=None, comment='#')
+
         return df
 
-    def _read_loop_header(self) -> list:
-        # Initialise loop header, line number and line
+    def _read_loop_header(self, start_line_number: int) -> Tuple[list, int]:
+        """
+
+        :param start_line_number: line number (1-indexed) with loop_ entry
+        :return:
+        """
         loop_header = []
-        self._next_line()
+        line_number = start_line_number
 
-        while self.line.startswith('_') or self.line.startswith('loop_'):
-            if self.line.startswith('_'):
-                line = self.line.split()[0][1:]  # Removes leading '_' and numbers in loopheader if present
+        # Check that loop header starts with loop
+        line = getline(str(self.filename), line_number).strip()
+        if not line.startswith('loop_'):
+            raise ValueError(f'Cannot start reading loop from line which does not indicate start of loop block')
+
+        # Advance then iterate over lines while in loop header
+        line_number +=1
+        line = self._get_line(line_number)
+
+        while line.startswith('_'):
+            if line.startswith('_'):
+                line = line.split()[0][1:]  # Removes leading '_' and numbers in loopheader if present
                 loop_header.append(line)
-            self._next_line()
+                line_number += 1
+            line = self._get_line(line_number)
 
-        return loop_header
+        data_block_start = line_number
+        return loop_header, data_block_start
 
-    def _next_line(self):
-        self._line = getline(str(self.filename), self._line_number).strip()
-        self._line_number += 1
+    def _get_line(self, line_number: int):
+        return getline(str(self.filename), line_number).strip()
 
     @property
-    def line(self):
-        return self._line
+    def _starts_ends(self):
+        """
+        tuple of start and end line numbers
+        :return:
+        """
+        starts_ends = [(start, end - 1) for start, end in zip(self.data_block_starts, self.data_block_starts[1:])]
+        starts_ends.append((self.data_block_starts[-1], self.n_lines))
+        return starts_ends
 
-    def _clean_simple_data_block(self, data_block, data_block_name):
+    def _clean_data_block(self, data_block, data_block_name):
         """
         Make a pandas dataframe from the names and info in a data block from a star file in a list of lists
         :param data_block:
@@ -152,7 +206,7 @@ class StarFile:
         data_clean = {}
         for line in data_block:
 
-            if line == '' or line.startswith('#'):
+            if line == '':
                 continue
 
             name_and_data = line.split()
@@ -299,20 +353,16 @@ class StarFile:
         trims unnecessary info from end of data block to ensure correct parsing when passed to pandas
         """
         current_line_number = data_block_end
-        current_line = self._next_line(current_line_number)
+        current_line = self._get_line(current_line_number)
 
         # step back over lines until you reach the true end of the data block
         while current_line == "" or current_line.startswith('#'):
             current_line_number -= 1
-            current_line = self._next_line(current_line_number)
+            current_line = self._get_line(current_line_number)
 
         # return new data block end
         new_data_block_end = current_line_number + 1
         return new_data_block_end
-
-    @line.setter
-    def line(self, line):
-        self._line = line
 
 
 
