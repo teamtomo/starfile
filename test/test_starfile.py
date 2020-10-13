@@ -42,7 +42,8 @@ class TestStarFile(TestCase):
 
     def test_read_data_block_simple(self):
         s = StarFile(self.postprocess)
-        df = s._read_data_block(4)
+        s._line_number = 4
+        df = s._read_data_block()
         self.assertIsInstance(df, pd.DataFrame)
         self.assertTrue(df.shape == (1, 6))
 
@@ -112,7 +113,7 @@ class TestStarFile(TestCase):
 
     def test_multi_line_end_of_file(self):
         sf = StarFile(self.multi_line_c_engine)
-        for df in sf.dataframes:
+        for df in sf.iterable_dataframes:
             self.assertTrue(df.shape == (2, 5))
 
     def test_single_line_end_of_file(self):

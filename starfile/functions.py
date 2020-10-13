@@ -6,7 +6,7 @@ from .starfile import StarFile
 from .version import __version__
 
 
-def open(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+def open(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
     Read a star file into a pandas dataframe or list of pandas dataframes
     :param filename: file from which to read data
@@ -16,13 +16,13 @@ def open(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     return df
 
 
-def read(filename: str) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+def read(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
     Read a star file into a pandas dataframe or list of pandas dataframes
     :param filename: file from which to read data
     :return:
     """
-    df = open(filename)
+    df = open(filename, max_data_blocks)
     return df
 
 
