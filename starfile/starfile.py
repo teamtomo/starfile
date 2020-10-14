@@ -1,5 +1,6 @@
 from linecache import getline
 from itertools import chain
+from functools import cached_property
 
 import pandas as pd
 from datetime import datetime
@@ -13,8 +14,6 @@ class StarFile:
     def __init__(self, filename: str = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
         self.filename = filename
         self.dataframes = []
-        self._n_lines = None
-        self._data_block_starts = None
 
         if self.filename.exists():
             self._read_file()
@@ -46,15 +45,10 @@ class StarFile:
     def dataframes(self, dataframes: List[pd.DataFrame]):
         self._dataframes = dataframes
 
-    @property
+    @cached_property
     def n_lines(self):
-        if self._n_lines:
-            return self._n_lines
-
-        if self.filename.exists():
-            with open(self.filename, 'r') as f:
-                self._n_lines = sum(1 for line in f)
-        return self._n_lines
+        with open(self.filename, 'rb') as f:
+            return sum(1 for line in f)
 
     @property
     def data_block_starts(self):
