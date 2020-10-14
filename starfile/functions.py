@@ -8,17 +8,17 @@ from .version import __version__
 
 def open(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
-    Read a star file into a pandas dataframe or list of pandas dataframes
+    Read a star file into a pandas dataframe or list of pandas data
     :param filename: file from which to read data
     :return:
     """
-    df = StarFile(filename).dataframes
+    df = StarFile(filename).data
     return df
 
 
 def read(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
-    Read a star file into a pandas dataframe or list of pandas dataframes
+    Read a star file into a pandas dataframe or list of pandas data
     :param filename: file from which to read data
     :return:
     """

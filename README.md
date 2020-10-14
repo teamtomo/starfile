@@ -85,7 +85,7 @@ Index(['rlnResolutionSquared', 'rlnLogAmplitudesOriginal', 'rlnLogAmplitudesWeig
 This functionality is also exposed by `starfile.read` for convenience.
 
 ### Writing STAR files
-DataFrame objects (or lists of dataframes) can be written to STAR files using `starfile.write`
+DataFrame objects (or lists of data) can be written to STAR files using `starfile.write`
 
 ```python
 >>> cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],

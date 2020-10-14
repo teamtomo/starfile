@@ -1,5 +1,5 @@
 from linecache import getline
-from itertools import chain
+from io import StringIO
 from functools import cached_property
 
 import pandas as pd
@@ -11,38 +11,37 @@ from .version import __version__
 
 
 class StarFile:
-    def __init__(self, filename: str = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
+    def __init__(self, filename: Union[str, Path] = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
         self.filename = filename
-        self.dataframes = []
-
-        if self.filename.exists():
-            self._read_file()
+        self.data = []
+        self.line_number = 0
+        self.max_data_blocks = None
 
         if isinstance(data, pd.DataFrame) or isinstance(data, list):
             self._append_data(data)
 
-        self._to_numeric()
+        elif self.filename is not None:
+            self.read_file()
 
     @property
     def filename(self):
         return self._filename
 
     @filename.setter
-    def filename(self, filename: str):
-        if filename is not None:
+    def filename(self, filename: Union[str, Path]):
+        if isinstance(filename, (str, Path)) and Path(filename).exists():
             self._filename = Path(filename)
         else:
-            self._filename = Path('starfile_auto.star')
-        return
+            self._filename = None
 
     @property
-    def dataframes(self):
+    def data(self):
         if len(self._dataframes) == 1 and isinstance(self._dataframes, list):
             return self._dataframes[0]
         return self._dataframes
 
-    @dataframes.setter
-    def dataframes(self, dataframes: List[pd.DataFrame]):
+    @data.setter
+    def data(self, dataframes: List[pd.DataFrame]):
         self._dataframes = dataframes
 
     @cached_property
@@ -51,167 +50,99 @@ class StarFile:
             return sum(1 for line in f)
 
     @property
-    def data_block_starts(self):
-        """
-        Return a list of indices in which line.strip() == 'data_'
-        :return:
-        """
-        if self._data_block_starts is not None:
-            return self._data_block_starts
+    def line_number(self):
+        return self._line_number
 
-        self._data_block_starts = []
-        with open(self.filename) as file:
-            for idx, line in enumerate(file, 1):
-                if line.strip().startswith('data_'):
-                    self._data_block_starts.append(idx)
-
-        if len(self.data_block_starts) == 0:
-            raise ValueError(f"File with name '{self.filename}' has no valid STAR data blocks")
-
-        return self._data_block_starts
+    @line_number.setter
+    def line_number(self, n: int):
+        self._line_number = int(n)
 
     @property
-    def _n_data_blocks(self):
-        """
-        Count the number of data blocks in the file
-        :return:
-        """
-        n_data_blocks = len(self.data_block_starts)
-        return n_data_blocks
-
-    def _read_file(self):
-        starts_ends = self._starts_ends
-        dataframes = []
-
-        for data_block_start, data_block_end in starts_ends:
-            df = self._read_data_block(data_block_start, data_block_end)
-            dataframes.append(df)
-
-        self.dataframes = dataframes
-
-    def _read_data_block(self, data_block_start: int, data_block_end: int):
-        line_number = data_block_start
-        current_line = self._get_line(line_number)
-
-        if not current_line.startswith('data_'):
-            raise ValueError(f'Cannot start reading loop from line which does not indicate start of data block')
-
-        data_block_name = current_line[5:]
-
-        data_block = []
-        line_number += 1
-
-        # iterate over lines in each block and process as keywords are reached
-        for line_number in range(line_number, data_block_end):
-            current_line = self._get_line(line_number)
-
-            if current_line.startswith('loop_'):
-                data_block = self._read_loop_block(line_number, data_block_end)
-                data_block.name = data_block_name
-                return data_block
-
-            elif current_line.startswith('#'):
-                continue
-
-            else:
-                data_block.append(current_line)
-
-        data_block = self._clean_data_block(data_block, data_block_name)
-        return data_block
-
-    def _read_loop_block(self, start_line_number: int, end_line_number: int):
-        # read header
-        header, data_block_start = self._read_loop_header(start_line_number)
-
-        # get true data block endpoint
-        #end_line_number = self._true_data_block_end(end_line_number)
-
-        # read loop data into DataFrame
-        df = self._read_loop_data(data_block_start, end_line_number)
-
-        # Apply headings
-        df.columns = header
-        return df
-
-    def _read_loop_data(self, start_line_number: int, end_line_number: int = None) -> pd.DataFrame:
-        # Set amount of file to ignore before datablock
-        header_length = start_line_number - 1
-
-        # Read data blocks with pandas
-        if end_line_number is None:
-            df = pd.read_csv(self.filename, skiprows=header_length, delim_whitespace=True, header=None, comment='#')
-
-        # case where footer is skipped
-        else:
-            # create generator for row indices to be skipped
-            skiprows = chain(range(header_length), range(end_line_number, self.n_lines))
-            # read
-            df = pd.read_csv(self.filename, skiprows=skiprows, delim_whitespace=True, header=None, comment='#')
-
-        return df
-
-    def _read_loop_header(self, start_line_number: int) -> Tuple[list, int]:
-        """
-
-        :param start_line_number: line number (1-indexed) with loop_ entry
-        :return:
-        """
-        loop_header = []
-        line_number = start_line_number
-
-        # Check that loop header starts with loop
-        line = getline(str(self.filename), line_number).strip()
-        if not line.startswith('loop_'):
-            raise ValueError(f'Cannot start reading loop from line which does not indicate start of loop block')
-
-        # Advance then iterate over lines while in loop header
-        line_number +=1
-        line = self._get_line(line_number)
-
-        while line.startswith('_'):
-            if line.startswith('_'):
-                line = line.split()[0][1:]  # Removes leading '_' and numbers in loopheader if present
-                loop_header.append(line)
-                line_number += 1
-            line = self._get_line(line_number)
-
-        data_block_start = line_number
-        return loop_header, data_block_start
+    def line(self):
+        return self._get_line(self.line_number)
 
     def _get_line(self, line_number: int):
-        return getline(str(self.filename), line_number).strip()
+        return getline(str(self.filename), int(line_number)).strip()
 
-    @property
-    def _starts_ends(self):
-        """
-        tuple of start and end line numbers
-        :return:
-        """
-        starts_ends = [(start, end - 1) for start, end in zip(self.data_block_starts, self.data_block_starts[1:])]
-        starts_ends.append((self.data_block_starts[-1], self.n_lines))
-        return starts_ends
+    def _next_line(self):
+        self.line_number += 1
 
-    def _clean_data_block(self, data_block, data_block_name):
-        """
-        Make a pandas dataframe from the names and info in a data block from a star file in a list of lists
-        :param data_block:
-        :return:
-        """
+    def read_file(self):
+        while self.line_number <= self.n_lines:
+
+            if self.line.startswith('data_'):
+                self._read_data_block()
+
+            elif len(self.data) == self.max_data_blocks:
+                break
+
+            self._next_line()
+        self._to_numeric()
+        return
+
+    def _read_data_block(self):
+        # Get data block name and initialise empty list to store data block
+        self._current_data_block_name = self.line[5:]
+        data_block = []
+
+        # iterate over lines in each block and process as keywords are reached
+        while self.line_number <= self.n_lines:
+            self._next_line()
+
+            if self.line.startswith('loop_'):
+                self._read_loop_block()
+                return
+
+            else:
+                data_block.append(self.line)
+
+        self._simple_data_block_to_dataframe(data_block)
+        return
+
+    def _read_loop_block(self):
+        self._next_line()
+        header = self._read_loop_header()
+        df = self._read_loop_data()
+        df.columns = header
+        df.name = self._current_data_block_name
+        self.data.append(df)
+        return
+
+    def _read_loop_header(self) -> List:
+        loop_header = []
+
+        while self.line.startswith('_'):
+            heading = self.line.split()[0][1:]
+            loop_header.append(heading)
+            self._next_line()
+
+        return loop_header
+
+    def _read_loop_data(self) -> pd.DataFrame:
+        buffer = """"""
+        while self.line_number <= self.n_lines:
+            if self.line.startswith('data_'):
+                break
+            buffer += self.line + '\n'
+            self._next_line()
+
+        df = pd.read_csv(StringIO(buffer), delim_whitespace=True, header=None, comment='#')
+        return df
+
+    def _simple_data_block_to_dataframe(self, data_block, data_block_name):
         data_clean = {}
         for line in data_block:
-
             if line == '':
                 continue
 
-            name_and_data = line.split()
-            key = name_and_data[0][1:]
-            value = name_and_data[1]
-
+            key = line.split()[0][1:]
+            value = line.split[1]
             data_clean[key] = value
 
         df = pd.DataFrame(data_clean, index=['value'])
-        df.name = data_block_name
-        return df
+        df.name = self._current_data_block_name
+        self.data.append(df)
+        return
 
     def to_excel(self, filename: str):
         # Sanitise filename
@@ -235,7 +166,7 @@ class StarFile:
                 else:
                     sheet_name = df_name
 
-                # Transpose 1 row dataframes for cleanness
+                # Transpose 1 row data for cleanness
                 if df.shape[0] == 1:
                     df = df.transpose()
 
@@ -247,10 +178,10 @@ class StarFile:
 
     @property
     def iterable_dataframes(self):
-        if isinstance(self.dataframes, pd.DataFrame):
-            iterable_df = [self.dataframes]
+        if isinstance(self.data, pd.DataFrame):
+            iterable_df = [self.data]
         else:
-            iterable_df = self.dataframes
+            iterable_df = self.data
         return iterable_df
 
     def _to_numeric(self):
@@ -264,7 +195,7 @@ class StarFile:
             # reapply name
             if name is not None:
                 self.iterable_dataframes[idx].name = name
-        self.dataframes = self.iterable_dataframes
+        self.data = self.iterable_dataframes
 
     def write_star_file(self, filename: str = None, **kwargs):
         # Set filename
@@ -336,10 +267,10 @@ class StarFile:
         return
 
     def _append_data(self, data: pd.DataFrame):
-        self.dataframes = self.iterable_dataframes
+        self.data = self.iterable_dataframes
         if isinstance(data, pd.DataFrame):
             data = [data]
-        self.dataframes += data
+        self.data += data
         return
 
     def _true_data_block_end(self, data_block_end: int) -> int:
