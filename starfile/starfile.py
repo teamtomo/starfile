@@ -13,12 +13,12 @@ from .version import __version__
 class StarFile:
     def __init__(self, filename: Union[str, Path] = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
         self.filename = filename
-        self.data = []
+        self.dataframes = []
         self.line_number = 0
         self.max_data_blocks = None
 
         if isinstance(data, pd.DataFrame) or isinstance(data, list):
-            self._append_data(data)
+            self._add_data(data)
 
         elif self.filename is not None:
             self.read_file()
@@ -38,11 +38,24 @@ class StarFile:
     def data(self):
         if len(self._dataframes) == 1 and isinstance(self._dataframes, list):
             return self._dataframes[0]
+        return self.dataframes
+
+    @property
+    def dataframes(self):
         return self._dataframes
 
-    @data.setter
-    def data(self, dataframes: List[pd.DataFrame]):
+    @dataframes.setter
+    def dataframes(self, dataframes: List[pd.DataFrame]):
         self._dataframes = dataframes
+
+    def _add_dataframe(self, df: pd.DataFrame):
+        self.dataframes.append(df)
+
+    def _add_data(self, data: pd.DataFrame):
+        if isinstance(data, pd.DataFrame):
+            data = [data]
+        self.dataframes += data
+        return
 
     @cached_property
     def n_lines(self):
@@ -73,7 +86,7 @@ class StarFile:
             if self.line.startswith('data_'):
                 self._read_data_block()
 
-            elif len(self.data) == self.max_data_blocks:
+            elif len(self.dataframes) == self.max_data_blocks:
                 break
 
             self._next_line()
@@ -81,7 +94,7 @@ class StarFile:
         return
 
     def _read_data_block(self):
-        # Get data block name and initialise empty list to store data block
+        # Get dataframes block name and initialise empty list to store dataframes block
         self._current_data_block_name = self.line[5:]
         data_block = []
 
@@ -105,7 +118,7 @@ class StarFile:
         df = self._read_loop_data()
         df.columns = header
         df.name = self._current_data_block_name
-        self.data.append(df)
+        self.dataframes.append(df)
         return
 
     def _read_loop_header(self) -> List:
@@ -141,7 +154,7 @@ class StarFile:
 
         df = pd.DataFrame(data_clean, index=['value'])
         df.name = self._current_data_block_name
-        self.data.append(df)
+        self.dataframes.append(df)
         return
 
     def to_excel(self, filename: str):
@@ -166,7 +179,7 @@ class StarFile:
                 else:
                     sheet_name = df_name
 
-                # Transpose 1 row data for cleanness
+                # Transpose 1 row dataframes for cleanness
                 if df.shape[0] == 1:
                     df = df.transpose()
 
@@ -178,15 +191,15 @@ class StarFile:
 
     @property
     def iterable_dataframes(self):
-        if isinstance(self.data, pd.DataFrame):
-            iterable_df = [self.data]
+        if isinstance(self.dataframes, pd.DataFrame):
+            iterable_df = [self.dataframes]
         else:
-            iterable_df = self.data
+            iterable_df = self.dataframes
         return iterable_df
 
     def _to_numeric(self):
         for idx, df in enumerate(self.iterable_dataframes):
-            # applying pd.to_numeric loses name data of DataFrame, need to extract and reapply here
+            # applying pd.to_numeric loses name dataframes of DataFrame, need to extract and reapply here
             name = getattr(df, 'name', None)
 
             # to numeric
@@ -195,7 +208,7 @@ class StarFile:
             # reapply name
             if name is not None:
                 self.iterable_dataframes[idx].name = name
-        self.data = self.iterable_dataframes
+        self.dataframes = self.iterable_dataframes
 
     def write_star_file(self, filename: str = None, **kwargs):
         # Set filename
@@ -208,7 +221,7 @@ class StarFile:
             file.write(f'# Created by the starfile python package (version {__version__}) on {now}\n')
         self._write_blank_lines(filename, 1)
 
-        # Write each data block
+        # Write each dataframes block
         for df in self.iterable_dataframes:
             self._write_data_block(df, filename, **kwargs)
 
@@ -256,7 +269,6 @@ class StarFile:
         return
 
     def _write_data_block_loop(self, dataframe: pd.DataFrame, filename: str, **kwargs):
-        # new loopheader
         self._write_loopheader(dataframe, filename)
 
         # new main block
@@ -266,28 +278,8 @@ class StarFile:
             dataframe.to_csv(filename, mode='a', sep='\t', header=False, index=False, **kwargs)
         return
 
-    def _append_data(self, data: pd.DataFrame):
-        self.data = self.iterable_dataframes
-        if isinstance(data, pd.DataFrame):
-            data = [data]
-        self.data += data
-        return
 
-    def _true_data_block_end(self, data_block_end: int) -> int:
-        """
-        trims unnecessary info from end of data block to ensure correct parsing when passed to pandas
-        """
-        current_line_number = data_block_end
-        current_line = self._get_line(current_line_number)
 
-        # step back over lines until you reach the true end of the data block
-        while current_line == "" or current_line.startswith('#'):
-            current_line_number -= 1
-            current_line = self._get_line(current_line_number)
-
-        # return new data block end
-        new_data_block_end = current_line_number + 1
-        return new_data_block_end
 
 
 

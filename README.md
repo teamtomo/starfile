@@ -7,13 +7,13 @@
 
 `starfile` is a Python implementation of the [STAR](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) file format.
 
-It allows STAR files to be created and opened easily using a very simple API, exposing data blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) DataFrames.
+It allows STAR files to be created and opened easily using a very simple API, exposing dataframes blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) DataFrames.
 
-This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further data analysis in pandas. 
-You can use it interactively to inspect files, to plot data or in scripts and larger software packages to provide basic STAR file I/O functions.
+This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further dataframes analysis in pandas. 
+You can use it interactively to inspect files, to plot dataframes or in scripts and larger software packages to provide basic STAR file I/O functions.
 
 ```
-The STAR file: a new format for electronic data transfer and archiving
+The STAR file: a new format for electronic dataframes transfer and archiving
 J. Chem. Inf. Comput. Sci. 1991, 31, 2, 326–333
 Publication Date: May 1, 1991
 https://doi.org/10.1021/ci00002a020
@@ -21,7 +21,7 @@ https://doi.org/10.1021/ci00002a020
 ## Features
 - Clean, simple API for reading and writing of STAR files
 - Easy to install and use
-- Uses pandas `DataFrame`s to encourage and facilitate data analysis
+- Uses pandas `DataFrame`s to encourage and facilitate dataframes analysis
 - Conversion to Excel speadsheet (.xlsx)
 
 
@@ -38,7 +38,7 @@ pip install starfile
 To open a STAR file
 ```python
 >>> import starfile
->>> df = starfile.open('test/data/one_loop.star')
+>>> df = starfile.open('test/dataframes/one_loop.star')
 >>> df
       rlnCoordinateX  rlnCoordinateY  ...  rlnAngleTilt rlnAnglePsi
 0           1572.444        1084.500  ...             0           0
@@ -56,9 +56,9 @@ To open a STAR file
 [1365 rows x 12 columns]
 ```
 
-Opening STAR files containing multiple data blocks will return a list of DataFrame objects.
+Opening STAR files containing multiple dataframes blocks will return a list of DataFrame objects.
 ```python
-df = starfile.open('test/data/postprocess.star')
+df = starfile.open('test/dataframes/postprocess.star')
 >>> len(df)
 3
 >>> df[0]
@@ -85,7 +85,7 @@ Index(['rlnResolutionSquared', 'rlnLogAmplitudesOriginal', 'rlnLogAmplitudesWeig
 This functionality is also exposed by `starfile.read` for convenience.
 
 ### Writing STAR files
-DataFrame objects (or lists of data) can be written to STAR files using `starfile.write`
+DataFrame objects (or lists of dataframes) can be written to STAR files using `starfile.write`
 
 ```python
 >>> cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
@@ -94,7 +94,7 @@ DataFrame objects (or lists of data) can be written to STAR files using `starfil
 
 >>> df = pd.DataFrame(cars, columns=['Brand', 'Price'])
 >>> df.name = 'cars'
->>> starfile.new(df, 'test/data/cars.star')
+>>> starfile.new(df, 'test/dataframes/cars.star')
 ```
 
 Produces a STAR file which looks like
@@ -126,7 +126,7 @@ starfile.new(df, 'test.star', float_format='%.12f')
 Any keyword arguments to `starfile.new()` are passed through to pandas [DataFrame.to_csv()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html)
 
 ### Plotting
-One of the reasons for using DataFrame objects is that they provide some convenient data plotting tools
+One of the reasons for using DataFrame objects is that they provide some convenient dataframes plotting tools
 ```python
 >>> bars = df.plot.barh(x='Brand', y='Price')
 ```
@@ -141,16 +141,16 @@ This functionality depends on the `matplotlib` package, providing endless opport
 ```
 
 ### Converting STAR files to an Excel Spreadsheet
-Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw data for presented 
+Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw dataframes for presented 
 figures as an excel spreadsheet. This is supported with the `star2excel` function.
 
 ```python
->>> starfile.star2excel('test/data/postprocess.star', 'test/data/postprocess.xlsx')
+>>> starfile.star2excel('test/dataframes/postprocess.star', 'test/dataframes/postprocess.xlsx')
 ```
 
 produces an Excel spreadsheet including column and row names from the DataFrame.
 
-![Image of data in Excel spreadsheet](./img/excel_data.png)
+![Image of dataframes in Excel spreadsheet](./img/excel_data.png)
 
 Multi-block STAR files are written as multi-sheet Excel spreadsheets
 
@@ -164,4 +164,4 @@ This functionality depends upon the `openpyxml` package
 The project is released under the BSD 3-Clause License
 
 ## Known Issues
-- Cannot handle more than one loop in a data block as found in mmCIF files
+- Cannot handle more than one loop in a dataframes block as found in mmCIF files

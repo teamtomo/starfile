@@ -35,39 +35,30 @@ class TestStarFile(TestCase):
 
     def test_read_loop_block(self):
         s = StarFile(self.loop_simple)
-        self.assertIsInstance(s.data, pd.DataFrame)
-        self.assertTrue(df.shape == (1365, 12))
-
-    def test_find_data_block_starts(self):
-        s = StarFile(self.postprocess)
-        db_starts = s.data_block_starts
-        self.assertTrue(db_starts == [4, 14, 75])
-
-    def test_n_data_blocks(self):
-        s = StarFile(self.postprocess)
-        n_data_blocks = s._n_data_blocks
-        self.assertTrue(n_data_blocks == 3)
+        self.assertIsInstance(s.dataframes, pd.DataFrame)
+        self.assertTrue(s.dataframes.shape == (1365, 12))
 
     def test_read_data_block_simple(self):
         s = StarFile(self.postprocess)
-        df = s._read_data_block(4, 14)
-        self.assertIsInstance(df, pd.DataFrame)
-        self.assertTrue(df.shape == (1, 6))
+        s.line_number = 4
+        s._read_data_block()
+        self.assertIsInstance(s.dataframes, pd.DataFrame)
+        self.assertTrue(s.dataframes.shape == (1, 6))
 
     def test_read_file_loop(self):
         s = StarFile(self.loop_simple)
         s.read_file()
-        self.assertIsInstance(s.data, pd.DataFrame)
-        self.assertTrue(s.data.shape == (1365, 12))
+        self.assertIsInstance(s.dataframes, pd.DataFrame)
+        self.assertTrue(s.dataframes.shape == (1365, 12))
 
     def test_read_file_multiblock(self):
         s = StarFile(self.postprocess)
         s.read_file()
-        self.assertTrue(len(s.data) == 3)
-        self.assertTrue(all([isinstance(s.data[i], pd.DataFrame) for i in range(3)]))
-        self.assertTrue(s.data[0].shape == (1, 6))
-        self.assertTrue(s.data[1].shape == (49, 7))
-        self.assertTrue(s.data[2].shape == (49, 3))
+        self.assertTrue(len(s.dataframes) == 3)
+        self.assertTrue(all([isinstance(s.dataframes[i], pd.DataFrame) for i in range(3)]))
+        self.assertTrue(s.dataframes[0].shape == (1, 6))
+        self.assertTrue(s.dataframes[1].shape == (49, 7))
+        self.assertTrue(s.dataframes[2].shape == (49, 3))
 
     def test_write_excel(self):
         s = StarFile(self.postprocess)
@@ -76,7 +67,7 @@ class TestStarFile(TestCase):
 
     def test_write_simple_block(self):
         s = StarFile(self.postprocess)
-        s.data = s.data[0]
+        s.dataframes = s.dataframes[0]
         s.write_star_file(Path('test', 'data', 'basic_block.star'))
 
     def test_write_loop(self):
@@ -85,32 +76,32 @@ class TestStarFile(TestCase):
 
     def test_write_multiblock(self):
         s = StarFile(self.postprocess)
-        self.assertTrue(s.data[0].name == 'general')
+        self.assertTrue(s.dataframes[0].name == 'general')
         s.write_star_file(Path('test', 'data', 'multiblock.star'))
 
     def test_create_from_dataframe(self):
         s = StarFile(data=self.test_df)
-        self.assertIsInstance(s.data, pd.DataFrame)
+        self.assertIsInstance(s.dataframes, pd.DataFrame)
 
     def test_create_from_dataframes(self):
         df = [self.test_df, self.test_df]
         s = StarFile(data=df)
-        self.assertTrue(len(s.data) == 2)
-        self.assertIsInstance(s.data[0], pd.DataFrame)
+        self.assertTrue(len(s.dataframes) == 2)
+        self.assertIsInstance(s.dataframes[0], pd.DataFrame)
 
     def test_read_pipeline(self):
         s = StarFile(self.pipeline)
-        self.assertIsInstance(s.data, list)
+        self.assertIsInstance(s.dataframes, list)
         for i in range(5):
-            self.assertIsInstance(s.data[i], pd.DataFrame)
+            self.assertIsInstance(s.dataframes[i], pd.DataFrame)
 
         # Check that comments are handled properly for blocks now and aren't included in df
-        self.assertTrue(s.data[0].shape == (1, 1))
+        self.assertTrue(s.dataframes[0].shape == (1, 1))
 
 
     def test_read_optics_group_inter1965(self):
         sf = StarFile(self.optics_group_rln31)
-        for idx, df in enumerate(sf.data):
+        for idx, df in enumerate(sf.dataframes):
             self.assertIsInstance(df, pd.DataFrame)
             if idx == 0:
                 self.assertTrue(df.shape == (1, 7))
@@ -120,16 +111,16 @@ class TestStarFile(TestCase):
 
     def test_multi_line_c_engine(self):
         sf = StarFile(self.multi_line_c_engine)
-        for df in sf.data:
+        for df in sf.dataframes:
             self.assertTrue(df.shape == (2, 5))
 
     def test_single_line_c_engine(self):
         sf = StarFile(self.single_line_c_engine)
-        df_last = sf.data[-1]
+        df_last = sf.dataframes[-1]
         self.assertTrue(df_last.shape == (1, 5))
 
     def test_single_line_python_engine(self):
         sf = StarFile(self.single_line_python_engine)
-        df_first = sf.data[0]
+        df_first = sf.dataframes[0]
         self.assertTrue(df_first.shape == (1, 5))
 

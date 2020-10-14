@@ -8,18 +8,18 @@ from .version import __version__
 
 def open(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
-    Read a star file into a pandas dataframe or list of pandas data
-    :param filename: file from which to read data
+    Read a star file into a pandas dataframe or list of pandas dataframes
+    :param filename: file from which to read dataframes
     :return:
     """
-    df = StarFile(filename).data
+    df = StarFile(filename).dataframes
     return df
 
 
 def read(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
-    Read a star file into a pandas dataframe or list of pandas data
-    :param filename: file from which to read data
+    Read a star file into a pandas dataframe or list of pandas dataframes
+    :param filename: file from which to read dataframes
     :return:
     """
     df = open(filename, max_data_blocks)
@@ -28,9 +28,9 @@ def read(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List
 
 def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str, **kwargs):
     """
-    Write data from pandas dataframe(s) to a star file
-    :param data: data in pandas dataframe(s) to be written to file
-    :param filename: filename in which to new data
+    Write dataframes from pandas dataframe(s) to a star file
+    :param data: dataframes in pandas dataframe(s) to be written to file
+    :param filename: filename in which to new dataframes
     :return:
     """
     star = StarFile(data=data)
@@ -40,9 +40,9 @@ def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str, **kwargs):
 
 def write(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
     """
-    Write data from pandas dataframe(s) to a star file
-    :param data: data in pandas dataframe(s) to be written to file
-    :param filename: filename in which to new data
+    Write dataframes from pandas dataframe(s) to a star file
+    :param data: dataframes in pandas dataframe(s) to be written to file
+    :param filename: filename in which to new dataframes
     :return:
     """
     star = StarFile(data=data)
