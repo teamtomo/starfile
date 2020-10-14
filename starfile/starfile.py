@@ -51,10 +51,11 @@ class StarFile:
     def _add_dataframe(self, df: pd.DataFrame):
         self.dataframes.append(df)
 
-    def _add_data(self, data: pd.DataFrame):
+    def _add_data(self, data: Union[pd.DataFrame, List[pd.DataFrame]]):
         if isinstance(data, pd.DataFrame):
             data = [data]
-        self.dataframes += data
+        for df in data:
+            self.add_dataframe(df)
         return
 
     @cached_property
@@ -82,14 +83,15 @@ class StarFile:
 
     def read_file(self):
         while self.line_number <= self.n_lines:
-
             if self.line.startswith('data_'):
                 self._read_data_block()
 
             elif len(self.dataframes) == self.max_data_blocks:
                 break
 
-            self._next_line()
+            if not self.line.startswith('data_'):
+                self._next_line()
+
         self._to_numeric()
         return
 
@@ -106,10 +108,11 @@ class StarFile:
                 self._read_loop_block()
                 return
 
-            else:
-                data_block.append(self.line)
+            elif self.line.startswith('data_'):
+                self._simple_data_block_to_dataframe(data_block)
+                return
 
-        self._simple_data_block_to_dataframe(data_block)
+            data_block.append(self.line)
         return
 
     def _read_loop_block(self):
@@ -142,19 +145,19 @@ class StarFile:
         df = pd.read_csv(StringIO(buffer), delim_whitespace=True, header=None, comment='#')
         return df
 
-    def _simple_data_block_to_dataframe(self, data_block, data_block_name):
+    def _simple_data_block_to_dataframe(self, data_block):
         data_clean = {}
         for line in data_block:
             if line == '':
                 continue
 
             key = line.split()[0][1:]
-            value = line.split[1]
+            value = line.split()[1]
             data_clean[key] = value
 
         df = pd.DataFrame(data_clean, index=['value'])
         df.name = self._current_data_block_name
-        self.dataframes.append(df)
+        self._add_dataframe(df)
         return
 
     def to_excel(self, filename: str):
