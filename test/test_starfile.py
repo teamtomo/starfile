@@ -28,10 +28,8 @@ class TestStarFile(TestCase):
 
     def test_read_loopheader(self):
         s = StarFile(self.loop_simple)
-        s.line_number = 5
-        header = s._read_loop_header()
-        self.assertTrue('rlnCoordinateX' in header)
-        self.assertTrue(len(header) == 12)
+        self.assertTrue('rlnCoordinateX' in s.data.columns)
+        self.assertTrue(len(s.data.columns) == 12)
 
     def test_read_loop_block(self):
         s = StarFile(self.loop_simple)
@@ -40,12 +38,13 @@ class TestStarFile(TestCase):
 
     def test_read_data_block_simple(self):
         s = StarFile(self.postprocess)
-        self.assertIsInstance(s.dataframes[0], pd.DataFrame)
-        self.assertTrue(s.dataframes[0].shape == (1, 6))
+        s.line_number = 4
+        s._read_data_block()
+        self.assertIsInstance(s.dataframes[-1], pd.DataFrame)
+        self.assertTrue(s.dataframes[-1].shape == (1, 6))
 
     def test_read_file_loop(self):
         s = StarFile(self.loop_simple)
-        s.read_file()
         self.assertIsInstance(s.data, pd.DataFrame)
         self.assertTrue(s.data.shape == (1365, 12))
 
@@ -78,7 +77,7 @@ class TestStarFile(TestCase):
 
     def test_create_from_dataframe(self):
         s = StarFile(data=self.test_df)
-        self.assertIsInstance(s.dataframes[0], pd.DataFrame)
+        self.assertIsInstance(s.data, pd.DataFrame)
 
     def test_create_from_dataframes(self):
         df = [self.test_df, self.test_df]
