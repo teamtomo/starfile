@@ -11,11 +11,13 @@ from .version import __version__
 
 
 class StarFile:
-    def __init__(self, filename: Union[str, Path] = None, data: Union[pd.DataFrame, List[pd.DataFrame]] = None):
+    def __init__(self, filename: Union[str, Path] = None,
+                 data: Union[pd.DataFrame, List[pd.DataFrame]] = None,
+                 read_n_blocks=None):
         self.filename = filename
         self.dataframes = []
         self.line_number = 0
-        self.max_data_blocks = None
+        self.n_data_blocks = read_n_blocks
 
         if isinstance(data, pd.DataFrame) or isinstance(data, list):
             self._add_data(data)
@@ -83,11 +85,11 @@ class StarFile:
 
     def read_file(self):
         while self.line_number <= self.n_lines:
-            if self.line.startswith('data_'):
-                self._read_data_block()
-
-            elif len(self.dataframes) == self.max_data_blocks:
+            if len(self.dataframes) == self.n_data_blocks:
                 break
+
+            elif self.line.startswith('data_'):
+                self._read_data_block()
 
             if not self.line.startswith('data_'):
                 self._next_line()
@@ -201,12 +203,12 @@ class StarFile:
         return iterable_df
 
     def _to_numeric(self):
-        for idx, df in enumerate(self.iterable_dataframes):
+        for idx, df in enumerate(self.dataframes):
             # applying pd.to_numeric loses name dataframes of DataFrame, need to extract and reapply here
             name = getattr(df, 'name', None)
 
             # to numeric
-            self.iterable_dataframes[idx] = df.apply(pd.to_numeric, errors='ignore')
+            self.dataframes[idx] = df.apply(pd.to_numeric, errors='ignore')
 
             # reapply name
             if name is not None:

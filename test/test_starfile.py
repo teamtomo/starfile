@@ -120,3 +120,8 @@ class TestStarFile(TestCase):
         df_first = sf.dataframes[0]
         self.assertTrue(df_first.shape == (1, 5))
 
+    def test_read_n_blocks(self):
+        sf = StarFile(self.single_line_python_engine, read_n_blocks=1)
+        self.assertTrue(len(sf.dataframes) == 1)
+
+
