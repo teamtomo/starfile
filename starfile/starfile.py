@@ -1,11 +1,10 @@
 from linecache import getline
 from io import StringIO
-from functools import cached_property
 
 import pandas as pd
 from datetime import datetime
 from pathlib import Path
-from typing import Tuple, List, Union
+from typing import List, Union
 
 from .version import __version__
 
@@ -17,6 +16,8 @@ class StarFile:
         self.filename = filename
         self.dataframes = []
         self.line_number = 0
+        if self.filename is not None:
+            self.n_lines = None
         self.n_data_blocks = read_n_blocks
 
         if isinstance(data, pd.DataFrame) or isinstance(data, list):
@@ -60,10 +61,17 @@ class StarFile:
             self._add_dataframe(df)
         return
 
-    @cached_property
+    @property
     def n_lines(self):
-        with open(self.filename, 'rb') as f:
-            return sum(1 for line in f)
+        return self._n_lines
+
+    @n_lines.setter
+    def n_lines(self, value):
+        if value is None and self.filename.exists():
+            with open(self.filename, 'rb') as f:
+                self._n_lines = sum(1 for line in f)
+        else:
+            return None
 
     @property
     def line_number(self):
