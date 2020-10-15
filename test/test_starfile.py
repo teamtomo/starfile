@@ -63,7 +63,6 @@ class TestStarFile(TestCase):
 
     def test_write_simple_block(self):
         s = StarFile(self.postprocess)
-        s.dataframes = s.dataframes[0]
         s.write_star_file(Path('test', 'data', 'basic_block.star'))
 
     def test_write_loop(self):

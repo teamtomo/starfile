@@ -171,7 +171,7 @@ class StarFile:
         used_sheet_names = []
         sheet_index = 1
 
-        iterable_df = self.iterable_dataframes
+        iterable_df = self.dataframes
 
         with pd.ExcelWriter(filename) as writer:
             for df in iterable_df:
@@ -194,14 +194,6 @@ class StarFile:
 
         return
 
-    @property
-    def iterable_dataframes(self):
-        if isinstance(self.dataframes, pd.DataFrame):
-            iterable_df = [self.dataframes]
-        else:
-            iterable_df = self.dataframes
-        return iterable_df
-
     def _to_numeric(self):
         for idx, df in enumerate(self.dataframes):
             # applying pd.to_numeric loses name dataframes of DataFrame, need to extract and reapply here
@@ -212,8 +204,7 @@ class StarFile:
 
             # reapply name
             if name is not None:
-                self.iterable_dataframes[idx].name = name
-        self.dataframes = self.iterable_dataframes
+                self.dataframes[idx].name = name
 
     def write_star_file(self, filename: str = None, **kwargs):
         # Set filename
@@ -227,7 +218,7 @@ class StarFile:
         self._write_blank_lines(filename, 1)
 
         # Write each dataframes block
-        for df in self.iterable_dataframes:
+        for df in self.dataframes:
             self._write_data_block(df, filename, **kwargs)
 
         # Write newline at end of file
