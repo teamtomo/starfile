@@ -12,7 +12,7 @@ def open(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List
     :param filename: file from which to read dataframes
     :return:
     """
-    df = StarFile(filename).dataframes
+    df = StarFile(filename).data
     return df
 
 

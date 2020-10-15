@@ -78,7 +78,7 @@ class TestStarFile(TestCase):
 
     def test_create_from_dataframe(self):
         s = StarFile(data=self.test_df)
-        self.assertIsInstance(s.dataframes, pd.DataFrame)
+        self.assertIsInstance(s.dataframes[0], pd.DataFrame)
 
     def test_create_from_dataframes(self):
         df = [self.test_df, self.test_df]

@@ -55,7 +55,7 @@ class StarFile:
         if isinstance(data, pd.DataFrame):
             data = [data]
         for df in data:
-            self.add_dataframe(df)
+            self._add_dataframe(df)
         return
 
     @cached_property
@@ -148,7 +148,7 @@ class StarFile:
     def _simple_data_block_to_dataframe(self, data_block):
         data_clean = {}
         for line in data_block:
-            if line == '':
+            if line == '' or line.startswith('#'):
                 continue
 
             key = line.split()[0][1:]
