@@ -21,7 +21,7 @@ https://doi.org/10.1021/ci00002a020
 ## Features
 - Clean, simple API for reading and writing of STAR files
 - Easy to install and use
-- Uses pandas `DataFrame`s to encourage and facilitate dataframes analysis
+- Uses pandas `DataFrame`s to encourage and facilitate further analysis
 - Conversion to Excel speadsheet (.xlsx)
 
 
