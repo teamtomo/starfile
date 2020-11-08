@@ -5,12 +5,13 @@
 [![DOI](https://zenodo.org/badge/273026988.svg)](https://zenodo.org/badge/latestdoi/273026988)
 
 
-`starfile` is a Python implementation of the [STAR](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) file format.
+`starfile` is a Python implementation of the [STAR](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) file format designed principally for compatibility with [RELION](https://github.com/3dem/relion) STAR files.
 
-It allows STAR files to be created and opened easily using a very simple API, exposing dataframes blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) DataFrames.
+It allows STAR files to be created and opened easily using a very simple API, exposing data blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) `DataFrame` objects.
 
-This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further dataframes analysis in pandas. 
-You can use it interactively to inspect files, to plot dataframes or in scripts and larger software packages to provide basic STAR file I/O functions.
+This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further analysis of dataframes within the [SciPy](https://www.scipy.org/) ecosystem.
+
+You can use it interactively to inspect/explore files or in scripts and larger software packages to provide basic STAR file I/O functions.
 
 ```
 The STAR file: a new format for electronic dataframes transfer and archiving
@@ -19,9 +20,9 @@ Publication Date: May 1, 1991
 https://doi.org/10.1021/ci00002a020
 ```
 ## Features
-- Clean, simple API for reading and writing of STAR files
 - Easy to install and use
-- Uses pandas `DataFrame`s to encourage and facilitate further analysis
+- Simple API for reading of STAR files as pandas `DataFrame` objects
+- Simple API for writing of STAR files from pandas `DataFrame` objects
 - Conversion to Excel speadsheet (.xlsx)
 
 
