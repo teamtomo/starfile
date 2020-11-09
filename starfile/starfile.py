@@ -118,7 +118,7 @@ class StarFile:
                 self._read_loop_block()
                 return
 
-            elif self.line.startswith('data_'):
+            elif self.line.startswith('data_') or self.line_number == self.n_lines:
                 self._simple_data_block_to_dataframe(data_block)
                 return
 

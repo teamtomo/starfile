@@ -8,14 +8,23 @@ import pandas as pd
 class TestStarFile(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.loop_simple = Path().joinpath('test', 'data', 'one_loop.star')
-        self.postprocess = Path().joinpath('test', 'data', 'postprocess.star')
-        self.pipeline = Path().joinpath('test', 'data', 'default_pipeline.star')
-        self.optics_group_rln31 = Path().joinpath('test', 'data', 'optics_group_inter1965_simpler.star')
-        self.mmcif = Path().joinpath('test', 'data', '3ja6.cif')
-        self.multi_line_c_engine = Path().joinpath('test', 'data', 'multi_line_c_engine.star')
-        self.single_line_c_engine = Path().joinpath('test', 'data', 'single_line_c_engine.star')
-        self.single_line_python_engine = Path().joinpath('test', 'data', 'single_line_python_engine.star')
+        self.test = Path('test') / 'data'
+        self.loop_simple = self.test / 'one_loop.star'
+        self.postprocess = self.test / 'postprocess.star'
+        self.pipeline = self.test / 'default_pipeline.star'
+        self.optics_group_rln31 = self.test / 'optics_group_inter1965_simpler.star'
+        self.mmcif = self.test / '3ja6.cif'
+        self.multi_line_c_engine = self.test / 'multi_line_c_engine.star'
+        self.single_line_c_engine = self.test / 'single_line_c_engine.star'
+        self.single_line_python_engine = self.test / 'single_line_python_engine.star'
+        self.class3d_25k = self.test / 'class3d_25k.star'
+
+        relion_tutorial = self.test / 'relion_tutorial'
+        self.optimiser_2d = relion_tutorial / 'run_it025_optimiser_2D.star'
+        self.optimiser_3d = relion_tutorial / 'run_it025_optimiser_3D.star'
+        self.sampling_2d = relion_tutorial / 'run_it025_sampling_2D.star'
+        self.sampling_3d = relion_tutorial / 'run_it025_sampling_3D.star'
+
         cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
                 'Price': [22000, 25000, 27000, 35000]
                 }
@@ -93,7 +102,6 @@ class TestStarFile(TestCase):
         # Check that comments are handled properly for blocks now and aren't included in df
         self.assertTrue(s.dataframes[0].shape == (1, 1))
 
-
     def test_read_optics_group_inter1965(self):
         sf = StarFile(self.optics_group_rln31)
         for idx, df in enumerate(sf.dataframes):
@@ -122,5 +130,26 @@ class TestStarFile(TestCase):
     def test_read_n_blocks(self):
         sf = StarFile(self.single_line_python_engine, read_n_blocks=1)
         self.assertTrue(len(sf.dataframes) == 1)
+
+    def test_large_file(self):
+        sf = StarFile(self.class3d_25k)
+        self.assertTrue(len(sf.dataframes) == 1)
+
+    def test_read_optimiser_2d(self):
+        sf = StarFile(self.optimiser_2d)
+        self.assertTrue(len(sf.dataframes) == 1)
+
+    def test_read_optimiser_3d(self):
+        sf = StarFile(self.optimiser_3d)
+        self.assertTrue(len(sf.dataframes) == 1)
+
+    def test_read_sampling_2d(self):
+        sf = StarFile(self.sampling_2d)
+        self.assertTrue(len(sf.dataframes) == 1)
+
+    def test_read_sampling_3d(self):
+        sf = StarFile(self.sampling_3d)
+        self.assertTrue(len(sf.dataframes) == 2)
+
 
 
