@@ -9,7 +9,7 @@
 
 It allows STAR files to be created and opened easily using a very simple API, exposing data blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) `DataFrame` objects.
 
-This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further analysis of dataframes within the [SciPy](https://www.scipy.org/) ecosystem.
+This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further analysis of data within the [SciPy](https://www.scipy.org/) ecosystem.
 
 You can use it interactively to inspect/explore files or in scripts and larger software packages to provide basic STAR file I/O functions.
 
