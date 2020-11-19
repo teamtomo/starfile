@@ -126,23 +126,9 @@ starfile.new(df, 'test.star', float_format='%.12f')
 
 Any keyword arguments to `starfile.new()` are passed through to pandas [DataFrame.to_csv()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html)
 
-### Plotting
-One of the reasons for using DataFrame objects is that they provide some convenient dataframes plotting tools
-```python
->>> bars = df.plot.barh(x='Brand', y='Price')
-```
-
-![Horizontal bar plot of car prices](./img/barh.png)
-
-This functionality depends on the `matplotlib` package, providing endless opportunity for customisation.
-
-```python
->>> bars
-<matplotlib.axes._subplots.AxesSubplot object at 0x7f3ed8f35640>
-```
 
 ### Converting STAR files to an Excel Spreadsheet
-Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw dataframes for presented 
+Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw data for presented 
 figures as an excel spreadsheet. This is supported with the `star2excel` function.
 
 ```python
@@ -158,7 +144,6 @@ Multi-block STAR files are written as multi-sheet Excel spreadsheets
 ![Image of different Excel sheet names](./img/excel_multisheet.png)
 
 This functionality depends upon the `openpyxml` package
-
 
 
 ## License
