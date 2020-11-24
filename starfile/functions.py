@@ -1,4 +1,5 @@
 from typing import Union, List
+from pathlib import Path
 
 import pandas as pd
 
@@ -6,23 +7,25 @@ from .starfile import StarFile
 from .version import __version__
 
 
-def open(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+def open(filename: str, n_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
     Read a star file into a pandas dataframe or list of pandas dataframes
     :param filename: file from which to read dataframes
     :return:
     """
-    df = StarFile(filename).data
-    return df
+    if Path(filename).exists():
+        return StarFile(filename, read_n_blocks=n_data_blocks).data
+    else:
+        raise FileNotFoundError
 
 
-def read(filename: str, max_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+def read(filename: str, n_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
     Read a star file into a pandas dataframe or list of pandas dataframes
     :param filename: file from which to read dataframes
     :return:
     """
-    df = open(filename, max_data_blocks)
+    df = open(filename, n_data_blocks)
     return df
 
 

@@ -1,4 +1,4 @@
-from unittest import TestCase
+from unittest import TestCase, expectedFailure
 from pathlib import Path
 
 import pandas as pd
@@ -27,3 +27,9 @@ class TestFunctions(TestCase):
         test_df = pd.DataFrame(cars, columns=['Brand', 'Price'])
         starfile.new(test_df, Path('test', 'data', 'test_write_kwargs.star'), float_format='%.5f')
         self.assertTrue(Path('test','data','test_write_kwargs.star').exists())
+
+    @expectedFailure
+    def test_read_non_existent_file(self):
+        f = Path('non-existent-file.star')
+        assert f.exists() is False
+        starfile.read(f)
