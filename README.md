@@ -9,7 +9,7 @@
 
 It allows STAR files to be created and opened easily using a very simple API, exposing data blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) `DataFrame` objects.
 
-This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further analysis of data within the [SciPy](https://www.scipy.org/) ecosystem.
+This library aims to allow users and developers to read and write STAR files in Python as easily as possible as well as to encourage further analysis of data within the scientific Python ([SciPy](https://www.scipy.org/)) ecosystem.
 
 You can use it interactively to inspect/explore files or in scripts and larger software packages to provide basic STAR file I/O functions.
 
@@ -126,23 +126,9 @@ starfile.new(df, 'test.star', float_format='%.12f')
 
 Any keyword arguments to `starfile.new()` are passed through to pandas [DataFrame.to_csv()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html)
 
-### Plotting
-One of the reasons for using DataFrame objects is that they provide some convenient dataframes plotting tools
-```python
->>> bars = df.plot.barh(x='Brand', y='Price')
-```
-
-![Horizontal bar plot of car prices](./img/barh.png)
-
-This functionality depends on the `matplotlib` package, providing endless opportunity for customisation.
-
-```python
->>> bars
-<matplotlib.axes._subplots.AxesSubplot object at 0x7f3ed8f35640>
-```
 
 ### Converting STAR files to an Excel Spreadsheet
-Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw dataframes for presented 
+Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw data for presented 
 figures as an excel spreadsheet. This is supported with the `star2excel` function.
 
 ```python
@@ -160,9 +146,8 @@ Multi-block STAR files are written as multi-sheet Excel spreadsheets
 This functionality depends upon the `openpyxml` package
 
 
-
 ## License
 The project is released under the BSD 3-Clause License
 
 ## Known Issues
-- Cannot handle more than one loop in a dataframes block as found in mmCIF files
+- Cannot handle more than one loop in a data block as found in mmCIF files
