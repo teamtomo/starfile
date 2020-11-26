@@ -7,4 +7,4 @@ python:
 install:
   - pip install -r requirements.txt; pip install pytest
 
-script: pythom -m pytest
+script: python -m pytest
