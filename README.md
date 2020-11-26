@@ -39,7 +39,7 @@ pip install starfile
 To open a STAR file
 ```python
 >>> import starfile
->>> df = starfile.open('test/dataframes/one_loop.star')
+>>> df = starfile.open('tests/dataframes/one_loop.star')
 >>> df
       rlnCoordinateX  rlnCoordinateY  ...  rlnAngleTilt rlnAnglePsi
 0           1572.444        1084.500  ...             0           0
@@ -59,7 +59,7 @@ To open a STAR file
 
 Opening STAR files containing multiple dataframes blocks will return a list of DataFrame objects.
 ```python
-df = starfile.open('test/dataframes/postprocess.star')
+df = starfile.open('tests/dataframes/postprocess.star')
 >>> len(df)
 3
 >>> df[0]
@@ -95,7 +95,7 @@ DataFrame objects (or lists of dataframes) can be written to STAR files using `s
 
 >>> df = pd.DataFrame(cars, columns=['Brand', 'Price'])
 >>> df.name = 'cars'
->>> starfile.new(df, 'test/dataframes/cars.star')
+>>> starfile.new(df, 'tests/dataframes/cars.star')
 ```
 
 Produces a STAR file which looks like
@@ -121,7 +121,7 @@ If you need to modify this behaviour, you can pass the keyword argument `float_f
 For example
 
 ```python
-starfile.new(df, 'test.star', float_format='%.12f')
+starfile.new(df, 'tests.star', float_format='%.12f')
 ```
 
 Any keyword arguments to `starfile.new()` are passed through to pandas [DataFrame.to_csv()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html)
@@ -132,7 +132,7 @@ Perhaps you aren't comfortable plotting in Python, or maybe a journal requires s
 figures as an excel spreadsheet. This is supported with the `star2excel` function.
 
 ```python
->>> starfile.star2excel('test/dataframes/postprocess.star', 'test/dataframes/postprocess.xlsx')
+>>> starfile.star2excel('tests/dataframes/postprocess.star', 'tests/dataframes/postprocess.xlsx')
 ```
 
 produces an Excel spreadsheet including column and row names from the DataFrame.
