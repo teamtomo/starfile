@@ -4,7 +4,7 @@ import pandas as pd
 
 from starfile.starfile import StarFile
 from .constants import loop_simple, postprocess, pipeline, rln31_style, optimiser_2d, optimiser_3d, sampling_2d, \
-    sampling_3d
+    sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock
 
 
 def test_instantiation():
@@ -91,6 +91,15 @@ def test_read_n_blocks():
     sf = StarFile(postprocess, read_n_blocks=1)
     assert len(sf.dataframes) == 1
 
+
+def test_single_line_middle_of_multiblock():
+    sf = StarFile(single_line_middle_of_multiblock)
+    assert len(sf.dataframes) == 2
+
+
+def test_single_line_end_of_multiblock():
+    sf = StarFile(single_line_end_of_multiblock)
+    assert len(sf.dataframes) == 2
 
 def test_read_optimiser_2d():
     sf = StarFile(optimiser_2d)
