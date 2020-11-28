@@ -69,6 +69,7 @@ def test_read_pipeline():
     # Check that comments aren't included in df
     assert s.dataframes[0].shape == (1, 1)
 
+
 def test_read_rln31():
     """
     Check that reading of RELION 3.1 style star files works properly
@@ -88,8 +89,13 @@ def test_read_n_blocks():
     Check that passing read_n_blocks allows reading of only a specified
     number of data blocks from a star file
     """
+    # test 1 block
     sf = StarFile(postprocess, read_n_blocks=1)
     assert len(sf.dataframes) == 1
+
+    # test 2 blocks
+    sf = StarFile(postprocess, read_n_blocks=2)
+    assert len(sf.dataframes) == 2
 
 
 def test_single_line_middle_of_multiblock():
@@ -100,22 +106,29 @@ def test_single_line_middle_of_multiblock():
 def test_single_line_end_of_multiblock():
     sf = StarFile(single_line_end_of_multiblock)
     assert len(sf.dataframes) == 2
+    assert sf.dataframes[-1].shape[0] == 1
+
 
 def test_read_optimiser_2d():
     sf = StarFile(optimiser_2d)
     assert len(sf.dataframes) == 1
+    assert sf.data.shape == (1, 84)
 
 
 def test_read_optimiser_3d():
     sf = StarFile(optimiser_3d)
     assert len(sf.dataframes) == 1
+    assert sf.data.shape == (1, 84)
 
 
 def test_read_sampling_2d():
     sf = StarFile(sampling_2d)
     assert len(sf.dataframes) == 1
+    assert sf.data.shape == (1, 12)
 
 
 def test_read_sampling_3d():
     sf = StarFile(sampling_3d)
     assert len(sf.dataframes) == 2
+    assert sf.dataframes[0].shape == (1, 15)
+    assert sf.dataframes[1].shape == (192, 2)
