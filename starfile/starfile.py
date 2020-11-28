@@ -170,38 +170,6 @@ class StarFile:
         self._add_dataframe(df)
         return
 
-    def to_excel(self, filename: str):
-        # Sanitise filename
-        if not str(filename).endswith('.xlsx'):
-            filename += '.xlsx'
-
-        # Initialise sheet naming
-        used_sheet_names = []
-        sheet_index = 1
-
-        iterable_df = self.dataframes
-
-        with pd.ExcelWriter(filename) as writer:
-            for df in iterable_df:
-                df_name = getattr(df, 'name', None)
-
-                # Set sheet name
-                if df_name in (None, '') or df_name in used_sheet_names:
-                    sheet_name = f'sheet{sheet_index}'
-                    sheet_index += 1
-                else:
-                    sheet_name = df_name
-
-                # Transpose 1 row dataframes for cleanness
-                if df.shape[0] == 1:
-                    df = df.transpose()
-
-                # Write df into sheet
-                df.to_excel(writer, sheet_name=sheet_name)
-                used_sheet_names.append(sheet_name)
-
-        return
-
     def _to_numeric(self):
         for idx, df in enumerate(self.dataframes):
             # applying pd.to_numeric loses name dataframes of DataFrame, need to extract and reapply here
