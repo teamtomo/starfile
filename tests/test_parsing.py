@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from starfile.starfile import StarFile
+from starfile.parser import StarParser
 from .constants import loop_simple, postprocess, pipeline, rln31_style, optimiser_2d, optimiser_3d, sampling_2d, \
     sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock
 
@@ -11,7 +11,7 @@ def test_instantiation():
     """
     Tests instantiation of the StarFile class
     """
-    s = StarFile()
+    s = StarParser()
 
 
 def test_read_loopheader():
@@ -19,7 +19,7 @@ def test_read_loopheader():
     Check that a simple loop block header is parsed correctly by the
     read_loopheader method by checking the dataframe columns
     """
-    s = StarFile(loop_simple)
+    s = StarParser(loop_simple)
     assert 'rlnCoordinateX' in s.data.columns
     assert len(s.data.columns) == 12
 
@@ -28,7 +28,7 @@ def test_read_loop_block():
     """
     Check that loop block is parsed correctly, data has the correct shape
     """
-    s = StarFile(loop_simple)
+    s = StarParser(loop_simple)
     assert isinstance(s.data, pd.DataFrame)
     assert s.data.shape == (16, 12)
 
@@ -37,9 +37,9 @@ def test_read_data_block_simple():
     """
     Check that simple data blocks (no loops) are read correctly
     """
-    s = StarFile(postprocess)
-    s.line_number = 4
-    s._read_data_block()
+    s = StarParser(postprocess)
+    s.current_line_number = 4
+    s._parse_data_block()
     assert isinstance(s.dataframes[-1], pd.DataFrame)
     assert s.dataframes[-1].shape == (1, 6)
 
@@ -49,7 +49,7 @@ def test_read_file_multiblock():
     Check that multiblock STAR files such as postprocess RELION files
     parse properly
     """
-    s = StarFile(postprocess)
+    s = StarParser(postprocess)
     assert len(s.dataframes) == 3
     assert all([isinstance(s.dataframes[i], pd.DataFrame) for i in range(3)])
     assert s.dataframes[0].shape == (1, 6)
@@ -61,7 +61,7 @@ def test_read_pipeline():
     """
     Check that a pipeline.star file is parsed correctly
     """
-    s = StarFile(pipeline)
+    s = StarParser(pipeline)
     assert isinstance(s.dataframes, list)
     for i in range(5):
         assert isinstance(s.dataframes[i], pd.DataFrame)
@@ -74,7 +74,7 @@ def test_read_rln31():
     """
     Check that reading of RELION 3.1 style star files works properly
     """
-    sf = StarFile(rln31_style)
+    sf = StarParser(rln31_style)
     for idx, df in enumerate(sf.dataframes):
         assert isinstance(df, pd.DataFrame)
         if idx == 0:
@@ -90,45 +90,45 @@ def test_read_n_blocks():
     number of data blocks from a star file
     """
     # test 1 block
-    sf = StarFile(postprocess, read_n_blocks=1)
+    sf = StarParser(postprocess, read_n_blocks=1)
     assert len(sf.dataframes) == 1
 
     # test 2 blocks
-    sf = StarFile(postprocess, read_n_blocks=2)
+    sf = StarParser(postprocess, read_n_blocks=2)
     assert len(sf.dataframes) == 2
 
 
 def test_single_line_middle_of_multiblock():
-    sf = StarFile(single_line_middle_of_multiblock)
+    sf = StarParser(single_line_middle_of_multiblock)
     assert len(sf.dataframes) == 2
 
 
 def test_single_line_end_of_multiblock():
-    sf = StarFile(single_line_end_of_multiblock)
+    sf = StarParser(single_line_end_of_multiblock)
     assert len(sf.dataframes) == 2
     assert sf.dataframes[-1].shape[0] == 1
 
 
 def test_read_optimiser_2d():
-    sf = StarFile(optimiser_2d)
+    sf = StarParser(optimiser_2d)
     assert len(sf.dataframes) == 1
     assert sf.data.shape == (1, 84)
 
 
 def test_read_optimiser_3d():
-    sf = StarFile(optimiser_3d)
+    sf = StarParser(optimiser_3d)
     assert len(sf.dataframes) == 1
     assert sf.data.shape == (1, 84)
 
 
 def test_read_sampling_2d():
-    sf = StarFile(sampling_2d)
+    sf = StarParser(sampling_2d)
     assert len(sf.dataframes) == 1
     assert sf.data.shape == (1, 12)
 
 
 def test_read_sampling_3d():
-    sf = StarFile(sampling_3d)
+    sf = StarParser(sampling_3d)
     assert len(sf.dataframes) == 2
-    assert sf.dataframes[0].shape == (1, 15)
-    assert sf.dataframes[1].shape == (192, 2)
+    assert sf.dataframes['sampling_general'].shape == (1, 15)
+    assert sf.dataframes['sampling_directions'].shape == (192, 2)

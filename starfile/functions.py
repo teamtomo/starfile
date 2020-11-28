@@ -3,9 +3,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from .starfile import StarFile
+from .parser import StarParser
 from .version import __version__
-
 
 def open(filename: str, n_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
     """
@@ -14,7 +13,7 @@ def open(filename: str, n_data_blocks: int = None) -> Union[pd.DataFrame, List[p
     :return:
     """
     if Path(filename).exists():
-        return StarFile(filename, read_n_blocks=n_data_blocks).data
+        return StarParser(filename, read_n_blocks=n_data_blocks).data
     else:
         raise FileNotFoundError
 
@@ -36,7 +35,7 @@ def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str, **kwargs):
     :param filename: filename in which to new dataframes
     :return:
     """
-    star = StarFile(data=data)
+    star = StarParser(data=data)
     star.write_star_file(filename, **kwargs)
     return
 
@@ -48,7 +47,7 @@ def write(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
     :param filename: filename in which to new dataframes
     :return:
     """
-    star = StarFile(data=data)
+    star = StarParser(data=data)
     star.write_star_file(filename)
     return
 
@@ -60,7 +59,7 @@ def star2excel(star_file: str, excel_filename: str):
     :param excel_filename: filename (should end in '.xlsx')
     :return:
     """
-    star = StarFile(star_file)
+    star = StarParser(star_file)
     star.to_excel(excel_filename)
     return
 
