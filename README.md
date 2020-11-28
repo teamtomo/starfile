@@ -126,26 +126,6 @@ starfile.new(df, 'tests.star', float_format='%.12f')
 
 Any keyword arguments to `starfile.new()` are passed through to pandas [DataFrame.to_csv()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html)
 
-
-### Converting STAR files to an Excel Spreadsheet
-Perhaps you aren't comfortable plotting in Python, or maybe a journal requires submission of raw data for presented 
-figures as an excel spreadsheet. This is supported with the `star2excel` function.
-
-```python
->>> starfile.star2excel('tests/dataframes/postprocess.star', 'tests/dataframes/postprocess.xlsx')
-```
-
-produces an Excel spreadsheet including column and row names from the DataFrame.
-
-![Image of dataframes in Excel spreadsheet](./img/excel_data.png)
-
-Multi-block STAR files are written as multi-sheet Excel spreadsheets
-
-![Image of different Excel sheet names](./img/excel_multisheet.png)
-
-This functionality depends upon the `openpyxml` package
-
-
 ## License
 The project is released under the BSD 3-Clause License
 
