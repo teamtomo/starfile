@@ -41,30 +41,20 @@ def test_read_loop_block():
         assert all(df.columns == loop_simple_columns)
 
 
-
-
-def test_read_data_block_simple():
-    """
-    Check that simple data blocks (no loops) are read correctly
-    """
-    s = StarParser(postprocess)
-    s.current_line_number = 4
-    s._parse_data_block()
-    assert isinstance(s.dataframes[-1], pd.DataFrame)
-    assert s.dataframes[-1].shape == (1, 6)
-
-
-def test_read_file_multiblock():
+def test_read_multiblock_file():
     """
     Check that multiblock STAR files such as postprocess RELION files
     parse properly
     """
     s = StarParser(postprocess)
     assert len(s.dataframes) == 3
-    assert all([isinstance(s.dataframes[i], pd.DataFrame) for i in range(3)])
-    assert s.dataframes[0].shape == (1, 6)
-    assert s.dataframes[1].shape == (49, 7)
-    assert s.dataframes[2].shape == (49, 3)
+
+    for key, df in s.dataframes.items():
+        assert isinstance(df, pd.DataFrame)
+
+    assert s.dataframes['general'].shape == (1, 6)
+    assert s.dataframes['fsc'].shape == (49, 7)
+    assert s.dataframes['guinier'].shape == (49, 3)
 
 
 def test_read_pipeline():
@@ -72,26 +62,29 @@ def test_read_pipeline():
     Check that a pipeline.star file is parsed correctly
     """
     s = StarParser(pipeline)
-    assert isinstance(s.dataframes, list)
-    for i in range(5):
-        assert isinstance(s.dataframes[i], pd.DataFrame)
+    for key, df in s.dataframes.items():
+        assert isinstance(df, pd.DataFrame)
 
-    # Check that comments aren't included in df
-    assert s.dataframes[0].shape == (1, 1)
+    # Check that dataframes have the correct shapes
+    assert s.dataframes['pipeline_general'].shape == (1, 1)
+    assert s.dataframes['pipeline_processes'].shape == (31, 4)
+    assert s.dataframes['pipeline_nodes'].shape == (74, 2)
+    assert s.dataframes['pipeline_input_edges'].shape == (48, 2)
+    assert s.dataframes['pipeline_output_edges'].shape == (72, 2)
 
 
 def test_read_rln31():
     """
     Check that reading of RELION 3.1 style star files works properly
     """
-    sf = StarParser(rln31_style)
-    for idx, df in enumerate(sf.dataframes):
+    s = StarParser(rln31_style)
+
+    for key, df in s.dataframes.items():
         assert isinstance(df, pd.DataFrame)
-        if idx == 0:
-            assert df.shape == (1, 7)
-            pass
-        else:
-            assert df.shape == (2, 5)
+
+    assert isinstance(s.dataframes['block_1'], pd.DataFrame)
+    assert isinstance(s.dataframes['block_2'], pd.DataFrame)
+    assert isinstance(s.dataframes['block_3'], pd.DataFrame)
 
 
 def test_read_n_blocks():
