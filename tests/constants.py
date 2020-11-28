@@ -17,9 +17,17 @@ optimiser_2d = relion_tutorial / 'run_it025_optimiser_2D.star'
 optimiser_3d = relion_tutorial / 'run_it025_optimiser_3D.star'
 sampling_2d = relion_tutorial / 'run_it025_sampling_2D.star'
 sampling_3d = relion_tutorial / 'run_it025_sampling_3D.star'
+non_existant_file = test_data / 'non_existant_file.star'
 
 # Example DataFrame for testing
 cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
         'Price': [22000, 25000, 27000, 35000]
         }
 test_df = pd.DataFrame.from_dict(cars)
+
+
+# Attributes of certain files
+loop_simple_columns = ['rlnCoordinateX', 'rlnCoordinateY', 'rlnCoordinateZ',
+       'rlnMicrographName', 'rlnMagnification', 'rlnDetectorPixelSize',
+       'rlnCtfMaxResolution', 'rlnImageName', 'rlnCtfImage', 'rlnAngleRot',
+       'rlnAngleTilt', 'rlnAnglePsi']

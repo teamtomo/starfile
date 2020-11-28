@@ -1,27 +1,22 @@
-from pathlib import Path
-
 import pandas as pd
+import pytest
 
 from starfile.parser import StarParser
 from .constants import loop_simple, postprocess, pipeline, rln31_style, optimiser_2d, optimiser_3d, sampling_2d, \
-    sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock
+    sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock, non_existant_file, loop_simple_columns
 
 
 def test_instantiation():
     """
     Tests instantiation of the StarFile class
     """
-    s = StarParser()
-
-
-def test_read_loopheader():
-    """
-    Check that a simple loop block header is parsed correctly by the
-    read_loopheader method by checking the dataframe columns
-    """
+    # instantiation with file which exists
     s = StarParser(loop_simple)
-    assert 'rlnCoordinateX' in s.data.columns
-    assert len(s.data.columns) == 12
+
+    # instantiation with non-existant file should fail
+    assert non_existant_file.exists() is False
+    with pytest.raises(FileNotFoundError):
+        s = StarParser(non_existant_file)
 
 
 def test_read_loop_block():
@@ -29,8 +24,23 @@ def test_read_loop_block():
     Check that loop block is parsed correctly, data has the correct shape
     """
     s = StarParser(loop_simple)
-    assert isinstance(s.data, pd.DataFrame)
-    assert s.data.shape == (16, 12)
+
+    # Check the output
+    for idx, key in enumerate(s.dataframes.keys()):
+        # Check that only one object is present
+        assert idx < 1
+
+        # get dataframe
+        df = s.dataframes[key]
+        assert isinstance(df, pd.DataFrame)
+
+        # Check shape of dataframe
+        assert df.shape == (16, 12)
+
+        # check columns
+        assert all(df.columns == loop_simple_columns)
+
+
 
 
 def test_read_data_block_simple():
