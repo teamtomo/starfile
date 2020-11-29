@@ -8,8 +8,26 @@ from .version import __version__
 
 
 class StarWriter:
-    def __init__(self, filename: Union[Path, str]):
+    def __init__(self, dataframes: Union[pd.DataFrame, dict, list], filename: Union[Path, str],
+                 overwrite=False):
+        self.overwrite = overwrite
         self.filename = filename
+        self.dataframes = dataframes
+
+    @property
+    def dataframes(self):
+        return self._dataframes
+
+    @dataframes.setter
+    def dataframes(self, dataframes: Union[pd.DataFrame, dict, list]):
+        if isinstance(dataframes, pd.DataFrame):
+            self._dataframes = self.coerce_dataframe(dataframes)
+        elif isinstance(dataframes, dict):
+            self._dataframes = self.coerce_dict(dataframes)
+        elif isinstance(dataframes, list):
+            self._dataframes = self.coerce_list(dataframes)
+        else:
+            raise ValueError(f'Expected a DataFrame, dict or list object, got {type(dataframes)}')
 
     @property
     def filename(self):
@@ -75,7 +93,8 @@ class StarWriter:
         for _, df in self.dataframes.items():
             self._write_data_block(df, filename, **kwargs)
 
-        self.add_blank_line_to_buffer()
+        self.add_blank_lines_to_buffer(2)
+        self._write_buffer_and_clear()
         return
 
     def add_loopheader_to_buffer(self, df: pd.DataFrame):
@@ -101,8 +120,8 @@ class StarWriter:
         if df.shape[0] == 1:
             self._write_simple_block(df)
         elif df.shape[0] > 1:
-            self._write_loop_block(df, filename, **kwargs)
-        self._write_blank_lines(filename, 2)
+            self._write_loop_block(df)
+        self._write_blank_lines( 2)
         return
 
     def _write_simple_block(self, dataframe: pd.DataFrame, filename: str):
