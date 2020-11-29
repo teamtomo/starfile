@@ -1,6 +1,6 @@
 import datetime
 from pathlib import Path
-from typing import Union
+from typing import Union, Dict, List
 
 import pandas as pd
 
@@ -16,6 +16,10 @@ class StarWriter:
 
     @property
     def dataframes(self):
+        """
+        OrderedDict of pandas dataframes
+        df.name defines the data block name
+        """
         return self._dataframes
 
     @dataframes.setter
@@ -27,7 +31,16 @@ class StarWriter:
         elif isinstance(dataframes, list):
             self._dataframes = self.coerce_list(dataframes)
         else:
-            raise ValueError(f'Expected a DataFrame, dict or list object, got {type(dataframes)}')
+            raise ValueError(f'Expected a DataFrame, Dict or List object, got {type(dataframes)}')
+
+    def coerce_dataframe(self, df: pd.DataFrame):
+        pass
+
+    def coerce_dict(self, dfs: Dict[pd.DataFrame]):
+        pass
+
+    def coerce_list(self, dfs: List[pd.DataFrame]):
+        pass
 
     @property
     def filename(self):
