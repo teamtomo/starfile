@@ -1,6 +1,9 @@
 import datetime
-from typing import Union
 from pathlib import Path
+from typing import Union
+
+import pandas as pd
+
 from .version import __version__
 
 
@@ -33,6 +36,9 @@ class StarWriter:
     def buffer(self):
         return self._buffer
 
+    def clear_buffer(self):
+        self._buffer = ""
+
     def add_line_to_buffer(self, line):
         self._buffer += f'{line}\n'
 
@@ -50,15 +56,21 @@ class StarWriter:
         with open(self.filename, 'a+') as file:
             file.write(self.buffer)
 
+    def _write_buffer_and_clear(self):
+        self._write_buffer_to_disk()
+        self.clear_buffer()
+
     def add_package_info_to_buffer(self):
         now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
         line = f'Created by the starfile Python package (version {__version__}) on {now}\n'
         self.add_comment_to_buffer(line)
 
+    def write_package_info(self):
+        self.add_package_info_to_buffer()
+        self._write_buffer_and_clear()
 
     def write_star_file(self, filename: str = None, **kwargs):
-        self.add_package_info_to_buffer()
-        self.add_blank_line_to_buffer()
+        self.write_package_info()
 
         for _, df in self.dataframes.items():
             self._write_data_block(df, filename, **kwargs)
@@ -66,33 +78,34 @@ class StarWriter:
         self.add_blank_line_to_buffer()
         return
 
-    def _write_loopheader(self, dataframe: pd.DataFrame, filename: str) -> List:
-        loopheader = ['loop_']
+    def add_loopheader_to_buffer(self, df: pd.DataFrame):
+        self.add_line_to_buffer('loop_')
         headings = [f'_{column_name} #{idx}' for idx, column_name in
-                    enumerate(dataframe.columns, 1)]
-        loopheader += headings
+                    enumerate(df.columns, 1)]
+        for heading in headings:
+            self.add_line_to_buffer(heading)
 
-        with open(filename, 'a') as file:
-            for line in loopheader:
-                file.write(f'{line}\n')
-        return
+    def _write_loopheader(self, df: pd.DataFrame):
+        self.add_loopheader_to_buffer(df)
+        self._write_buffer_and_clear()
 
-    def _write_data_block(self, dataframe: pd.DataFrame, filename: str, **kwargs):
-        data_block_name = 'data_' + getattr(dataframe, 'name', '')
+    def get_block_name(self, df: pd.DataFrame):
+        return 'data_' + getattr(df, 'name')
 
-        with open(filename, 'a') as file:
-            file.write(f'{data_block_name}\n\n')
+    def add_block_name_to_buffer(self, df: pd.DataFrame):
+        self.add_line_to_buffer(self.get_block_name(df))
 
-        if dataframe.shape[0] == 1:
-            self._write_data_block_simple(dataframe, filename)
-        elif dataframe.shape[0] > 1:
-            self._write_data_block_loop(dataframe, filename, **kwargs)
-        else:
-            raise ValueError('DataFrame does not have at least 1 row')
+    def _write_data_block(self, df: pd.DataFrame):
+        self.add_block_name_to_buffer(df)
+
+        if df.shape[0] == 1:
+            self._write_simple_block(df)
+        elif df.shape[0] > 1:
+            self._write_loop_block(df, filename, **kwargs)
         self._write_blank_lines(filename, 2)
         return
 
-    def _write_data_block_simple(self, dataframe: pd.DataFrame, filename: str):
+    def _write_simple_block(self, dataframe: pd.DataFrame, filename: str):
         entries = [f'_{column_name}\t\t\t{dataframe[column_name][0]}' for column_name in
                    dataframe.columns]
 
@@ -107,7 +120,7 @@ class StarWriter:
                 file.write('\n')
         return
 
-    def _write_data_block_loop(self, dataframe: pd.DataFrame, filename: str, **kwargs):
+    def _write_loop_block(self, dataframe: pd.DataFrame, filename: str, **kwargs):
         self._write_loopheader(dataframe, filename)
 
         # new main block
