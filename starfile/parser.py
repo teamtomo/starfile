@@ -6,6 +6,7 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Union
 
+from .core import TextBuffer, TextCrawler
 
 class StarParser:
     def __init__(self, filename: Union[str, Path], read_n_blocks=None):
@@ -13,12 +14,12 @@ class StarParser:
         self.filename = filename
 
         # initialise attributes for parsing
-        self._dataframes = OrderedDict()
-        self._initialise_n_lines()
-        self._current_line_number = 0
-        self._current_dataframe_index = 0
-        self._clear_buffer()
+        self.buffer = TextBuffer()
+        self.crawler = TextCrawler(self.filename)
         self.read_n_blocks = read_n_blocks
+        self._dataframes = OrderedDict()
+        self._current_dataframe_index = 1
+        self._initialise_n_lines()
 
         # parse file
         self.parse_file()
@@ -40,39 +41,7 @@ class StarParser:
         return self._n_lines
 
     def _initialise_n_lines(self):
-        with open(self.filename, 'rb') as f:
-                self._n_lines = sum(1 for line in f)
-
-    @property
-    def current_line_number(self):
-        return self._current_line_number
-
-    @property
-    def current_line(self):
-        return self._get_line(self.current_line_number)
-
-    def _get_line(self, line_number: int):
-        return getline(str(self.filename), line_number).strip()
-
-    def _next_line(self):
-        self._current_line_number += 1
-
-    @property
-    def buffer(self):
-        return self._buffer
-
-    def _clear_buffer(self):
-        self._buffer = ""
-
-    def _add_line_to_buffer(self, line):
-        self._buffer += f'{line}\n'
-
-    def _add_current_line_to_buffer(self):
-        self._add_line_to_buffer(self.current_line)
-
-    @property
-    def buffer_split_on_newline(self):
-        return self.buffer.split('\n')
+        self._n_lines = self.crawler.count_lines()
 
     @property
     def dataframes(self):
@@ -99,21 +68,23 @@ class StarParser:
         self._current_dataframe_index += 1
 
     def _get_dataframe_key(self, df):
-        if df.name == '' or df.name in self.dataframes.keys():
+        name = df.name
+
+        if name == '' or isinstance(name, int) or name in self.dataframes.keys():
             return self._current_dataframe_index
         else:
             return df.name
 
     def parse_file(self):
-        while self.current_line_number <= self.n_lines:
+        while self.crawler.current_line_number <= self.n_lines:
             if len(self.dataframes) == self.read_n_blocks:
                 break
 
-            elif self.current_line.startswith('data_'):
+            elif self.crawler.current_line.startswith('data_'):
                 self._parse_data_block()
 
-            if not self.current_line.startswith('data_'):
-                self._next_line()
+            if not self.crawler.current_line.startswith('data_'):
+                self.crawler.increment_line_number()
 
         self._to_numeric()
         return
@@ -123,18 +94,19 @@ class StarParser:
         self.current_block_name = self._block_name_from_current_line()
 
         # iterate over lines in each block and process as keywords are reached
-        while self.current_line_number <= self.n_lines:
-            self._next_line()
+        while self.crawler.current_line_number <= self.n_lines:
+            self.crawler.increment_line_number()
+            line = self.crawler.current_line
 
-            if self.current_line.startswith('loop_'):
+            if line.startswith('loop_'):
                 self._parse_loop_block()
                 return
 
-            elif self.current_line.startswith('data_') or self.current_line_number == self.n_lines:
+            elif line.startswith('data_') or self.crawler.current_line_number == self.n_lines:
                 self._parse_simple_block_from_buffer()
                 return
 
-            self._add_current_line_to_buffer()
+            self.buffer.add_line(line)
         return
 
     def _parse_simple_block_from_buffer(self):
@@ -148,7 +120,7 @@ class StarParser:
     def _clean_simple_block_buffer(self):
         clean_datablock = {}
 
-        for line in self.buffer_split_on_newline:
+        for line in self.buffer.split_on_newline:
             if line == '' or line.startswith('#'):
                 continue
 
@@ -163,7 +135,7 @@ class StarParser:
         return pd.DataFrame(data, columns=data.keys(), index=[0])
 
     def _parse_loop_block(self):
-        self._next_line()
+        self.crawler.increment_line_number()
         header = self._parse_loop_header()
         df = self._parse_loop_data()
         df.columns = header
@@ -172,26 +144,32 @@ class StarParser:
         return
 
     def _parse_loop_header(self) -> List:
-        self._clear_buffer()
+        self.buffer.clear()
 
-        while self.current_line.startswith('_'):
-            heading = self.current_line.split()[0][1:]
-            self._add_line_to_buffer(heading)
-            self._next_line()
+        while self.crawler.current_line.startswith('_'):
+            heading = self.heading_from_line(self.crawler.current_line)
+            self.buffer.add_line(heading)
+            self.crawler.increment_line_number()
 
-        header = self.buffer.split()
+        header = self.buffer.split_on_newline()
         return header
 
+    @staticmethod
+    def heading_from_line(line: str):
+        return line.split()[0][1:]
+
     def _parse_loop_data(self) -> pd.DataFrame:
-        self._clear_buffer()
+        self.buffer.clear()
 
-        while self.current_line_number <= self.n_lines:
-            if self.current_line.startswith('data_'):
+        while self.crawler.current_line_number <= self.n_lines:
+            current_line = self.crawler.current_line
+            if current_line.startswith('data_'):
                 break
-            self._add_current_line_to_buffer()
-            self._next_line()
+            self.buffer.add_line(current_line)
+            self.crawler.increment_line_number()
 
-        df = pd.read_csv(StringIO(self.buffer), delim_whitespace=True, header=None, comment='#')
+        df = pd.read_csv(StringIO(self.buffer.buffer), delim_whitespace=True, header=None,
+                         comment='#')
         return df
 
     def _to_numeric(self):
@@ -208,7 +186,7 @@ class StarParser:
                 self.dataframes[key].name = name
 
     def _block_name_from_current_line(self):
-        return self.current_line[5:]
+        return self.crawler.current_line[5:]
 
 
 

@@ -45,6 +45,9 @@ class TextBuffer:
         self.append_to_file(filename)
         self.clear()
 
+    def split_on_newline(self):
+        return self.buffer.split('\n')[:-1]
+
 
 class TextCrawler:
     def __init__(self, filename: Union[Path, str]):
@@ -65,14 +68,14 @@ class TextCrawler:
 
     @property
     def current_line(self):
-        return self._get_line(self.current_line_number)
+        return self.get_line(self.current_line_number)
 
     @current_line_number.setter
     def current_line_number(self, line_number: int):
         self._current_line_number = line_number
 
-    def _get_line(self, line_number: int):
+    def get_line(self, line_number: int):
         return getline(str(self.filename), line_number).strip()
 
-    def _next_line(self):
+    def increment_line_number(self):
         self._current_line_number += 1
