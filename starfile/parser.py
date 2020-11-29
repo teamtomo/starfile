@@ -18,7 +18,7 @@ class StarParser:
         self.crawler = TextCrawler(self.filename)
         self.read_n_blocks = read_n_blocks
         self._dataframes = OrderedDict()
-        self._current_dataframe_index = 1
+        self._current_dataframe_index = 0
         self._initialise_n_lines()
 
         # parse file
@@ -120,7 +120,7 @@ class StarParser:
     def _clean_simple_block_buffer(self):
         clean_datablock = {}
 
-        for line in self.buffer.split_on_newline:
+        for line in self.buffer.split_on_newline():
             if line == '' or line.startswith('#'):
                 continue
 
