@@ -1,10 +1,9 @@
+import datetime
+from .version import __version__
+
 class StarWriter:
-
+    def __init__(self):
     def write_star_file(self, filename: str = None, **kwargs):
-        # Set filename
-        if filename is None:
-            filename = self.filename
-
         # Write header
         with open(filename, 'w') as file:
             now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
