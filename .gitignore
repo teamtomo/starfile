@@ -12,3 +12,5 @@
 package.sh
 setup.cfg
 MANIFEST
+/tests/data/from_df.star
+/tests/data/from_list.star
