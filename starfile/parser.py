@@ -84,11 +84,11 @@ class StarParser:
         self._increment_dataframe_index()
 
     @property
-    def current_datablock_name(self):
+    def current_block_name(self):
         return self._current_data_block_name
 
-    @current_datablock_name.setter
-    def current_datablock_name(self, name: str):
+    @current_block_name.setter
+    def current_block_name(self, name: str):
         self._current_data_block_name = name
 
     @property
@@ -120,7 +120,7 @@ class StarParser:
 
     def _parse_data_block(self):
         # store data block name
-        self.current_datablock_name = self.current_line[5:]
+        self.current_block_name = self._block_name_from_current_line()
 
         # iterate over lines in each block and process as keywords are reached
         while self.current_line_number <= self.n_lines:
@@ -138,16 +138,11 @@ class StarParser:
         return
 
     def _parse_simple_block_from_buffer(self):
-        # tidy up buffer
         data = self._clean_simple_block_buffer()
 
-        # make dataframe
         df = self._cleaned_simple_block_to_dataframe(data)
-
-        # set dataframe name
         df.name = self._current_data_block_name
 
-        # add dataframe
         self._add_dataframe(df)
 
     def _clean_simple_block_buffer(self):
@@ -163,7 +158,8 @@ class StarParser:
 
         return clean_datablock
 
-    def _cleaned_simple_block_to_dataframe(self, data: dict):
+    @staticmethod
+    def _cleaned_simple_block_to_dataframe(data: dict):
         return pd.DataFrame(data, columns=data.keys(), index=[0])
 
     def _parse_loop_block(self):
@@ -199,16 +195,20 @@ class StarParser:
         return df
 
     def _to_numeric(self):
+        """
+        Converts strings in dataframes into numerical values where possible
+
+        applying pd.to_numeric loses name dataframes of DataFrame,
+        need to extract name and reapply inline
+        """
         for key, df in self.dataframes.items():
-            # applying pd.to_numeric loses name dataframes of DataFrame, need to extract and reapply here
             name = getattr(df, 'name', None)
-
-            # to numeric
             self.dataframes[key] = df.apply(pd.to_numeric, errors='ignore')
-
-            # reapply name
             if name is not None:
                 self.dataframes[key].name = name
+
+    def _block_name_from_current_line(self):
+        return self.current_line[5:]
 
 
 
