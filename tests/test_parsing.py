@@ -2,8 +2,10 @@ import pandas as pd
 import pytest
 
 from starfile.parser import StarParser
-from .constants import loop_simple, postprocess, pipeline, rln31_style, optimiser_2d, optimiser_3d, sampling_2d, \
-    sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock, non_existant_file, loop_simple_columns
+from .constants import loop_simple, postprocess, pipeline, rln31_style, optimiser_2d, optimiser_3d, \
+    sampling_2d, \
+    sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock, non_existant_file, \
+    loop_simple_columns
 
 
 def test_instantiation():
@@ -53,6 +55,9 @@ def test_read_multiblock_file():
         assert isinstance(df, pd.DataFrame)
 
     assert s.dataframes['general'].shape == (1, 6)
+    assert all(['rlnFinalResolution', 'rlnBfactorUsedForSharpening', 'rlnUnfilteredMapHalf1',
+                'rlnUnfilteredMapHalf2', 'rlnMaskName', 'rlnRandomiseFrom']
+               == s.dataframes['general'].columns)
     assert s.dataframes['fsc'].shape == (49, 7)
     assert s.dataframes['guinier'].shape == (49, 3)
 
@@ -93,45 +98,55 @@ def test_read_n_blocks():
     number of data blocks from a star file
     """
     # test 1 block
-    sf = StarParser(postprocess, read_n_blocks=1)
-    assert len(sf.dataframes) == 1
+    s = StarParser(postprocess, read_n_blocks=1)
+    assert len(s.dataframes) == 1
 
     # test 2 blocks
-    sf = StarParser(postprocess, read_n_blocks=2)
-    assert len(sf.dataframes) == 2
+    s = StarParser(postprocess, read_n_blocks=2)
+    assert len(s.dataframes) == 2
 
 
 def test_single_line_middle_of_multiblock():
-    sf = StarParser(single_line_middle_of_multiblock)
-    assert len(sf.dataframes) == 2
+    s = StarParser(single_line_middle_of_multiblock)
+    assert len(s.dataframes) == 2
 
 
 def test_single_line_end_of_multiblock():
-    sf = StarParser(single_line_end_of_multiblock)
-    assert len(sf.dataframes) == 2
-    assert sf.dataframes[-1].shape[0] == 1
+    s = StarParser(single_line_end_of_multiblock)
+    assert len(s.dataframes) == 2
+
+    # iterate over dataframes, checking keys, names and shapes
+    for idx, (key, df) in enumerate(s.dataframes.items()):
+        assert df.name == 'block_3'
+        if idx == 0:
+            assert key == 'block_3'
+            assert df.shape == (2, 5)
+        if idx == 1:
+            assert key == 1
+            assert df.shape == (1, 5)
+
 
 
 def test_read_optimiser_2d():
-    sf = StarParser(optimiser_2d)
-    assert len(sf.dataframes) == 1
-    assert sf.data.shape == (1, 84)
+    s = StarParser(optimiser_2d)
+    assert len(s.dataframes) == 1
+    assert s.dataframes['optimiser_general'].shape == (1, 84)
 
 
 def test_read_optimiser_3d():
-    sf = StarParser(optimiser_3d)
-    assert len(sf.dataframes) == 1
-    assert sf.data.shape == (1, 84)
+    s = StarParser(optimiser_3d)
+    assert len(s.dataframes) == 1
+    assert s.dataframes['optimiser_general'].shape == (1, 84)
 
 
 def test_read_sampling_2d():
-    sf = StarParser(sampling_2d)
-    assert len(sf.dataframes) == 1
-    assert sf.data.shape == (1, 12)
+    s = StarParser(sampling_2d)
+    assert len(s.dataframes) == 1
+    assert s.dataframes['sampling_general'].shape == (1, 12)
 
 
 def test_read_sampling_3d():
-    sf = StarParser(sampling_3d)
-    assert len(sf.dataframes) == 2
-    assert sf.dataframes['sampling_general'].shape == (1, 15)
-    assert sf.dataframes['sampling_directions'].shape == (192, 2)
+    s = StarParser(sampling_3d)
+    assert len(s.dataframes) == 2
+    assert s.dataframes['sampling_general'].shape == (1, 15)
+    assert s.dataframes['sampling_directions'].shape == (192, 2)

@@ -81,6 +81,7 @@ class StarParser:
     def _add_dataframe(self, df: pd.DataFrame):
         key = self._get_dataframe_key(df)
         self.dataframes[key] = df
+        self._increment_dataframe_index()
 
     @property
     def current_datablock_name(self):
