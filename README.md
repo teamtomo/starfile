@@ -58,8 +58,8 @@ To open a STAR file
 [1365 rows x 12 columns]
 ```
 
-Opening STAR files containing multiple dataframes blocks will return a `dict` of DataFrame objects.
-If you would like to always return a `dict`, you can use the `always_dict=True` keyword argument
+- Opening STAR files containing multiple dataframes blocks will return a `dict` of DataFrame objects.
+- If you would like to always return a `dict`, you can use the `always_dict=True` keyword argument
 
 This functionality is also exposed by `starfile.read` for convenience.
 
@@ -85,11 +85,12 @@ Ford_Focus	27000
 Audi_A4	        35000
 ```
 
-This functionality is also exposed by `starfile.write` for convenience.
 
 - floating point format can be specified by the `float_format` keyword argument (default `%.6f`)
 - data block headers are of format `data_<key>` where key is the dictionary key if a `dict` is passed, `df.name` if a 
 `DataFrame` or list of `DataFrame`s is passed
+
+This functionality is also exposed by `starfile.write` for convenience.
 
 ## License
 The project is released under the BSD 3-Clause License
