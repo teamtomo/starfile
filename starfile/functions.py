@@ -1,72 +1,53 @@
-from typing import Union, List
-from pathlib import Path
+from typing import Dict, List, Union
 
 import pandas as pd
 
 from .parser import StarParser
-from .version import __version__
+from .writer import StarWriter
 
-def open(filename: str, n_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+
+def open(filename: str, read_n_blocks: int = None, always_dict: bool = False):
     """
-    Read a star file into a pandas dataframe or list of pandas dataframes
-    :param filename: file from which to read dataframes
-    :return:
+    Read a star file into a pandas dataframe or dict of pandas dataframes
+
+    default behaviour in the case of only one data block being present in the STAR file is to
+    return only a dataframe, this can be changed by setting 'always_dict=True'
     """
-    if Path(filename).exists():
-        return StarParser(filename, read_n_blocks=n_data_blocks).data
+    star = StarParser(filename, read_n_blocks=read_n_blocks)
+    if len(star.dataframes) == 1 and always_dict is False:
+        return star.first_dataframe
     else:
-        raise FileNotFoundError
+        return star.dataframes
 
 
-def read(filename: str, n_data_blocks: int = None) -> Union[pd.DataFrame, List[pd.DataFrame]]:
+def read(filename: str, read_n_blocks: int = None, always_dict: bool = False):
     """
-    Read a star file into a pandas dataframe or list of pandas dataframes
-    :param filename: file from which to read dataframes
-    :return:
+    Read a star file into a pandas dataframe or dict of pandas dataframes
+
+    default behaviour in the case of only one data block being present in the STAR file is to
+    return only a dataframe, this can be changed by setting 'always_dict=True'
     """
-    df = open(filename, n_data_blocks)
-    return df
+    return open(filename, read_n_blocks=read_n_blocks, always_dict=always_dict)
 
 
-def new(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str, **kwargs):
-    """
-    Write dataframes from pandas dataframe(s) to a star file
-    :param data: dataframes in pandas dataframe(s) to be written to file
-    :param filename: filename in which to new dataframes
-    :return:
-    """
-    star = StarParser(data=data)
-    star.write_star_file(filename, **kwargs)
-    return
-
-
-def write(data: Union[pd.DataFrame, List[pd.DataFrame]], filename: str):
+def new(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]], filename: str,
+        float_format: str = '%.6f', overwrite: bool = False):
     """
     Write dataframes from pandas dataframe(s) to a star file
-    :param data: dataframes in pandas dataframe(s) to be written to file
-    :param filename: filename in which to new dataframes
-    :return:
+
+    data can be a single dataframe, a list of dataframes or a dict of dataframes
+    float format defaults to 6 digits after the decimal point
     """
-    star = StarParser(data=data)
-    star.write_star_file(filename)
+    StarWriter(data, filename=filename, float_format=float_format, overwrite=overwrite)
     return
 
 
-def star2excel(star_file: str, excel_filename: str):
+def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]], filename: str,
+          float_format: str = '%.6f', overwrite: bool = False):
     """
-    Converts a star file to an excel (.xlsx) file
-    :param star_file: STAR file
-    :param excel_filename: filename (should end in '.xlsx')
-    :return:
-    """
-    star = StarParser(star_file)
-    star.to_excel(excel_filename)
-    return
+    Write dataframes from pandas dataframe(s) to a star file
 
-
-def version():
+    data can be a single dataframe, a list of dataframes or a dict of dataframes
+    float format defaults to 6 digits after the decimal point
     """
-    Returns the current version of starfile
-    :return:
-    """
-    return __version__
+    new(data, filename=filename, float_format=float_format, overwrite=overwrite)
