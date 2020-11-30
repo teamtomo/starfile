@@ -189,3 +189,17 @@ class StarParser:
     @staticmethod
     def heading_from_line(line: str):
         return line.split()[0][1:]
+
+    @property
+    def first_dataframe(self):
+        return self.dataframe_at_index(0)
+
+    def dataframe_at_index(self, idx: int):
+        return self.dataframes_as_list()[idx]
+
+    def dataframes_as_list(self):
+        return list(self.dataframes.values())
+
+
+
+

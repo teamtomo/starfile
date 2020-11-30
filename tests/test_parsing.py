@@ -150,3 +150,14 @@ def test_read_sampling_3d():
     assert len(s.dataframes) == 2
     assert s.dataframes['sampling_general'].shape == (1, 15)
     assert s.dataframes['sampling_directions'].shape == (192, 2)
+
+
+def test_df_as_list():
+    s = StarParser(sampling_3d)
+    assert isinstance(s.dataframes_as_list(), list)
+    assert len(s.dataframes_as_list()) == 2
+
+
+def test_first_dataframe():
+    s = StarParser(sampling_3d)
+    assert isinstance(s.first_dataframe, pd.DataFrame)
