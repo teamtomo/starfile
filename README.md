@@ -5,7 +5,9 @@
 [![DOI](https://zenodo.org/badge/273026988.svg)](https://zenodo.org/badge/latestdoi/273026988)
 
 
-`starfile` is a Python implementation of the [STAR](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) file format designed principally for compatibility with [RELION](https://github.com/3dem/relion) STAR files.
+`starfile` is a Python implementation of the [STAR](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) 
+file format designed principally for compatibility with [RELION](https://github.com/3dem/relion)
+ format STAR files.
 
 It allows STAR files to be created and opened easily using a very simple API, exposing data blocks as [pandas](https://pandas.pydata.org/pandas-docs/stable/getting_started/overview.html) `DataFrame` objects.
 
@@ -23,7 +25,6 @@ https://doi.org/10.1021/ci00002a020
 - Easy to install and use
 - Simple API for reading of STAR files as pandas `DataFrame` objects
 - Simple API for writing of STAR files from pandas `DataFrame` objects
-- Conversion to Excel speadsheet (.xlsx)
 
 
 ## Installation
@@ -57,44 +58,15 @@ To open a STAR file
 [1365 rows x 12 columns]
 ```
 
-Opening STAR files containing multiple dataframes blocks will return a list of DataFrame objects.
-```python
-df = starfile.open('tests/dataframes/postprocess.star')
->>> len(df)
-3
->>> df[0]
-       rlnFinalResolution  ...  rlnRandomiseFrom
-value           16.363636  ...         32.727273
-
-[1 rows x 6 columns]
->>> df[1].head()
-   rlnSpectralIndex  ...  rlnCorrectedFourierShellCorrelationPhaseRandomizedMaskedMaps
-0                 0  ...                                           1.000000           
-1                 1  ...                                           0.999964           
-2                 2  ...                                           0.999856           
-3                 3  ...                                           0.999421           
-4                 4  ...                                           0.998708           
-
-[5 rows x 7 columns]
-
->>> df[2].columns
-Index(['rlnResolutionSquared', 'rlnLogAmplitudesOriginal', 'rlnLogAmplitudesWeighted'], dtype='object')
->>> df[2].name
-'guinier'
-```
+- Opening STAR files containing multiple dataframes blocks will return a `dict` of DataFrame objects.
+- If you would like to always return a `dict`, you can use the `always_dict=True` keyword argument
 
 This functionality is also exposed by `starfile.read` for convenience.
 
 ### Writing STAR files
-DataFrame objects (or lists of dataframes) can be written to STAR files using `starfile.write`
+DataFrame objects (or dicts or lists of dataframes) can be written to STAR files using `starfile.write`
 
 ```python
->>> cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
-                'Price': [22000, 25000, 27000, 35000]
-                }
-
->>> df = pd.DataFrame(cars, columns=['Brand', 'Price'])
->>> df.name = 'cars'
 >>> starfile.new(df, 'tests/dataframes/cars.star')
 ```
 
@@ -113,21 +85,20 @@ Ford_Focus	27000
 Audi_A4	        35000
 ```
 
+
+- floating point format can be specified by the `float_format` keyword argument (default `%.6f`)
+- data block headers are of format `data_<key>` where key is the dictionary key if a `dict` is passed, `df.name` if a 
+`DataFrame` or list of `DataFrame`s is passed
+
 This functionality is also exposed by `starfile.write` for convenience.
-
-Floating point numbers will be written with 5 digits after the decimal separator (%.5f) by default. 
-If you need to modify this behaviour, you can pass the keyword argument `float_format` to the function call.
-
-For example
-
-```python
-starfile.new(df, 'tests.star', float_format='%.12f')
-```
-
-Any keyword arguments to `starfile.new()` are passed through to pandas [DataFrame.to_csv()](https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_csv.html)
 
 ## License
 The project is released under the BSD 3-Clause License
 
+## Testing
+The project is tested using [pytest](https://github.com/project-gemmi/gemmi). 
+To run tests, simply run `pytest` in the `tests` directory
+
 ## Known Issues
-- Cannot handle more than one loop in a data block as found in mmCIF files
+- Cannot handle more than one loop in a data block as found in mmCIF files, please use 
+[GEMMI](https://github.com/project-gemmi/gemmi) in these cases

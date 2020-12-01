@@ -6,9 +6,14 @@
 /tests/data/postprocess.xlsx
 /tests/data/cars.star
 /tests/data/test_write_kwargs.star
+/tests/data/from_df.star
+/tests/data/from_list.star
+/tests/data/test_overwrite_flag.star
+/tests/data/test_write_with_float_format.star
 /build/
 /dist/
 /m2relion/
 package.sh
 setup.cfg
 MANIFEST
+

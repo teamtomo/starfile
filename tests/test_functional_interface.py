@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import starfile
 
-from .constants import loop_simple, test_df, test_data
+from .constants import loop_simple, postprocess, test_df, test_data
 
 
 def test_read():
@@ -12,15 +12,45 @@ def test_read():
     assert isinstance(df, pd.DataFrame)
 
 
+def test_read_always_dict():
+    data = starfile.open(loop_simple, always_dict=True)
+    assert isinstance(data, dict)
+
+
+def test_read_multiblock():
+    data = starfile.open(postprocess)
+    assert isinstance(data, dict)
+    assert len(data) == 3
+
+
 def test_write():
     output_file = test_data / 'test_write.star'
-    starfile.new(test_df, output_file)
+    starfile.new(test_df, output_file, overwrite=True)
     assert output_file.exists()
 
 
-def test_write_with_kwargs():
-    output_file = test_data / 'test_write_kwargs.star'
-    starfile.new(test_df, output_file, float_format='%.5f')
+def test_write_fails_to_overwrite_without_flag():
+    output_file = test_data / 'test_overwrite_flag.star'
+    starfile.new(test_df, output_file, overwrite=True)
+
+    assert output_file.exists()
+    with pytest.raises(FileExistsError):
+        starfile.new(test_df, output_file, overwrite=False)
+        starfile.new(test_df, output_file)
+
+
+def test_write_overwrites_with_flag():
+    output_file = test_data / 'test_overwrite_flag.star'
+    starfile.new(test_df, output_file, overwrite=True)
+
+    assert output_file.exists()
+    starfile.new(test_df, output_file, overwrite=True)
+
+
+def test_write_with_float_format():
+    output_file = test_data / 'test_write_with_float_format.star'
+    test_df['float_col'] = 1.23456789
+    starfile.new(test_df, output_file, float_format='%.3f', overwrite=True)
     assert output_file.exists()
 
 
