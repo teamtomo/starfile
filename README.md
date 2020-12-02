@@ -96,7 +96,7 @@ This functionality is also exposed by `starfile.write` for convenience.
 The project is released under the BSD 3-Clause License
 
 ## Testing
-The project is tested using [pytest](https://github.com/project-gemmi/gemmi). 
+The project is tested using [pytest](https://docs.pytest.org/en/stable/). 
 To run tests, simply run `pytest` in the `tests` directory
 
 ## Known Issues
