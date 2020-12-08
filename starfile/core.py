@@ -45,9 +45,6 @@ class TextBuffer:
         self.append_to_file(filename)
         self.clear()
 
-    def split_on_newline(self):
-        return self.buffer
-
 
 class TextCrawler:
     def __init__(self, filename: Union[Path, str]):

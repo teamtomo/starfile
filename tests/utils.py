@@ -9,7 +9,7 @@ million_row_file = test_data / '1m_row.star'
 
 def generate_large_star_file():
     df = pd.DataFrame(np.random.randint(0, 100, size=(100000, 4)), columns=list('ABCD'))
-    starfile.write(df, million_row_file)
+    starfile.write(df, million_row_file, overwrite=True)
 
 
 def remove_large_star_file():

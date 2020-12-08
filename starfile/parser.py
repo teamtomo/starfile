@@ -14,7 +14,7 @@ class StarParser:
         self.filename = filename
 
         # initialise attributes for parsing
-        self.buffer = TextBuffer()
+        self.text_buffer = TextBuffer()
         self.crawler = TextCrawler(self.filename)
         self.read_n_blocks = read_n_blocks
         self._dataframes = OrderedDict()
@@ -53,7 +53,7 @@ class StarParser:
                 self._parse_simple_block()
                 return
 
-            self.buffer.add_line(line)
+            self.text_buffer.add_line(line)
         return
 
     def _parse_simple_block(self):
@@ -127,7 +127,7 @@ class StarParser:
     def _clean_simple_block_in_buffer(self):
         clean_datablock = {}
 
-        for line in self.buffer.split_on_newline():
+        for line in self.text_buffer.buffer:
             if line == '' or line.startswith('#'):
                 continue
 
@@ -142,27 +142,26 @@ class StarParser:
         return pd.DataFrame(data, columns=data.keys(), index=[0])
 
     def _parse_loop_header(self) -> List:
-        self.buffer.clear()
+        self.text_buffer.clear()
 
         while self.crawler.current_line.startswith('_'):
             heading = self.heading_from_line(self.crawler.current_line)
-            self.buffer.add_line(heading)
+            self.text_buffer.add_line(heading)
             self.crawler.increment_line_number()
 
-        header = self.buffer.split_on_newline()
-        return header
+        return self.text_buffer.buffer
 
     def _parse_loop_data(self) -> pd.DataFrame:
-        self.buffer.clear()
+        self.text_buffer.clear()
 
         while self.crawler.current_line_number <= self.n_lines:
             current_line = self.crawler.current_line
             if current_line.startswith('data_'):
                 break
-            self.buffer.add_line(current_line)
+            self.text_buffer.add_line(current_line)
             self.crawler.increment_line_number()
 
-        df = pd.read_csv(StringIO(self.buffer.as_str()), delim_whitespace=True, header=None,
+        df = pd.read_csv(StringIO(self.text_buffer.as_str()), delim_whitespace=True, header=None,
                          comment='#')
         return df
 
