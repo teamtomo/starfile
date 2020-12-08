@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import pytest
 
 from starfile.parser import StarParser
@@ -6,7 +7,7 @@ from .constants import loop_simple, postprocess, pipeline, rln31_style, optimise
     sampling_2d, \
     sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock, non_existant_file, \
     loop_simple_columns
-
+from .utils import generate_large_star_file, remove_large_star_file, million_row_file
 
 def test_instantiation():
     """
@@ -161,3 +162,11 @@ def test_df_as_list():
 def test_first_dataframe():
     s = StarParser(sampling_3d)
     assert isinstance(s.first_dataframe, pd.DataFrame)
+
+
+def test_parsing_speed():
+    generate_large_star_file()
+    s = StarParser(million_row_file)
+    remove_large_star_file()
+
+
