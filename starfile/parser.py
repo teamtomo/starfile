@@ -162,7 +162,7 @@ class StarParser:
             self.buffer.add_line(current_line)
             self.crawler.increment_line_number()
 
-        df = pd.read_csv(StringIO(self.buffer.buffer), delim_whitespace=True, header=None,
+        df = pd.read_csv(StringIO(self.buffer.as_str()), delim_whitespace=True, header=None,
                          comment='#')
         return df
 
