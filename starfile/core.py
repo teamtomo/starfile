@@ -1,35 +1,35 @@
 from pathlib import Path
 from linecache import getline
 from typing import Union
+from collections import deque
 
 
 class TextBuffer:
     def __init__(self):
-        self.buffer = ''
+        self.buffer = deque()
 
     def clear(self):
-        self.buffer = ''
-
-    def add_newline(self):
-        self.buffer += '\n'
+        self.buffer = deque()
 
     def add_line(self, line):
-        self.buffer += f'{line}'
-        self.add_newline()
+        self.buffer.append(f'{line}')
 
     def add_comment(self, line):
         self.add_line(f'# {line}')
 
     def add_blank_line(self):
-        self.add_newline()
+        self.add_line('\n')
 
     def add_blank_lines(self, n: int):
         for i in range(n):
             self.add_blank_line()
 
+    def as_str(self):
+        return '\n'.join(self.buffer)
+
     def write_to_disk(self, filename: Union[Path, str], mode: str):
         with open(filename, mode) as file:
-            file.write(self.buffer)
+            file.write(self.as_str())
 
     def write_as_new_file(self, filename: Union[Path, str]):
         self.write_to_disk(filename, 'w+')
@@ -46,7 +46,7 @@ class TextBuffer:
         self.clear()
 
     def split_on_newline(self):
-        return self.buffer.split('\n')[:-1]
+        return self.buffer
 
 
 class TextCrawler:
