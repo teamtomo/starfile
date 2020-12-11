@@ -18,7 +18,7 @@ class TextBuffer:
         self.add_line(f'# {line}')
 
     def add_blank_line(self):
-        self.add_line('\n')
+        self.add_line('')
 
     def add_blank_lines(self, n: int):
         for i in range(n):
