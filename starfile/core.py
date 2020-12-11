@@ -26,7 +26,9 @@ class TextBuffer:
 
     def as_str(self):
         buffer_with_newlines = '\n'.join(self.buffer)
-        return f'{buffer_with_newlines}\n'
+        if buffer_with_newlines[-2:] != '\n':
+            buffer_with_newlines = f'{buffer_with_newlines}\n'
+        return buffer_with_newlines
 
     def write_to_disk(self, filename: Union[Path, str], mode: str):
         with open(filename, mode) as file:
