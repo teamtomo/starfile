@@ -25,7 +25,8 @@ class TextBuffer:
             self.add_blank_line()
 
     def as_str(self):
-        return '\n'.join(self.buffer)
+        buffer_with_newlines = '\n'.join(self.buffer)
+        return f'{buffer_with_newlines}\n'
 
     def write_to_disk(self, filename: Union[Path, str], mode: str):
         with open(filename, mode) as file:
