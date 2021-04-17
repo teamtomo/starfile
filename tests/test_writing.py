@@ -1,3 +1,6 @@
+from os.path import join as join_path
+from tempfile import TemporaryDirectory
+
 import pandas as pd
 
 from starfile.parser import StarParser
@@ -46,3 +49,20 @@ def test_create_from_dataframes():
 
     s = StarParser(output_file)
     assert len(s.dataframes) == 2
+
+def test_can_write_non_zero_indexed_one_row_dataframe():
+    df = pd.DataFrame([[1,2,3]], columns=["A", "B", "C"])
+    df.index += 1
+
+    with TemporaryDirectory() as directory:
+        filename = join_path(directory, "test.star")
+        StarWriter(df, filename)
+        with open(filename) as output_file:
+            output = output_file.read()
+
+    expected = (
+        "_A\t\t\t1\n"
+        "_B\t\t\t2\n"
+        "_C\t\t\t3\n"
+    )
+    assert (expected in output)

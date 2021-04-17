@@ -128,7 +128,7 @@ class StarWriter:
         self.buffer.append_to_file_and_clear(self.filename)
 
     def _write_simple_block(self, df: pd.DataFrame):
-        lines = [f'_{column_name}\t\t\t{df[column_name][0]}'
+        lines = [f'_{column_name}\t\t\t{df[column_name][df.index[0]]}'
                  for column_name in df.columns]
         for line in lines:
             self.buffer.add_line(line)
