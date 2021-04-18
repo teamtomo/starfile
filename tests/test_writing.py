@@ -51,6 +51,7 @@ def test_create_from_dataframes():
     assert len(s.dataframes) == 2
 
 def test_can_write_non_zero_indexed_one_row_dataframe():
+    # see PR #13 - https://github.com/alisterburt/starfile/pull/13
     df = pd.DataFrame([[1,2,3]], columns=["A", "B", "C"])
     df.index += 1
 
