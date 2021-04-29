@@ -21,14 +21,14 @@ def open(filename: str, read_n_blocks: int = None, always_dict: bool = False):
 
 
 def new(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]], filename: str,
-        float_format: str = '%.6f', sep: str = '\t', overwrite: bool = False):
+        float_format: str = '%.6f', sep: str = '\t', na_rep: str = '<NA>', overwrite: bool = False):
     """
     Write dataframes from pandas dataframe(s) to a star file
 
     data can be a single dataframe, a list of dataframes or a dict of dataframes
     float format defaults to 6 digits after the decimal point
     """
-    StarWriter(data, filename=filename, float_format=float_format, sep=sep, overwrite=overwrite)
+    StarWriter(data, filename=filename, float_format=float_format, sep=sep, na_rep=na_rep, overwrite=overwrite)
 
 
 read = open
