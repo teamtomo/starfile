@@ -11,11 +11,12 @@ from .version import __version__
 
 class StarWriter:
     def __init__(self, dataframes: Union[pd.DataFrame, dict, list], filename: Union[Path, str],
-                 overwrite=False, float_format='%.6f'):
+                 overwrite=False, float_format='%.6f', sep='\t'):
         self.overwrite = overwrite
         self.filename = filename
         self.dataframes = dataframes
         self.float_format = float_format
+        self.sep = sep
         self.buffer = TextBuffer()
         self.write_star_file()
 
@@ -136,6 +137,6 @@ class StarWriter:
 
     def _write_loop_block(self, df: pd.DataFrame):
         self.write_loopheader(df)
-        df.to_csv(self.filename, mode='a', sep='\t', header=False, index=False,
+        df.to_csv(self.filename, mode='a', sep=self.sep, header=False, index=False,
                   float_format=self.float_format)
 
