@@ -13,7 +13,15 @@ setup(
     python_requires='>=3.6',
     install_requires=[
         'pandas',
+        'Click',
+        'IPython',
     ],
+    py_modules=['starfile'],
+    entry_points={
+        'console_scripts': [
+            'starfile = starfile.__main__:cli',
+        ],
+    },
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
