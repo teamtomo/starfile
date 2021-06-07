@@ -5,7 +5,7 @@ from typing import Union, Dict, List
 
 import pandas as pd
 
-from .core import TextBuffer
+from .utils import TextBuffer
 from .version import __version__
 
 

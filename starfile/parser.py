@@ -5,7 +5,7 @@ import pandas as pd
 from pathlib import Path
 from typing import List, Union
 
-from .core import TextBuffer, TextCrawler
+from .utils import TextBuffer, TextCrawler
 
 
 class StarParser:
