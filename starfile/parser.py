@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from io import StringIO
 
 import pandas as pd
 from pathlib import Path
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Union, Optional
 
-from .core import TextBuffer, TextCrawler
+from .utils import TextBuffer, TextCrawler
+
+if TYPE_CHECKING:
+    from os import PathLike
 
 
 class StarParser:
-    def __init__(self, filename: Union[str, Path], read_n_blocks=None):
+    def __init__(self, filename: PathLike, read_n_blocks: Optional[int] = None):
         # set filename, with path checking
         self.filename = filename
 
@@ -141,7 +146,7 @@ class StarParser:
     def _cleaned_simple_block_to_dataframe(data: dict):
         return pd.DataFrame(data, columns=data.keys(), index=[0])
 
-    def _parse_loop_header(self) -> List:
+    def _parse_loop_header(self) -> List[str]:
         self.text_buffer.clear()
 
         while self.crawler.current_line.startswith('_'):
@@ -169,7 +174,7 @@ class StarParser:
         """
         Converts strings in dataframes into numerical values where possible
 
-        applying pd.dataframes_to_numeric loses name dataframes of DataFrame,
+        applying pd.to_numeric causes loss of 'name' attribute of DataFrame,
         need to extract name and reapply inline
         """
         for key, df in self.dataframes.items():

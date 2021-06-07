@@ -8,49 +8,49 @@ from .constants import loop_simple, postprocess, test_df, test_data
 
 
 def test_read():
-    df = starfile.open(loop_simple)
+    df = starfile.read(loop_simple)
     assert isinstance(df, pd.DataFrame)
 
 
 def test_read_always_dict():
-    data = starfile.open(loop_simple, always_dict=True)
+    data = starfile.read(loop_simple, always_dict=True)
     assert isinstance(data, dict)
 
 
 def test_read_multiblock():
-    data = starfile.open(postprocess)
+    data = starfile.read(postprocess)
     assert isinstance(data, dict)
     assert len(data) == 3
 
 
 def test_write():
     output_file = test_data / 'test_write.star'
-    starfile.new(test_df, output_file, overwrite=True)
+    starfile.write(test_df, output_file, overwrite=True)
     assert output_file.exists()
 
 
 def test_write_fails_to_overwrite_without_flag():
     output_file = test_data / 'test_overwrite_flag.star'
-    starfile.new(test_df, output_file, overwrite=True)
+    starfile.write(test_df, output_file, overwrite=True)
 
     assert output_file.exists()
     with pytest.raises(FileExistsError):
-        starfile.new(test_df, output_file, overwrite=False)
+        starfile.write(test_df, output_file, overwrite=False)
         starfile.new(test_df, output_file)
 
 
 def test_write_overwrites_with_flag():
     output_file = test_data / 'test_overwrite_flag.star'
-    starfile.new(test_df, output_file, overwrite=True)
+    starfile.write(test_df, output_file, overwrite=True)
 
     assert output_file.exists()
-    starfile.new(test_df, output_file, overwrite=True)
+    starfile.write(test_df, output_file, overwrite=True)
 
 
 def test_write_with_float_format():
     output_file = test_data / 'test_write_with_float_format.star'
     test_df['float_col'] = 1.23456789
-    starfile.new(test_df, output_file, float_format='%.3f', overwrite=True)
+    starfile.write(test_df, output_file, float_format='%.3f', overwrite=True)
     assert output_file.exists()
 
 

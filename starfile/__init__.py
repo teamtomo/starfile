@@ -1,2 +1,2 @@
-from .functions import open, read, new, write
+from .functions import read, write
 from .version import __version__

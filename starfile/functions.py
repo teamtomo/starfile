@@ -1,12 +1,20 @@
-from typing import Dict, List, Union
+from __future__ import annotations
 
-import pandas as pd
+from typing import TYPE_CHECKING, Dict, List, Union
+
+if TYPE_CHECKING:
+    import pandas as pd
+    from os import PathLike
 
 from .parser import StarParser
 from .writer import StarWriter
 
+if TYPE_CHECKING:
+    import pandas as pd
+    from os import PathLike
 
-def open(filename: str, read_n_blocks: int = None, always_dict: bool = False):
+
+def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = False):
     """
     Read a star file into a pandas dataframe or dict of pandas dataframes
 
@@ -20,16 +28,14 @@ def open(filename: str, read_n_blocks: int = None, always_dict: bool = False):
         return star.dataframes
 
 
-def new(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]], filename: str,
-        float_format: str = '%.6f', sep: str = '\t', na_rep: str = '<NA>', overwrite: bool = False):
+def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]],
+          filename: PathLike,
+          float_format: str = '%.6f', sep: str = '\t', na_rep: str = '<NA>',
+          overwrite: bool = False):
     """
     Write dataframes from pandas dataframe(s) to a star file
 
     data can be a single dataframe, a list of dataframes or a dict of dataframes
     float format defaults to 6 digits after the decimal point
     """
-    StarWriter(data, filename=filename, float_format=float_format, sep=sep, na_rep=na_rep, overwrite=overwrite)
-
-
-read = open
-write = new
+    StarWriter(data, filename=filename, float_format=float_format, overwrite=overwrite)
