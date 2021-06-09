@@ -1,1 +1,4 @@
-pandas>=1.0.5
+# requirements are in setup.cfg
+# https://caremad.io/posts/2013/07/setup-vs-requirement/
+
+-e ".[cli]"
