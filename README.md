@@ -67,7 +67,7 @@ This functionality is also exposed by `starfile.read` for convenience.
 DataFrame objects (or dicts or lists of dataframes) can be written to STAR files using `starfile.write`
 
 ```python
->>> starfile.new(df, 'tests/dataframes/cars.star')
+>>> starfile.write(df, 'tests/dataframes/cars.star')
 ```
 
 Produces a STAR file which looks like
