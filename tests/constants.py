@@ -19,6 +19,7 @@ sampling_2d = relion_tutorial / 'run_it025_sampling_2D.star'
 sampling_3d = relion_tutorial / 'run_it025_sampling_3D.star'
 non_existant_file = test_data / 'non_existant_file.star'
 two_single_line_loop_blocks = test_data / 'two_single_line_loop_blocks.star'
+two_basic_blocks = test_data / 'two_basic_blocks.star'
 
 # Example DataFrame for testing
 cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],

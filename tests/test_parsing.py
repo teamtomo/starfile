@@ -8,7 +8,7 @@ from starfile.parser import StarParser
 from .constants import loop_simple, postprocess, pipeline, rln31_style, optimiser_2d, optimiser_3d, \
     sampling_2d, \
     sampling_3d, single_line_middle_of_multiblock, single_line_end_of_multiblock, non_existant_file, \
-    loop_simple_columns, two_single_line_loop_blocks
+    loop_simple_columns, two_single_line_loop_blocks, two_basic_blocks
 from .utils import generate_large_star_file, remove_large_star_file, million_row_file
 
 
@@ -192,3 +192,8 @@ def test_two_single_line_loop_blocks():
     assert parser.dataframes['block_1'].shape == (1, 3)
 
 
+def test_two_basic_blocks():
+    parser = StarParser(two_basic_blocks)
+    assert len(parser.dataframes) == 2
+    for df in parser.dataframes.values():
+        assert df.shape == (1, 3)
