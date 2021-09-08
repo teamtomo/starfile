@@ -55,19 +55,20 @@ class StarParser:
                 return
 
             elif line.startswith('data_') or self.crawler.current_line_number == self.n_lines:
-                self._parse_simple_block()
+                self._parse_simple_block_from_buffer()
                 return
 
             self.text_buffer.add_line(line)
         return
 
-    def _parse_simple_block(self):
+    def _parse_simple_block_from_buffer(self):
         data = self._clean_simple_block_in_buffer()
 
         df = self._cleaned_simple_block_to_dataframe(data)
         df.name = self._current_data_block_name
-
         self._add_dataframe(df)
+
+        self.text_buffer.clear()
 
     def _parse_loop_block(self):
         self.crawler.increment_line_number()
