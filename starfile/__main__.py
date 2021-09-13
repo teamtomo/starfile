@@ -1,6 +1,8 @@
 try:
     from IPython.terminal.embed import InteractiveShellEmbed
     import click
+    import matplotlib.pyplot as plt
+    import seaborn as sns
 except ImportError:
     deps = False
 else:
