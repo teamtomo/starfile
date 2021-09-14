@@ -88,8 +88,39 @@ Audi_A4	        35000
 - floating point format can be specified by the `float_format` keyword argument (default `%.6f`)
 - data block headers are of format `data_<key>` where key is the dictionary key if a `dict` is passed, `df.name` if a 
 `DataFrame` or list of `DataFrame`s is passed
+  
+## Interactive usage
+You can also use `starfile` as an interactive command line tool for quick
+and dirty data analysis.
+This functionality can be installed using pip:
 
-This functionality is also exposed by `starfile.write` for convenience.
+```shell
+pip install starfile[cli]
+```
+
+Note that with certain shells (e.g. `zsh`) you may need to use 
+`pip install 'starfile[cli]'` to avoid unwanted shell expansion of the 
+square bracket syntax.
+
+You can then call `starfile <my_file>.star` to be dropped into an interactive
+Python console with access to your data.
+
+```sh
+starfile tests/data/loop_block.star
+```
+
+```python
+Python 3.9.6 (default, Aug 18 2021, 12:38:10) 
+Type 'copyright', 'credits' or 'license' for more information
+IPython 7.27.0 -- An enhanced Interactive Python. Type '?' for help.
+
+=== Starfile ===
+    - access your data with `star`
+    - write it out with `write(...)`
+```
+
+Both matplotlib and seaborn are available for plotting your data in this 
+interactive shell.
 
 ## License
 The project is released under the BSD 3-Clause License
