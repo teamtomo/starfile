@@ -6,12 +6,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Union, Dict, List
 
 import pandas as pd
+from pkg_resources import get_distribution
 
 from .utils import TextBuffer
-from .version import __version__
 
 if TYPE_CHECKING:
     from os import PathLike
+
+__version__ = get_distribution("starfile").version
 
 
 class StarWriter:
