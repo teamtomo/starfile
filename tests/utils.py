@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 
 import starfile
-from .constants import test_data
+from .constants import test_data_directory
 
-million_row_file = test_data / '1m_row.star'
+million_row_file = test_data_directory / '1m_row.star'
 
 
 def generate_large_star_file():

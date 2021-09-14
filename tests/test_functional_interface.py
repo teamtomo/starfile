@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 import starfile
 
-from .constants import loop_simple, postprocess, test_df, test_data
+from .constants import loop_simple, postprocess, test_df, test_data_directory
 
 
 def test_read():
@@ -24,13 +24,13 @@ def test_read_multiblock():
 
 
 def test_write():
-    output_file = test_data / 'test_write.star'
+    output_file = test_data_directory / 'test_write.star'
     starfile.write(test_df, output_file, overwrite=True)
     assert output_file.exists()
 
 
 def test_write_fails_to_overwrite_without_flag():
-    output_file = test_data / 'test_overwrite_flag.star'
+    output_file = test_data_directory / 'test_overwrite_flag.star'
     starfile.write(test_df, output_file, overwrite=True)
 
     assert output_file.exists()
@@ -40,7 +40,7 @@ def test_write_fails_to_overwrite_without_flag():
 
 
 def test_write_overwrites_with_flag():
-    output_file = test_data / 'test_overwrite_flag.star'
+    output_file = test_data_directory / 'test_overwrite_flag.star'
     starfile.write(test_df, output_file, overwrite=True)
 
     assert output_file.exists()
@@ -48,7 +48,7 @@ def test_write_overwrites_with_flag():
 
 
 def test_write_with_float_format():
-    output_file = test_data / 'test_write_with_float_format.star'
+    output_file = test_data_directory / 'test_write_with_float_format.star'
     test_df['float_col'] = 1.23456789
     starfile.write(test_df, output_file, float_format='%.3f', overwrite=True)
     assert output_file.exists()
