@@ -35,7 +35,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install setuptools pytest
           pip install -e .
-      # this runs the platform-specific tests declared in tox.ini
+
       - name: Test with pytest
         run: pytest
         env:
