@@ -1,7 +1,11 @@
-from pathlib import Path
-from linecache import getline
-from typing import Union
+from __future__ import annotations
+
 from collections import deque
+from linecache import getline
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from os import PathLike
 
 
 class TextBuffer:
@@ -30,27 +34,27 @@ class TextBuffer:
             buffer_with_newlines = f'{buffer_with_newlines}\n'
         return buffer_with_newlines
 
-    def write_to_disk(self, filename: Union[Path, str], mode: str):
+    def write_to_disk(self, filename: PathLike, mode: str):
         with open(filename, mode) as file:
             file.write(self.as_str())
 
-    def write_as_new_file(self, filename: Union[Path, str]):
+    def write_as_new_file(self, filename: PathLike):
         self.write_to_disk(filename, 'w+')
 
-    def write_as_new_file_and_clear(self, filename: Union[Path, str]):
+    def write_as_new_file_and_clear(self, filename: PathLike):
         self.write_as_new_file(filename)
         self.clear()
 
-    def append_to_file(self, filename: Union[Path, str]):
+    def append_to_file(self, filename: PathLike):
         self.write_to_disk(filename, 'a')
 
-    def append_to_file_and_clear(self, filename: Union[Path, str]):
+    def append_to_file_and_clear(self, filename: PathLike):
         self.append_to_file(filename)
         self.clear()
 
 
 class TextCrawler:
-    def __init__(self, filename: Union[Path, str]):
+    def __init__(self, filename: PathLike):
         self.filename = filename
         self.current_line_number = 0
 

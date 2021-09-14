@@ -1,17 +1,23 @@
+from __future__ import annotations
+
+from collections import OrderedDict
 from datetime import datetime
 from pathlib import Path
-from collections import OrderedDict
-from typing import Union, Dict, List
+from typing import TYPE_CHECKING, Union, Dict, List
 
 import pandas as pd
 
-from .core import TextBuffer
+from .utils import TextBuffer
 from .version import __version__
+
+if TYPE_CHECKING:
+    from os import PathLike
 
 
 class StarWriter:
-    def __init__(self, dataframes: Union[pd.DataFrame, dict, list], filename: Union[Path, str],
-                 overwrite=False, float_format='%.6f', sep='\t', na_rep='<NA>'):
+    def __init__(self, dataframes: Union[pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]],
+                 filename: PathLike, overwrite: bool = False, float_format: str = '%.6f',
+                 sep: str = '\t', na_rep: str = '<NA>'):
         self.overwrite = overwrite
         self.filename = filename
         self.dataframes = dataframes
@@ -30,7 +36,7 @@ class StarWriter:
         return self._dataframes
 
     @dataframes.setter
-    def dataframes(self, dataframes: Union[pd.DataFrame, dict, list]):
+    def dataframes(self, dataframes: Union[pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]]):
         if isinstance(dataframes, pd.DataFrame):
             self._dataframes = self.coerce_dataframe(dataframes)
         elif isinstance(dataframes, dict):
@@ -140,4 +146,3 @@ class StarWriter:
         self.write_loopheader(df)
         df.to_csv(self.filename, mode='a', sep=self.sep, header=False, index=False,
                   float_format=self.float_format, na_rep=self.na_rep)
-

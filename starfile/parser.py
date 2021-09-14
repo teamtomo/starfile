@@ -1,15 +1,20 @@
+from __future__ import annotations
+
 from collections import OrderedDict
 from io import StringIO
 
 import pandas as pd
 from pathlib import Path
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Union, Optional
 
-from .core import TextBuffer, TextCrawler
+from .utils import TextBuffer, TextCrawler
+
+if TYPE_CHECKING:
+    from os import PathLike
 
 
 class StarParser:
-    def __init__(self, filename: Union[str, Path], read_n_blocks=None):
+    def __init__(self, filename: PathLike, read_n_blocks: Optional[int] = None):
         # set filename, with path checking
         self.filename = filename
 
@@ -50,19 +55,20 @@ class StarParser:
                 return
 
             elif line.startswith('data_') or self.crawler.current_line_number == self.n_lines:
-                self._parse_simple_block()
+                self._parse_simple_block_from_buffer()
                 return
 
             self.text_buffer.add_line(line)
         return
 
-    def _parse_simple_block(self):
+    def _parse_simple_block_from_buffer(self):
         data = self._clean_simple_block_in_buffer()
 
         df = self._cleaned_simple_block_to_dataframe(data)
         df.name = self._current_data_block_name
-
         self._add_dataframe(df)
+
+        self.text_buffer.clear()
 
     def _parse_loop_block(self):
         self.crawler.increment_line_number()
@@ -141,7 +147,7 @@ class StarParser:
     def _cleaned_simple_block_to_dataframe(data: dict):
         return pd.DataFrame(data, columns=data.keys(), index=[0])
 
-    def _parse_loop_header(self) -> List:
+    def _parse_loop_header(self) -> List[str]:
         self.text_buffer.clear()
 
         while self.crawler.current_line.startswith('_'):
@@ -169,7 +175,7 @@ class StarParser:
         """
         Converts strings in dataframes into numerical values where possible
 
-        applying pd.dataframes_to_numeric loses name dataframes of DataFrame,
+        applying pd.to_numeric causes loss of 'name' attribute of DataFrame,
         need to extract name and reapply inline
         """
         for key, df in self.dataframes.items():

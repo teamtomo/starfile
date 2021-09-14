@@ -40,7 +40,7 @@ pip install starfile
 To open a STAR file
 ```python
 >>> import starfile
->>> df = starfile.open('tests/dataframes/one_loop.star')
+>>> df = starfile.read('tests/dataframes/one_loop.star')
 >>> df
       rlnCoordinateX  rlnCoordinateY  ...  rlnAngleTilt rlnAnglePsi
 0           1572.444        1084.500  ...             0           0
@@ -61,13 +61,12 @@ To open a STAR file
 - Opening STAR files containing multiple dataframes blocks will return a `dict` of DataFrame objects.
 - If you would like to always return a `dict`, you can use the `always_dict=True` keyword argument
 
-This functionality is also exposed by `starfile.read` for convenience.
 
 ### Writing STAR files
 DataFrame objects (or dicts or lists of dataframes) can be written to STAR files using `starfile.write`
 
 ```python
->>> starfile.new(df, 'tests/dataframes/cars.star')
+>>> starfile.write(df, 'tests/dataframes/cars.star')
 ```
 
 Produces a STAR file which looks like
