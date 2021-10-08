@@ -31,7 +31,7 @@ def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = Fals
 def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]],
           filename: PathLike,
           float_format: str = '%.6f', sep: str = '\t', na_rep: str = '<NA>',
-          overwrite: bool = False):
+          overwrite: bool = False, force_loop: bool = True):
     """
     Write dataframes from pandas dataframe(s) to a star file
 
@@ -39,4 +39,4 @@ def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]]
     float format defaults to 6 digits after the decimal point
     """
     StarWriter(data, filename=filename, float_format=float_format, overwrite=overwrite,
-               na_rep=na_rep, sep=sep)
+               na_rep=na_rep, sep=sep, force_loop=force_loop)
