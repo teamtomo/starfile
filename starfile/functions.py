@@ -38,4 +38,5 @@ def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]]
     data can be a single dataframe, a list of dataframes or a dict of dataframes
     float format defaults to 6 digits after the decimal point
     """
-    StarWriter(data, filename=filename, float_format=float_format, overwrite=overwrite)
+    StarWriter(data, filename=filename, float_format=float_format, overwrite=overwrite,
+               na_rep=na_rep, sep=sep)
