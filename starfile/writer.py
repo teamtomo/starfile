@@ -19,13 +19,14 @@ __version__ = get_distribution("starfile").version
 class StarWriter:
     def __init__(self, dataframes: Union[pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]],
                  filename: PathLike, overwrite: bool = False, float_format: str = '%.6f',
-                 sep: str = '\t', na_rep: str = '<NA>'):
+                 sep: str = '\t', na_rep: str = '<NA>', force_loop: bool = False):
         self.overwrite = overwrite
         self.filename = filename
         self.dataframes = dataframes
         self.float_format = float_format
         self.sep = sep
         self.na_rep = na_rep
+        self.force_loop = force_loop
         self.buffer = TextBuffer()
         self.write_star_file()
 
@@ -130,9 +131,9 @@ class StarWriter:
     def write_block(self, df: pd.DataFrame):
         self.add_block_name_to_buffer(df)
 
-        if df.shape[0] == 1:
+        if (df.shape[0] == 1) and not self.force_loop:
             self._write_simple_block(df)
-        elif df.shape[0] > 1:
+        elif (df.shape[0] > 1) or self.force_loop:
             self._write_loop_block(df)
         self.buffer.add_blank_lines(2)
         self.buffer.append_to_file_and_clear(self.filename)
