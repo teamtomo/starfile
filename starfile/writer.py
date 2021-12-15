@@ -19,7 +19,7 @@ __version__ = get_distribution("starfile").version
 class StarWriter:
     def __init__(self, dataframes: Union[pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]],
                  filename: PathLike, overwrite: bool = False, float_format: str = '%.6f',
-                 sep: str = '\t', na_rep: str = '<NA>', force_loop: bool = False):
+                 sep: str = '\t', na_rep: str = '<NA>', force_loop: bool = True):
         self.overwrite = overwrite
         self.filename = filename
         self.dataframes = dataframes
