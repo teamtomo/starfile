@@ -31,7 +31,7 @@ def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = Fals
 def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]],
           filename: PathLike,
           float_format: str = '%.6f', sep: str = '\t', na_rep: str = '<NA>',
-          overwrite: bool = False, force_loop: bool = False):
+          overwrite: bool = False, force_loop: bool = True):
     """
     Write dataframes from pandas dataframe(s) to a star file
 
