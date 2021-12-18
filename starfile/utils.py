@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from collections import deque
-from linecache import getline
+from linecache import getline, checkcache
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -57,6 +57,7 @@ class TextCrawler:
     def __init__(self, filename: PathLike):
         self.filename = filename
         self.current_line_number = 0
+        checkcache(str(self.filename))
 
     def count_lines(self):
         with open(self.filename, 'rb') as f:
