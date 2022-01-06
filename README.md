@@ -33,7 +33,13 @@ Installation is available directly from the [Python package index](https://pypi.
 pip install starfile
 ```
 
-Currently `python>=3.8` is supported.
+Currently `python` >= `3.8` is supported. You can check your `python` version with
+
+```sh
+python -V
+```
+
+We recommend installing into a [virtual environment](https://jni.github.io/using-python-for-science/intro-to-environments.html) for use in your projects.
 
 ## Usage
 
