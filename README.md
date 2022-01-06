@@ -33,6 +33,7 @@ Installation is available directly from the [Python package index](https://pypi.
 pip install starfile
 ```
 
+Currently `python>=3.8` is supported.
 
 ## Usage
 
