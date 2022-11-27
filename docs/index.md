@@ -1,6 +1,6 @@
 # Overview
 
-*starfile* is a Python package for reading and writing
+*starfile* is a package for reading and writing
 [STAR files](https://en.wikipedia.org/wiki/Self-defining_Text_Archive_and_Retrieval) in Python.
 
 <figure markdown>
@@ -72,10 +72,7 @@ Save the (modified) data to file
 starfile.write(df, 'modified_particles.star')
 ```
 
-For more advanced usage, including dealing with
-files containing multiple data blocks, please see the 
-[data model](./data_model.md) and 
-[multiple data block](examples/multi_block.md) pages.
+For more advanced usage please check out the examples.
 
 ---
 

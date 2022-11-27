@@ -5,6 +5,7 @@ site_description: >-
   Documentation for starfile
 repo_name: teamtomo/starfile
 repo_url: https://github.com/teamtomo/starfile
+edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2022 - 2022 teamtomo
 
 
