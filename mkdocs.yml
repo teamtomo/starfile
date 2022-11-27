@@ -1,0 +1,55 @@
+site_name: teamtomo/starfile
+site_url: https://teamtomo.org/starfile
+site_author: teamtomo
+site_description: >-
+  Documentation for starfile
+repo_name: teamtomo/starfile
+repo_url: https://github.com/teamtomo/starfile
+copyright: Copyright &copy; 2022 - 2022 teamtomo
+
+
+# Custom navigation can be specified
+nav:
+  - Overview: index.md
+  - Examples:
+      - single data block: examples/single_block.md
+      - multiple data blocks: examples/multi_block.md
+      - merging data across tables: examples/merging.md
+
+theme:
+  icon:
+    logo: material/cube-outline
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+
+  features:
+    - navigation.instant
+    - navigation.expand
+    - search.highlight
+    - search.suggest
+    - content.tabs.link
+
+markdown_extensions:
+  - admonition
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+
+plugins:
+  - search
