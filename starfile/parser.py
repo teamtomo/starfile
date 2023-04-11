@@ -54,7 +54,8 @@ class StarParser:
                 self._parse_loop_block()
                 return
 
-            elif line.startswith('data_') or self.crawler.current_line_number == self.n_lines:
+            elif line.startswith(
+                'data_') or self.crawler.current_line_number == self.n_lines:
                 self._parse_simple_block_from_buffer()
                 return
 
@@ -74,6 +75,8 @@ class StarParser:
         self.crawler.increment_line_number()
         header = self._parse_loop_header()
         df = self._parse_loop_data()
+        if df is None:
+            df = pd.DataFrame({h: None for h in header}, index=[0])
         df.columns = header
         df.name = self._current_data_block_name
         self._add_dataframe(df)
@@ -157,7 +160,7 @@ class StarParser:
 
         return self.text_buffer.buffer
 
-    def _parse_loop_data(self) -> pd.DataFrame:
+    def _parse_loop_data(self) -> Union[pd.DataFrame, None]:
         self.text_buffer.clear()
 
         while self.crawler.current_line_number <= self.n_lines:
@@ -167,8 +170,16 @@ class StarParser:
             self.text_buffer.add_line(current_line)
             self.crawler.increment_line_number()
 
-        df = pd.read_csv(StringIO(self.text_buffer.as_str()), delim_whitespace=True, header=None,
-                         comment='#')
+        # check whether the buffer is empty
+        if self.text_buffer.is_empty:
+            return None
+
+        df = pd.read_csv(
+            StringIO(self.text_buffer.as_str()),
+            delim_whitespace=True,
+            header=None,
+            comment='#'
+        )
         return df
 
     def dataframes_to_numeric(self):
@@ -204,7 +215,3 @@ class StarParser:
 
     def dataframes_as_list(self):
         return list(self.dataframes.values())
-
-
-
-

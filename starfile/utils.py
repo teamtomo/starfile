@@ -12,6 +12,15 @@ class TextBuffer:
     def __init__(self):
         self.buffer = deque()
 
+    @property
+    def is_empty(self) -> bool:
+        if len(self.buffer) == 0:
+            return True
+        elif len(self.buffer) <= 100:  # arbitrary, avoid iterating large buffer
+            return all([item.strip() == '' for item in self.buffer])
+        else:
+            return False
+
     def clear(self):
         self.buffer = deque()
 
