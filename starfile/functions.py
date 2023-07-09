@@ -14,14 +14,17 @@ if TYPE_CHECKING:
     from os import PathLike
 
 
-def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = False):
+def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = False, quotechar: str = '"'):
     """
     Read a star file into a pandas dataframe or dict of pandas dataframes
 
     default behaviour in the case of only one data block being present in the STAR file is to
     return only a dataframe, this can be changed by setting 'always_dict=True'
+
+    The quote character that is optional for strings in the star file can be changed by setting
+    'quotechar' to the desired character
     """
-    star = StarParser(filename, read_n_blocks=read_n_blocks)
+    star = StarParser(filename, read_n_blocks=read_n_blocks, quotechar=quotechar)
     if len(star.dataframes) == 1 and always_dict is False:
         return star.first_dataframe
     else:

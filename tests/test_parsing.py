@@ -21,6 +21,8 @@ from .constants import (
     two_single_line_loop_blocks,
     two_basic_blocks,
     empty_loop,
+    single_quote,
+    double_quote,
 )
 from .utils import generate_large_star_file, remove_large_star_file, million_row_file
 
@@ -217,3 +219,23 @@ def test_empty_loop_block():
     """Parsing an empty loop block should return an empty dataframe."""
     parser = StarParser(empty_loop)
     assert len(parser.dataframes) == 1
+
+def test_double_quote():
+    import math
+    parser = StarParser(double_quote)
+    assert len(parser.dataframes) == 1
+    assert parser.dataframes[0].loc[0,'no_quote_string'] == "noquote"
+    assert parser.dataframes[0].loc[0,'double_quote_string'] == "double quote"
+    assert parser.dataframes[0].loc[0,'whitespace_string'] == " "
+    # This is probably not the best behaviour, but maybe acceptable
+    assert math.isnan(parser.dataframes[0].loc[0,'empty_string'])
+
+def test_single_quote():
+    import math
+    parser = StarParser(single_quote,quotechar="'")
+    assert len(parser.dataframes) == 1
+    assert parser.dataframes[0].loc[0,'no_quote_string'] == "noquote"
+    assert parser.dataframes[0].loc[0,'single_quote_string'] == "single quote"
+    assert parser.dataframes[0].loc[0,'whitespace_string'] == " "
+    # This is probably not the best behaviour, but maybe acceptable
+    assert math.isnan(parser.dataframes[0].loc[0,'empty_string'])

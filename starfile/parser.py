@@ -14,10 +14,11 @@ if TYPE_CHECKING:
 
 
 class StarParser:
-    def __init__(self, filename: PathLike, read_n_blocks: Optional[int] = None):
+    def __init__(self, filename: PathLike, read_n_blocks: Optional[int] = None, quotechar: str = '"'):
         # set filename, with path checking
         self.filename = filename
-
+        self.quotechar = quotechar
+        
         # initialise attributes for parsing
         self.text_buffer = TextBuffer()
         self.crawler = TextCrawler(self.filename)
@@ -178,6 +179,7 @@ class StarParser:
             StringIO(self.text_buffer.as_str()),
             delim_whitespace=True,
             header=None,
+            quotechar=self.quotechar,
             comment='#'
         )
         return df
