@@ -21,8 +21,10 @@ from .constants import (
     two_single_line_loop_blocks,
     two_basic_blocks,
     empty_loop,
-    single_quote,
-    double_quote,
+    basic_single_quote,
+    basic_double_quote,
+    loop_single_quote,
+    loop_double_quote,
 )
 from .utils import generate_large_star_file, remove_large_star_file, million_row_file
 
@@ -220,22 +222,17 @@ def test_empty_loop_block():
     parser = StarParser(empty_loop)
     assert len(parser.dataframes) == 1
 
-def test_double_quote():
-    import math
-    parser = StarParser(double_quote)
-    assert len(parser.dataframes) == 1
-    assert parser.dataframes[0].loc[0,'no_quote_string'] == "noquote"
-    assert parser.dataframes[0].loc[0,'double_quote_string'] == "double quote"
-    assert parser.dataframes[0].loc[0,'whitespace_string'] == " "
-    # This is probably not the best behaviour, but maybe acceptable
-    assert math.isnan(parser.dataframes[0].loc[0,'empty_string'])
 
-def test_single_quote():
+@pytest.mark.parametrize("quotechar, filename", [("'",basic_single_quote), 
+                                                 ('"',basic_double_quote), 
+                                                 ('"',loop_double_quote),
+                                                 ("'",loop_single_quote)])
+def test_quote(quotechar,filename):
     import math
-    parser = StarParser(single_quote,quotechar="'")
+    parser = StarParser(filename,quotechar=quotechar)
     assert len(parser.dataframes) == 1
     assert parser.dataframes[0].loc[0,'no_quote_string'] == "noquote"
-    assert parser.dataframes[0].loc[0,'single_quote_string'] == "single quote"
+    assert parser.dataframes[0].loc[0,'quote_string'] == "quote string"
     assert parser.dataframes[0].loc[0,'whitespace_string'] == " "
     # This is probably not the best behaviour, but maybe acceptable
     assert math.isnan(parser.dataframes[0].loc[0,'empty_string'])

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import OrderedDict
 from io import StringIO
+import shlex
 
 import pandas as pd
 from pathlib import Path
@@ -136,13 +137,14 @@ class StarParser:
 
     def _clean_simple_block_in_buffer(self):
         clean_datablock = {}
-
+        print(self.text_buffer.buffer)
         for line in self.text_buffer.buffer:
             if line == '' or line.startswith('#'):
                 continue
 
             heading_name = self.heading_from_line(line)
-            value = line.split()[1]
+            value = shlex.split(line)[1]
+            print(heading_name, value)
             clean_datablock[heading_name] = value
 
         return clean_datablock
