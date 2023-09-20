@@ -17,8 +17,10 @@ __version__ = get_distribution("starfile").version
 
 
 class StarWriter:
-    def __init__(self, dataframes: Union[pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]],
-                 filename: PathLike, overwrite: bool = False, float_format: str = '%.6f',
+    def __init__(self, dataframes: Union[
+        pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]],
+                 filename: PathLike, overwrite: bool = False,
+                 float_format: str = '%.6f',
                  sep: str = '\t', na_rep: str = '<NA>', force_loop: bool = False):
         self.overwrite = overwrite
         self.filename = filename
@@ -39,7 +41,8 @@ class StarWriter:
         return self._dataframes
 
     @dataframes.setter
-    def dataframes(self, dataframes: Union[pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]]):
+    def dataframes(self, dataframes: Union[
+        pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]]):
         if isinstance(dataframes, pd.DataFrame):
             self._dataframes = self.coerce_dataframe(dataframes)
         elif isinstance(dataframes, dict):
@@ -47,7 +50,8 @@ class StarWriter:
         elif isinstance(dataframes, list):
             self._dataframes = self.coerce_list(dataframes)
         else:
-            raise ValueError(f'Expected a DataFrame, Dict or List object, got {type(dataframes)}')
+            raise ValueError(
+                f'Expected a DataFrame, Dict or List object, got {type(dataframes)}')
 
     @staticmethod
     def coerce_dataframe(df: pd.DataFrame):
@@ -112,7 +116,8 @@ class StarWriter:
 
     def write_loopheader(self, df: pd.DataFrame):
         self.buffer.add_line('loop_')
-        lines = [f'_{column_name} #{idx}' for idx, column_name in enumerate(df.columns, 1)]
+        lines = [f'_{column_name} #{idx}' for idx, column_name in
+                 enumerate(df.columns, 1)]
 
         for line in lines:
             self.buffer.add_line(line)

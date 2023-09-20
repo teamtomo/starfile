@@ -21,11 +21,11 @@ def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = Fals
     default behaviour in the case of only one data block being present in the STAR file is to
     return only a dataframe, this can be changed by setting 'always_dict=True'
     """
-    star = StarParser(filename, read_n_blocks=read_n_blocks)
-    if len(star.dataframes) == 1 and always_dict is False:
+    star = StarParser(filename, n_blocks_to_read=read_n_blocks)
+    if len(star.data_blocks) == 1 and always_dict is False:
         return star.first_dataframe
     else:
-        return star.dataframes
+        return star.data_blocks
 
 
 def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]],

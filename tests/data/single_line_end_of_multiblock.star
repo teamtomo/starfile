@@ -1,6 +1,6 @@
 # multi-current_line, python engine
 
-data_block_3
+data_block_1
 
 loop_
 _rlnImageName #1
@@ -13,7 +13,7 @@ _rlnCoordinateZ #5
 
 # single-current_line, c engine
 
-data_block_3
+data_block_2
 
 loop_
 _rlnImageName #1
