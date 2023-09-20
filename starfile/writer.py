@@ -9,6 +9,7 @@ import pandas as pd
 from pkg_resources import get_distribution
 
 from .utils import TextBuffer
+from .typing import DataBlock
 
 if TYPE_CHECKING:
     from os import PathLike
@@ -17,140 +18,155 @@ __version__ = get_distribution("starfile").version
 
 
 class StarWriter:
-    def __init__(self, dataframes: Union[
-        pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]],
-                 filename: PathLike, overwrite: bool = False,
-                 float_format: str = '%.6f',
-                 sep: str = '\t', na_rep: str = '<NA>', force_loop: bool = False):
-        self.overwrite = overwrite
-        self.filename = filename
-        self.dataframes = dataframes
+    def __init__(
+        self,
+        data_blocks: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
+        filename: PathLike,
+        float_format: str = '%.6f',
+        sep: str = '\t',
+        na_rep: str = '<NA>',
+    ):
+        # coerce data
+        self.data_blocks = self.coerce_data_blocks(data_blocks)
+
+        # write
+        self.filename = Path(filename)
         self.float_format = float_format
         self.sep = sep
         self.na_rep = na_rep
-        self.force_loop = force_loop
         self.buffer = TextBuffer()
-        self.write_star_file()
+        self.backup_if_file_exists()
+        self.write()
 
-    @property
-    def dataframes(self):
-        """
-        Ordered dictionary of pandas dataframes
-        df.name defines the data block name
-        """
-        return self._dataframes
-
-    @dataframes.setter
-    def dataframes(self, dataframes: Union[
-        pd.DataFrame, Dict[pd.DataFrame], List[pd.DataFrame]]):
-        if isinstance(dataframes, pd.DataFrame):
-            self._dataframes = self.coerce_dataframe(dataframes)
-        elif isinstance(dataframes, dict):
-            self._dataframes = self.coerce_dict(dataframes)
-        elif isinstance(dataframes, list):
-            self._dataframes = self.coerce_list(dataframes)
+    def coerce_data_blocks(
+        self,
+        data_blocks: Union[DataBlock, List[DataBlock], Dict[str, DataBlock]]
+    ) -> Dict[str, DataBlock]:
+        if isinstance(data_blocks, pd.DataFrame):
+            return coerce_dataframe(data_blocks)
+        elif isinstance(data_blocks, dict):
+            return coerce_dict(data_blocks)
+        elif isinstance(data_blocks, list):
+            return coerce_list(data_blocks)
         else:
             raise ValueError(
-                f'Expected a DataFrame, Dict or List object, got {type(dataframes)}')
+                f'Expected \
+                {pd.DataFrame}, \
+                {Dict[str, pd.DataFrame]} \
+                or {List[pd.DataFrame]}, \
+                got {type(data_blocks)}'
+            )
 
-    @staticmethod
-    def coerce_dataframe(df: pd.DataFrame):
-        name = getattr(df, 'name', '')
-        if name != '':
-            name = 0
-        return {name: df}
+    def write(self):
+        write_package_info(self.filename)
+        write_blank_lines(self.filename, n=2)
+        self.write_data_blocks()
 
-    @staticmethod
-    def coerce_dict(dfs: Dict[str, pd.DataFrame]):
-        """
-        This method ensures that dataframe names are updated based on dict keys
-        """
-        for key, df in dfs.items():
-            df.name = str(key)
-        return dfs
+    def write_data_blocks(self):
+        for block_name, block in self.data_blocks.items():
+            if isinstance(block, dict):
+                write_simple_block(
+                    file=self.filename,
+                    block_name=block_name,
+                    data=block
+                )
+            elif isinstance(block, pd.DataFrame):
+                write_loop_block(
+                    file=self.filename,
+                    block_name=block_name,
+                    df=block,
+                    float_format=self.float_format,
+                    separator=self.sep,
+                    na_rep=self.na_rep,
+                )
 
-    def coerce_list(self, dfs: List[pd.DataFrame]):
-        """
-        This method coerces a list of DataFrames into a dict
-        """
-        return self.coerce_dict(OrderedDict([(idx, df) for idx, df in enumerate(dfs)]))
+    def backup_if_file_exists(self):
+        if self.filename.exists():
+            new_name = self.filename.name + '~'
+            backup_path = self.filename.resolve().parent / new_name
+            self.filename.rename(backup_path)
 
-    @property
-    def filename(self):
-        return self._filename
 
-    @filename.setter
-    def filename(self, filename: Union[Path, str]):
-        self._filename = Path(filename)
-        if not self.file_writable:
-            raise FileExistsError('to overwrite an existing file set overwrite=True')
+def coerce_dataframe(df: pd.DataFrame) -> Dict[str, DataBlock]:
+    return {'': df}
 
-    @property
-    def file_exists(self):
-        return self.filename.exists()
 
-    @property
-    def file_writable(self):
-        if self.overwrite or (not self.file_exists):
-            return True
-        else:
-            return False
+def coerce_dict(
+    data_blocks: Union[DataBlock, Dict[str, DataBlock]]
+) -> Dict[str, DataBlock]:
+    """Coerce dict into dict of data blocks."""
+    # check if data is already Dict[str, DataBlock]
+    for k, v in data_blocks.items():
+        if type(v) in (dict, pd.DataFrame):  #
+            return data_blocks
+    # coerce if not
+    return {'': data_blocks}
 
-    def write_package_info(self):
-        date = datetime.now().strftime('%d/%m/%Y')
-        time = datetime.now().strftime('%H:%M:%S')
-        line = f'Created by the starfile Python package (version {__version__}) at {time} on' \
-               f' {date}'
-        self.buffer.add_comment(line)
-        self.buffer.add_blank_lines(1)
-        self.buffer.write_as_new_file_and_clear(self.filename)
 
-    def write_star_file(self, filename: str = None):
-        self.write_package_info()
+def coerce_list(data_blocks: List[DataBlock]) -> Dict[str, DataBlock]:
+    """Coerces a list of DataFrames into a dict"""
+    return {f'{idx}': df for idx, df in enumerate(data_blocks)}
 
-        for _, df in self.dataframes.items():
-            self.write_block(df)
 
-        self.buffer.add_blank_line()
-        self.buffer.append_to_file_and_clear(self.filename)
+def write_blank_lines(file: Path, n: int):
+    with open(file, mode='a') as f:
+        f.write('\n' * n)
 
-    def write_loopheader(self, df: pd.DataFrame):
-        self.buffer.add_line('loop_')
-        lines = [f'_{column_name} #{idx}' for idx, column_name in
-                 enumerate(df.columns, 1)]
 
-        for line in lines:
-            self.buffer.add_line(line)
+def write_package_info(file: Path):
+    date = datetime.now().strftime('%d/%m/%Y')
+    time = datetime.now().strftime('%H:%M:%S')
+    line = f'# Created by the starfile Python package (version {__version__}) at {time} on {date}'
+    with open(file, mode='w+') as f:
+        f.write(f'{line}\n')
 
-        self.buffer.append_to_file_and_clear(self.filename)
 
-    @staticmethod
-    def get_block_name(df: pd.DataFrame):
-        return 'data_' + getattr(df, 'name', '')
+def write_simple_block(
+    file: Path,
+    block_name: str,
+    data: Dict[str, Union[str, int, float]]
+):
+    formatted_lines = '\n'.join(
+        [
+            f'_{k}\t\t\t{v}'
+            for k, v
+            in data.items()
+        ]
+    )
+    with open(file, mode='a') as f:
+        f.write(f'data_{block_name}\n\n')
+        f.write(formatted_lines)
+        f.write('\n\n\n')
 
-    def add_block_name_to_buffer(self, df: pd.DataFrame):
-        self.buffer.add_line(self.get_block_name(df))
-        self.buffer.add_blank_lines(1)
-        self.buffer.append_to_file_and_clear(self.filename)
 
-    def write_block(self, df: pd.DataFrame):
-        self.add_block_name_to_buffer(df)
+def write_loop_block(
+    file: Path,
+    block_name: str,
+    df: pd.DataFrame,
+    float_format: str = '%.6f',
+    separator: str = '\t',
+    na_rep: str = '<NA>',
+):
+    # write header
+    header_lines = [
+        f'_{column_name} #{idx}'
+        for idx, column_name
+        in enumerate(df.columns, 1)
+    ]
+    with open(file, mode='a') as f:
+        f.write(f'data_{block_name}\n\n')
+        f.write('loop_\n')
+        f.write('\n'.join(header_lines))
+        f.write('\n')
 
-        if (df.shape[0] == 1) and not self.force_loop:
-            self._write_simple_block(df)
-        elif (df.shape[0] > 1) or self.force_loop:
-            self._write_loop_block(df)
-        self.buffer.add_blank_lines(2)
-        self.buffer.append_to_file_and_clear(self.filename)
-
-    def _write_simple_block(self, df: pd.DataFrame):
-        lines = [f'_{column_name}\t\t\t{df[column_name].iloc[0]}'
-                 for column_name in df.columns]
-        for line in lines:
-            self.buffer.add_line(line)
-        self.buffer.append_to_file_and_clear(self.filename)
-
-    def _write_loop_block(self, df: pd.DataFrame):
-        self.write_loopheader(df)
-        df.to_csv(self.filename, mode='a', sep=self.sep, header=False, index=False,
-                  float_format=self.float_format, na_rep=self.na_rep)
+    # write data
+    df.to_csv(
+        path_or_buf=file,
+        mode='a',
+        sep=separator,
+        header=False,
+        index=False,
+        float_format=float_format,
+        na_rep=na_rep,
+    )
+    write_blank_lines(file, n=2)

@@ -7,15 +7,12 @@ from linecache import getline
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from typing import TYPE_CHECKING, Union, Optional, Dict, TypeAlias, Tuple
+from typing import TYPE_CHECKING, Union, Optional, Dict, Tuple
+
+from starfile.typing import DataBlock
 
 if TYPE_CHECKING:
     from os import PathLike
-
-DataBlock: TypeAlias = Union[
-    pd.DataFrame,
-    Dict[str, Union[str, int, float]]
-]
 
 
 class StarParser:
