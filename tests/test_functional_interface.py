@@ -29,29 +29,14 @@ def test_write():
     assert output_file.exists()
 
 
-def test_write_fails_to_overwrite_without_flag():
-    output_file = test_data_directory / 'test_overwrite_flag.star'
-    starfile.write(test_df, output_file, overwrite=True)
-
+def test_write_overwrites_with_backup():
+    output_file = test_data_directory / 'test_overwrite_backup.star'
+    starfile.write(test_df, output_file)
     assert output_file.exists()
-    with pytest.raises(FileExistsError):
-        starfile.write(test_df, output_file, overwrite=False)
-        starfile.new(test_df, output_file)
 
-
-def test_write_overwrites_with_flag():
-    output_file = test_data_directory / 'test_overwrite_flag.star'
-    starfile.write(test_df, output_file, overwrite=True)
-
-    assert output_file.exists()
-    starfile.write(test_df, output_file, overwrite=True)
-
-
-def test_write_with_float_format():
-    output_file = test_data_directory / 'test_write_with_float_format.star'
-    test_df['float_col'] = 1.23456789
-    starfile.write(test_df, output_file, float_format='%.3f', overwrite=True)
-    assert output_file.exists()
+    starfile.write(test_df, output_file)
+    backup = test_data_directory / 'test_overwrite_backup.star~'
+    assert backup.exists()
 
 
 def test_read_non_existent_file():

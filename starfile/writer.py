@@ -23,7 +23,7 @@ class StarWriter:
         data_blocks: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
         filename: PathLike,
         float_format: str = '%.6f',
-        sep: str = '\t',
+        separator: str = '\t',
         na_rep: str = '<NA>',
     ):
         # coerce data
@@ -32,7 +32,7 @@ class StarWriter:
         # write
         self.filename = Path(filename)
         self.float_format = float_format
-        self.sep = sep
+        self.sep = separator
         self.na_rep = na_rep
         self.buffer = TextBuffer()
         self.backup_if_file_exists()
