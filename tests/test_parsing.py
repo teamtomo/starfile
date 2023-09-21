@@ -17,7 +17,6 @@ from .constants import (
     single_line_middle_of_multiblock,
     single_line_end_of_multiblock,
     non_existant_file,
-    loop_simple_columns,
     two_single_line_loop_blocks,
     two_basic_blocks,
     empty_loop,
@@ -42,22 +41,34 @@ def test_read_loop_block():
     """
     Check that loop block is parsed correctly, data has the correct shape
     """
-    s = StarParser(loop_simple)
+    parser = StarParser(loop_simple)
 
-    # Check the output
-    for idx, key in enumerate(s.dataframes.keys()):
-        # Check that only one object is present
-        assert idx < 1
+    # Check that only one object is present
+    assert len(parser.data_blocks) == 1
 
-        # get dataframe
-        df = s.dataframes[key]
-        assert isinstance(df, pd.DataFrame)
+    # get dataframe
+    df = list(parser.data_blocks.values())[0]
+    assert isinstance(df, pd.DataFrame)
 
-        # Check shape of dataframe
-        assert df.shape == (16, 12)
+    # Check shape of dataframe
+    assert df.shape == (16, 12)
 
-        # check columns
-        assert all(df.columns == loop_simple_columns)
+    # check columns
+    expected_columns = [
+        'rlnCoordinateX',
+        'rlnCoordinateY',
+        'rlnCoordinateZ',
+        'rlnMicrographName',
+        'rlnMagnification',
+        'rlnDetectorPixelSize',
+        'rlnCtfMaxResolution',
+        'rlnImageName',
+        'rlnCtfImage',
+        'rlnAngleRot',
+        'rlnAngleTilt',
+        'rlnAnglePsi',
+    ]
+    assert all(df.columns == expected_columns)
 
 
 def test_read_multiblock_file():
@@ -65,35 +76,44 @@ def test_read_multiblock_file():
     Check that multiblock STAR files such as postprocess RELION files
     parse properly
     """
-    s = StarParser(postprocess)
-    assert len(s.dataframes) == 3
+    parser = StarParser(postprocess)
+    assert len(parser.data_blocks) == 3
 
-    for key, df in s.dataframes.items():
-        assert isinstance(df, pd.DataFrame)
+    assert 'general' in parser.data_blocks
+    assert isinstance(parser.data_blocks['general'], dict)
+    assert len(parser.data_blocks['general']) == 6
+    columns = list(parser.data_blocks['general'].keys())
+    expected_columns = [
+        'rlnFinalResolution',
+        'rlnBfactorUsedForSharpening',
+        'rlnUnfilteredMapHalf1',
+        'rlnUnfilteredMapHalf2',
+        'rlnMaskName',
+        'rlnRandomiseFrom',
+    ]
+    assert columns == expected_columns
 
-    assert s.dataframes['general'].shape == (1, 6)
-    assert all(
-        ['rlnFinalResolution', 'rlnBfactorUsedForSharpening', 'rlnUnfilteredMapHalf1',
-         'rlnUnfilteredMapHalf2', 'rlnMaskName', 'rlnRandomiseFrom']
-        == s.dataframes['general'].columns)
-    assert s.dataframes['fsc'].shape == (49, 7)
-    assert s.dataframes['guinier'].shape == (49, 3)
+    assert 'fsc' in parser.data_blocks
+    assert isinstance(parser.data_blocks['fsc'], pd.DataFrame)
+    assert parser.data_blocks['fsc'].shape == (49, 7)
+
+    assert 'guinier' in parser.data_blocks
+    assert isinstance(parser.data_blocks['guinier'], pd.DataFrame)
+    assert parser.data_blocks['guinier'].shape == (49, 3)
 
 
 def test_read_pipeline():
     """
     Check that a pipeline.star file is parsed correctly
     """
-    s = StarParser(pipeline)
-    for key, df in s.dataframes.items():
-        assert isinstance(df, pd.DataFrame)
+    parser = StarParser(pipeline)
 
-    # Check that dataframes have the correct shapes
-    assert s.dataframes['pipeline_general'].shape == (1, 1)
-    assert s.dataframes['pipeline_processes'].shape == (31, 4)
-    assert s.dataframes['pipeline_nodes'].shape == (74, 2)
-    assert s.dataframes['pipeline_input_edges'].shape == (48, 2)
-    assert s.dataframes['pipeline_output_edges'].shape == (72, 2)
+    # Check that data match file contents
+    assert isinstance(parser.data_blocks['pipeline_general'], dict)
+    assert parser.data_blocks['pipeline_processes'].shape == (31, 4)
+    assert parser.data_blocks['pipeline_nodes'].shape == (74, 2)
+    assert parser.data_blocks['pipeline_input_edges'].shape == (48, 2)
+    assert parser.data_blocks['pipeline_output_edges'].shape == (72, 2)
 
 
 def test_read_rln31():
@@ -102,12 +122,12 @@ def test_read_rln31():
     """
     s = StarParser(rln31_style)
 
-    for key, df in s.dataframes.items():
+    for key, df in s.data_blocks.items():
         assert isinstance(df, pd.DataFrame)
 
-    assert isinstance(s.dataframes['block_1'], pd.DataFrame)
-    assert isinstance(s.dataframes['block_2'], pd.DataFrame)
-    assert isinstance(s.dataframes['block_3'], pd.DataFrame)
+    assert isinstance(s.data_blocks['block_1'], pd.DataFrame)
+    assert isinstance(s.data_blocks['block_2'], pd.DataFrame)
+    assert isinstance(s.data_blocks['block_3'], pd.DataFrame)
 
 
 def test_read_n_blocks():
@@ -116,68 +136,56 @@ def test_read_n_blocks():
     number of data blocks from a star file
     """
     # test 1 block
-    s = StarParser(postprocess, read_n_blocks=1)
-    assert len(s.dataframes) == 1
+    s = StarParser(postprocess, n_blocks_to_read=1)
+    assert len(s.data_blocks) == 1
 
     # test 2 blocks
-    s = StarParser(postprocess, read_n_blocks=2)
-    assert len(s.dataframes) == 2
+    s = StarParser(postprocess, n_blocks_to_read=2)
+    assert len(s.data_blocks) == 2
 
 
 def test_single_line_middle_of_multiblock():
     s = StarParser(single_line_middle_of_multiblock)
-    assert len(s.dataframes) == 2
+    assert len(s.data_blocks) == 2
 
 
 def test_single_line_end_of_multiblock():
     s = StarParser(single_line_end_of_multiblock)
-    assert len(s.dataframes) == 2
+    assert len(s.data_blocks) == 2
 
     # iterate over dataframes, checking keys, names and shapes
-    for idx, (key, df) in enumerate(s.dataframes.items()):
-        assert df.name == 'block_3'
+    for idx, (key, df) in enumerate(s.data_blocks.items()):
         if idx == 0:
-            assert key == 'block_3'
+            assert key == 'block_1'
             assert df.shape == (2, 5)
         if idx == 1:
-            assert key == 1
+            assert key == 'block_2'
             assert df.shape == (1, 5)
 
 
 def test_read_optimiser_2d():
-    s = StarParser(optimiser_2d)
-    assert len(s.dataframes) == 1
-    assert s.dataframes['optimiser_general'].shape == (1, 84)
+    parser = StarParser(optimiser_2d)
+    assert len(parser.data_blocks) == 1
+    assert len(parser.data_blocks['optimiser_general']) == 84
 
 
 def test_read_optimiser_3d():
-    s = StarParser(optimiser_3d)
-    assert len(s.dataframes) == 1
-    assert s.dataframes['optimiser_general'].shape == (1, 84)
+    parser = StarParser(optimiser_3d)
+    assert len(parser.data_blocks) == 1
+    assert len(parser.data_blocks['optimiser_general']) == 84
 
 
 def test_read_sampling_2d():
-    s = StarParser(sampling_2d)
-    assert len(s.dataframes) == 1
-    assert s.dataframes['sampling_general'].shape == (1, 12)
+    parser = StarParser(sampling_2d)
+    assert len(parser.data_blocks) == 1
+    assert len(parser.data_blocks['sampling_general']) == 12
 
 
 def test_read_sampling_3d():
-    s = StarParser(sampling_3d)
-    assert len(s.dataframes) == 2
-    assert s.dataframes['sampling_general'].shape == (1, 15)
-    assert s.dataframes['sampling_directions'].shape == (192, 2)
-
-
-def test_df_as_list():
-    s = StarParser(sampling_3d)
-    assert isinstance(s.dataframes_as_list(), list)
-    assert len(s.dataframes_as_list()) == 2
-
-
-def test_first_dataframe():
-    s = StarParser(sampling_3d)
-    assert isinstance(s.first_dataframe, pd.DataFrame)
+    parser = StarParser(sampling_3d)
+    assert len(parser.data_blocks) == 2
+    assert len(parser.data_blocks['sampling_general']) == 15
+    assert parser.data_blocks['sampling_directions'].shape == (192, 2)
 
 
 def test_parsing_speed():
@@ -193,27 +201,39 @@ def test_parsing_speed():
 
 def test_two_single_line_loop_blocks():
     parser = StarParser(two_single_line_loop_blocks)
-    assert len(parser.dataframes) == 2
+    assert len(parser.data_blocks) == 2
 
     np.testing.assert_array_equal(
-        parser.dataframes['block_0'].columns, [f'val{i}' for i in (1, 2, 3)]
+        parser.data_blocks['block_0'].columns, [f'val{i}' for i in (1, 2, 3)]
     )
-    assert parser.dataframes['block_0'].shape == (1, 3)
+    assert parser.data_blocks['block_0'].shape == (1, 3)
 
     np.testing.assert_array_equal(
-        parser.dataframes['block_1'].columns, [f'col{i}' for i in (1, 2, 3)]
+        parser.data_blocks['block_1'].columns, [f'col{i}' for i in (1, 2, 3)]
     )
-    assert parser.dataframes['block_1'].shape == (1, 3)
+    assert parser.data_blocks['block_1'].shape == (1, 3)
 
 
 def test_two_basic_blocks():
     parser = StarParser(two_basic_blocks)
-    assert len(parser.dataframes) == 2
-    for df in parser.dataframes.values():
-        assert df.shape == (1, 3)
+    assert len(parser.data_blocks) == 2
+    assert 'block_0' in parser.data_blocks
+    b0 = parser.data_blocks['block_0']
+    assert b0 == {
+        'val1': 1.0,
+        'val2': 2.0,
+        'val3': 3.0,
+    }
+    assert 'block_1' in parser.data_blocks
+    b1 = parser.data_blocks['block_1']
+    assert b1 == {
+        'col1': 'A',
+        'col2': 'B',
+        'col3': 'C',
+    }
 
 
 def test_empty_loop_block():
     """Parsing an empty loop block should return an empty dataframe."""
     parser = StarParser(empty_loop)
-    assert len(parser.dataframes) == 1
+    assert len(parser.data_blocks) == 1

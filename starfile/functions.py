@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 from .parser import StarParser
 from .writer import StarWriter
+from .typing import DataBlock
 
 if TYPE_CHECKING:
     import pandas as pd
@@ -21,22 +22,26 @@ def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = Fals
     default behaviour in the case of only one data block being present in the STAR file is to
     return only a dataframe, this can be changed by setting 'always_dict=True'
     """
-    star = StarParser(filename, read_n_blocks=read_n_blocks)
-    if len(star.dataframes) == 1 and always_dict is False:
-        return star.first_dataframe
+    parser = StarParser(filename, n_blocks_to_read=read_n_blocks)
+    if len(parser.data_blocks) == 1 and always_dict is False:
+        return list(parser.data_blocks.values())[0]
     else:
-        return star.dataframes
+        return parser.data_blocks
 
 
-def write(data: Union[pd.DataFrame, Dict[str, pd.DataFrame], List[pd.DataFrame]],
-          filename: PathLike,
-          float_format: str = '%.6f', sep: str = '\t', na_rep: str = '<NA>',
-          overwrite: bool = False, force_loop: bool = True):
-    """
-    Write dataframes from pandas dataframe(s) to a star file
-
-    data can be a single dataframe, a list of dataframes or a dict of dataframes
-    float format defaults to 6 digits after the decimal point
-    """
-    StarWriter(data, filename=filename, float_format=float_format, overwrite=overwrite,
-               na_rep=na_rep, sep=sep, force_loop=force_loop)
+def write(
+    data: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
+    filename: PathLike,
+    float_format: str = '%.6f',
+    sep: str = '\t',
+    na_rep: str = '<NA>',
+    **kwargs,
+):
+    """Write data blocks as STAR files."""
+    StarWriter(
+        data,
+        filename=filename,
+        float_format=float_format,
+        na_rep=na_rep,
+        separator=sep
+    )
