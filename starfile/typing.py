@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import TypeAlias, Union, Dict
+from typing import Union, Dict
+from typing_extensions import TypeAlias
 
 import pandas as pd
 
