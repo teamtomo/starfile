@@ -65,8 +65,9 @@ To open a STAR file
 [1365 rows x 12 columns]
 ```
 
-- Opening STAR files containing multiple dataframes blocks will return a `dict` of DataFrame objects.
-- If you would like to always return a `dict`, you can use the `always_dict=True` keyword argument
+- Each block will return either a DataFrame for a `loop_` block, or a `dict` for a simple block
+- A STAR file with a single block simply returns that DataFrame or `dict`, while a STAR file containing multiple blocks will return a `dict` of entries, with keys determined by the `data_*` titles
+- If you would like to always return a `dict` of entries even for single-block STAR files, you can use the `always_dict=True` keyword argument
 
 
 ### Writing STAR files

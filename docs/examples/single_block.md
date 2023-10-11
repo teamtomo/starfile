@@ -45,6 +45,12 @@ df.head()
 4        96.18780        80.12540       204.55875       14.910        163.26     -16.0300   01_10.00Apx.mrc
 ```
 
+
+!!! note
+
+    Simple data blocks (unlike those using the `loop_` notation) will return a python dictionary instead of a dataframe:
+
+
 Save the (modified) data to file
 
 ```python
