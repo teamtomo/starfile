@@ -3,9 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Union, Dict, List
+from importlib.metadata import version
 
 import pandas as pd
-from pkg_resources import get_distribution
 
 from .utils import TextBuffer
 from .typing import DataBlock
@@ -13,7 +13,7 @@ from .typing import DataBlock
 if TYPE_CHECKING:
     from os import PathLike
 
-__version__ = get_distribution("starfile").version
+__version__ = version("starfile")
 
 
 class StarWriter:
