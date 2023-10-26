@@ -1,29 +1,29 @@
 from __future__ import annotations
 
 from datetime import datetime
+from importlib.metadata import version
 from pathlib import Path
-from typing import TYPE_CHECKING, Union, Dict, List
+from typing import TYPE_CHECKING, Dict, List
 
 import pandas as pd
-from pkg_resources import get_distribution
 
-from .utils import TextBuffer
 from .typing import DataBlock
+from .utils import TextBuffer
 
 if TYPE_CHECKING:
     from os import PathLike
 
-__version__ = get_distribution("starfile").version
+__version__ = version("starfile")
 
 
 class StarWriter:
     def __init__(
         self,
-        data_blocks: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
+        data_blocks: DataBlock | dict[str, DataBlock] | list[DataBlock],
         filename: PathLike,
-        float_format: str = '%.6f',
-        separator: str = '\t',
-        na_rep: str = '<NA>',
+        float_format: str = "%.6f",
+        separator: str = "\t",
+        na_rep: str = "<NA>",
     ):
         # coerce data
         self.data_blocks = self.coerce_data_blocks(data_blocks)
@@ -38,9 +38,8 @@ class StarWriter:
         self.write()
 
     def coerce_data_blocks(
-        self,
-        data_blocks: Union[DataBlock, List[DataBlock], Dict[str, DataBlock]]
-    ) -> Dict[str, DataBlock]:
+        self, data_blocks: DataBlock | list[DataBlock] | dict[str, DataBlock]
+    ) -> dict[str, DataBlock]:
         if isinstance(data_blocks, pd.DataFrame):
             return coerce_dataframe(data_blocks)
         elif isinstance(data_blocks, dict):
@@ -49,11 +48,11 @@ class StarWriter:
             return coerce_list(data_blocks)
         else:
             raise ValueError(
-                f'Expected \
+                f"Expected \
                 {pd.DataFrame}, \
                 {Dict[str, pd.DataFrame]} \
                 or {List[pd.DataFrame]}, \
-                got {type(data_blocks)}'
+                got {type(data_blocks)}"
             )
 
     def write(self):
@@ -65,9 +64,7 @@ class StarWriter:
         for block_name, block in self.data_blocks.items():
             if isinstance(block, dict):
                 write_simple_block(
-                    file=self.filename,
-                    block_name=block_name,
-                    data=block
+                    file=self.filename, block_name=block_name, data=block
                 )
             elif isinstance(block, pd.DataFrame):
                 write_loop_block(
@@ -81,87 +78,74 @@ class StarWriter:
 
     def backup_if_file_exists(self):
         if self.filename.exists():
-            new_name = self.filename.name + '~'
+            new_name = self.filename.name + "~"
             backup_path = self.filename.resolve().parent / new_name
             self.filename.rename(backup_path)
 
 
-def coerce_dataframe(df: pd.DataFrame) -> Dict[str, DataBlock]:
-    return {'': df}
+def coerce_dataframe(df: pd.DataFrame) -> dict[str, DataBlock]:
+    return {"": df}
 
 
-def coerce_dict(
-    data_blocks: Union[DataBlock, Dict[str, DataBlock]]
-) -> Dict[str, DataBlock]:
+def coerce_dict(data_blocks: DataBlock | dict[str, DataBlock]) -> dict[str, DataBlock]:
     """Coerce dict into dict of data blocks."""
     # check if data is already Dict[str, DataBlock]
-    for k, v in data_blocks.items():
+    for _k, v in data_blocks.items():
         if type(v) in (dict, pd.DataFrame):  #
             return data_blocks
     # coerce if not
-    return {'': data_blocks}
+    return {"": data_blocks}
 
 
-def coerce_list(data_blocks: List[DataBlock]) -> Dict[str, DataBlock]:
-    """Coerces a list of DataFrames into a dict"""
-    return {f'{idx}': df for idx, df in enumerate(data_blocks)}
+def coerce_list(data_blocks: list[DataBlock]) -> dict[str, DataBlock]:
+    """Coerces a list of DataFrames into a dict."""
+    return {f"{idx}": df for idx, df in enumerate(data_blocks)}
 
 
 def write_blank_lines(file: Path, n: int):
-    with open(file, mode='a') as f:
-        f.write('\n' * n)
+    with open(file, mode="a") as f:
+        f.write("\n" * n)
 
 
 def write_package_info(file: Path):
-    date = datetime.now().strftime('%d/%m/%Y')
-    time = datetime.now().strftime('%H:%M:%S')
-    line = f'# Created by the starfile Python package (version {__version__}) at {time} on {date}'
-    with open(file, mode='w+') as f:
-        f.write(f'{line}\n')
+    date = datetime.now().strftime("%d/%m/%Y")
+    time = datetime.now().strftime("%H:%M:%S")
+    line = f"# Created by the starfile Python package \
+    (version {__version__}) at {time} on {date}"
+    with open(file, mode="w+") as f:
+        f.write(f"{line}\n")
 
 
-def write_simple_block(
-    file: Path,
-    block_name: str,
-    data: Dict[str, Union[str, int, float]]
-):
-    formatted_lines = '\n'.join(
-        [
-            f'_{k}\t\t\t{v}'
-            for k, v
-            in data.items()
-        ]
-    )
-    with open(file, mode='a') as f:
-        f.write(f'data_{block_name}\n\n')
+def write_simple_block(file: Path, block_name: str, data: dict[str, str | int | float]):
+    formatted_lines = "\n".join([f"_{k}\t\t\t{v}" for k, v in data.items()])
+    with open(file, mode="a") as f:
+        f.write(f"data_{block_name}\n\n")
         f.write(formatted_lines)
-        f.write('\n\n\n')
+        f.write("\n\n\n")
 
 
 def write_loop_block(
     file: Path,
     block_name: str,
     df: pd.DataFrame,
-    float_format: str = '%.6f',
-    separator: str = '\t',
-    na_rep: str = '<NA>',
+    float_format: str = "%.6f",
+    separator: str = "\t",
+    na_rep: str = "<NA>",
 ):
     # write header
     header_lines = [
-        f'_{column_name} #{idx}'
-        for idx, column_name
-        in enumerate(df.columns, 1)
+        f"_{column_name} #{idx}" for idx, column_name in enumerate(df.columns, 1)
     ]
-    with open(file, mode='a') as f:
-        f.write(f'data_{block_name}\n\n')
-        f.write('loop_\n')
-        f.write('\n'.join(header_lines))
-        f.write('\n')
+    with open(file, mode="a") as f:
+        f.write(f"data_{block_name}\n\n")
+        f.write("loop_\n")
+        f.write("\n".join(header_lines))
+        f.write("\n")
 
     # write data
     df.to_csv(
         path_or_buf=file,
-        mode='a',
+        mode="a",
         sep=separator,
         header=False,
         index=False,

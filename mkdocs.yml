@@ -12,6 +12,7 @@ copyright: Copyright &copy; 2022 - 2022 teamtomo
 # Custom navigation can be specified
 nav:
   - Overview: index.md
+  - Data Model: data_model.md
   - Examples:
       - single data block: examples/single_block.md
       - multiple data blocks: examples/multi_block.md
