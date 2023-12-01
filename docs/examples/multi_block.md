@@ -48,7 +48,7 @@ _rlnNrOfSignificantSamples #21
 
 ## Reading
 Reading a file with multiple data blocks is similar to reading a file with a single data block.
-In this case, a dictionary of dataframes is returned. The keys of this dictionary are the names
+In this case, a dictionary of dataframes or dictionaries is returned. The keys of this dictionary are the names
 of data blocks.
 
 ```python
@@ -61,14 +61,14 @@ particle_df = star['particles']
 
 !!! tip
     
-    `starfile.read` can be forced to always return a dictionary of dataframes.
+    `starfile.read` can be forced to always return a dictionary of entries.
 
     ```python
     starfile.read('particles.star', force_dict=True)
     ```
 
 ## Writing
-Writing a file containing multiple data blocks is similar, simply pass a dictionary of dataframes.
+Writing a file containing multiple data blocks is similar, simply pass a dictionary of entries.
 
 ```python
 import starfile

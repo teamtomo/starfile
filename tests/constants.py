@@ -31,10 +31,3 @@ cars = {'Brand': ['Honda_Civic', 'Toyota_Corolla', 'Ford_Focus', 'Audi_A4'],
         'Price': [22000, 25000, 27000, 35000]
         }
 test_df = pd.DataFrame.from_dict(cars)
-
-
-# Attributes of certain files
-loop_simple_columns = ['rlnCoordinateX', 'rlnCoordinateY', 'rlnCoordinateZ',
-       'rlnMicrographName', 'rlnMagnification', 'rlnDetectorPixelSize',
-       'rlnCtfMaxResolution', 'rlnImageName', 'rlnCtfImage', 'rlnAngleRot',
-       'rlnAngleTilt', 'rlnAnglePsi']
