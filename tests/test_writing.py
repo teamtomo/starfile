@@ -1,7 +1,9 @@
 from os.path import join as join_path
 from tempfile import TemporaryDirectory
+import math 
 
 import pandas as pd
+import pytest
 
 from starfile.parser import StarParser
 from starfile.writer import StarWriter
@@ -69,20 +71,42 @@ def test_can_write_non_zero_indexed_one_row_dataframe():
     )
     assert (expected in output)
 
-def test_string_quoting(tmp_path):
-    df = pd.DataFrame([["String with space", " ", '"Already quoted string"']], columns=["string_space", "just_space", "already_quoted"])
 
-    filename = tmp_path / "test.star"
-    StarWriter(df, filename, force_loop=True)
-    s = StarParser(filename)
-    print(s)
-    assert False
-
-def test_string_quoting_simple_datablock(tmp_path):
-    df = pd.DataFrame([["String with space", " ", '"Already quoted string"']], columns=["string_space", "just_space", "already_quoted"])
+@pytest.mark.parametrize("quotechar", ["'",'"'])
+def test_string_quoting_loop_datablock(tmp_path):
+    df = pd.DataFrame([["nospace", "String with space", " ", ""]],
+                       columns=["string_without_space", "string_space", "just_space", "empty_string"])
 
     filename = tmp_path / "test.star"
     StarWriter(df, filename)
+    
+    # Only 3 strings should be quoted
+    with open(filename) as f:
+        star_content = f.read()
+        assert star_content.count('"') == 6
+
     s = StarParser(filename)
-    print(s)
-    assert False
+    assert df.loc[0, "string_space"] == s.data_blocks[""].loc[0, "string_space"]
+    assert df.loc[0, "just_space"] == s.data_blocks[""].loc[0, "just_space"]
+    assert math.isnan(s.data_blocks[""].loc[0, "empty_string"])
+
+
+@pytest.mark.parametrize("quotechar", ["'",'"'])
+def test_string_quoting_simple_datablock(quotechar, tmp_path):
+    o = {
+        "string_without_space": "nospace",
+        "string_space": "String with space",
+        "just_space": " ",
+        "empty_string": ""
+    }
+
+    filename = tmp_path / "test.star"
+    StarWriter(o, filename, quotechar=quotechar)
+    # Only 3 strings should be quoted
+    with open(filename) as f:
+        star_content = f.read()
+        assert star_content.count(quotechar) == 6
+
+    s = StarParser(filename)
+    assert o["string_space"] == s.data_blocks[""]["string_space"]
+

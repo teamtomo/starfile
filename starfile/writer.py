@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Union, Dict, List
 from importlib.metadata import version
+import csv
 
 import pandas as pd
 
@@ -24,6 +25,7 @@ class StarWriter:
         float_format: str = '%.6f',
         separator: str = '\t',
         na_rep: str = '<NA>',
+        quotechar: str = '"'
     ):
         # coerce data
         self.data_blocks = self.coerce_data_blocks(data_blocks)
@@ -33,6 +35,7 @@ class StarWriter:
         self.float_format = float_format
         self.sep = separator
         self.na_rep = na_rep
+        self.quotechar = quotechar
         self.buffer = TextBuffer()
         self.backup_if_file_exists()
         self.write()
@@ -67,7 +70,8 @@ class StarWriter:
                 write_simple_block(
                     file=self.filename,
                     block_name=block_name,
-                    data=block
+                    data=block,
+                    quotechar=self.quotechar
                 )
             elif isinstance(block, pd.DataFrame):
                 write_loop_block(
@@ -77,6 +81,7 @@ class StarWriter:
                     float_format=self.float_format,
                     separator=self.sep,
                     na_rep=self.na_rep,
+                    quotechar=self.quotechar
                 )
 
     def backup_if_file_exists(self):
@@ -123,13 +128,19 @@ def write_package_info(file: Path):
 def write_simple_block(
     file: Path,
     block_name: str,
-    data: Dict[str, Union[str, int, float]]
-):
+    data: Dict[str, Union[str, int, float]],
+    quotechar: str = '"'
+):  
+    quoted_data = {
+        k: f"{quotechar}{v}{quotechar}" if isinstance(v, str) and (" " in v or v == "") else v
+        for k, v
+        in data.items()    
+    }
     formatted_lines = '\n'.join(
         [
             f'_{k}\t\t\t{v}'
             for k, v
-            in data.items()
+            in quoted_data.items()
         ]
     )
     with open(file, mode='a') as f:
@@ -145,6 +156,7 @@ def write_loop_block(
     float_format: str = '%.6f',
     separator: str = '\t',
     na_rep: str = '<NA>',
+    quotechar: str = '"'
 ):
     # write header
     header_lines = [
@@ -158,6 +170,8 @@ def write_loop_block(
         f.write('\n'.join(header_lines))
         f.write('\n')
 
+    df = df.applymap(lambda x: f'"{x}"' if isinstance(x, str) and (" " in x or x == "") else x)
+
     # write data
     df.to_csv(
         path_or_buf=file,
@@ -167,5 +181,7 @@ def write_loop_block(
         index=False,
         float_format=float_format,
         na_rep=na_rep,
+        quoting=csv.QUOTE_NONE,
+        quotechar=quotechar
     )
     write_blank_lines(file, n=2)
