@@ -25,7 +25,8 @@ class StarWriter:
         float_format: str = '%.6f',
         separator: str = '\t',
         na_rep: str = '<NA>',
-        quotechar: str = '"'
+        quotechar: str = '"',
+        quote_always: bool = False,
     ):
         # coerce data
         self.data_blocks = self.coerce_data_blocks(data_blocks)
@@ -36,6 +37,7 @@ class StarWriter:
         self.sep = separator
         self.na_rep = na_rep
         self.quotechar = quotechar
+        self.quote_always = quote_always
         self.buffer = TextBuffer()
         self.backup_if_file_exists()
         self.write()
@@ -71,7 +73,8 @@ class StarWriter:
                     file=self.filename,
                     block_name=block_name,
                     data=block,
-                    quotechar=self.quotechar
+                    quotechar=self.quotechar,
+                    quote_always=self.quote_always
                 )
             elif isinstance(block, pd.DataFrame):
                 write_loop_block(
@@ -81,7 +84,8 @@ class StarWriter:
                     float_format=self.float_format,
                     separator=self.sep,
                     na_rep=self.na_rep,
-                    quotechar=self.quotechar
+                    quotechar=self.quotechar,
+                    quote_always=self.quote_always
                 )
 
     def backup_if_file_exists(self):
@@ -129,10 +133,13 @@ def write_simple_block(
     file: Path,
     block_name: str,
     data: Dict[str, Union[str, int, float]],
-    quotechar: str = '"'
+    quotechar: str = '"',
+    quote_always: bool = False
 ):  
     quoted_data = {
-        k: f"{quotechar}{v}{quotechar}" if isinstance(v, str) and (" " in v or v == "") else v
+        k: f"{quotechar}{v}{quotechar}" 
+        if isinstance(v, str) and (quote_always or " " in v or v == "") 
+        else v
         for k, v
         in data.items()    
     }
@@ -156,7 +163,8 @@ def write_loop_block(
     float_format: str = '%.6f',
     separator: str = '\t',
     na_rep: str = '<NA>',
-    quotechar: str = '"'
+    quotechar: str = '"',
+    quote_always: bool = False
 ):
     # write header
     header_lines = [
@@ -170,7 +178,9 @@ def write_loop_block(
         f.write('\n'.join(header_lines))
         f.write('\n')
 
-    df = df.applymap(lambda x: f'"{x}"' if isinstance(x, str) and (" " in x or x == "") else x)
+    df = df.applymap(lambda x: f'{quotechar}{x}{quotechar}' 
+                     if isinstance(x, str) and (quote_always or " " in x or x == "") 
+                     else x)
 
     # write data
     df.to_csv(
@@ -181,7 +191,6 @@ def write_loop_block(
         index=False,
         float_format=float_format,
         na_rep=na_rep,
-        quoting=csv.QUOTE_NONE,
-        quotechar=quotechar
+        quoting=csv.QUOTE_NONE
     )
     write_blank_lines(file, n=2)

@@ -37,6 +37,7 @@ def write(
     sep: str = '\t',
     na_rep: str = '<NA>',
     quotechar: str = '"',
+    quote_always: bool = False,
     **kwargs,
 ):
     """Write data blocks as STAR files."""
@@ -47,4 +48,5 @@ def write(
         na_rep=na_rep,
         separator=sep,
         quotechar=quotechar,
+        quote_always=quote_always,
     )

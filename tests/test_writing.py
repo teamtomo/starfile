@@ -72,28 +72,41 @@ def test_can_write_non_zero_indexed_one_row_dataframe():
     assert (expected in output)
 
 
-@pytest.mark.parametrize("quotechar", ["'",'"'])
-def test_string_quoting_loop_datablock(tmp_path):
-    df = pd.DataFrame([["nospace", "String with space", " ", ""]],
-                       columns=["string_without_space", "string_space", "just_space", "empty_string"])
+@pytest.mark.parametrize("quotechar, quote_always, num_quotes", 
+                         [('"', False, 6),
+                          ('"', True, 8),
+                          ("'", False, 6),
+                          ("'", True, 8)
+                         ])
+def test_string_quoting_loop_datablock(quotechar, quote_always, num_quotes, tmp_path):
+    df = pd.DataFrame([[1,"nospace", "String with space", " ", ""]],
+                       columns=["a_number","string_without_space", "string_space", "just_space", "empty_string"])
 
     filename = tmp_path / "test.star"
-    StarWriter(df, filename)
+    StarWriter(df, filename, quotechar=quotechar, quote_always=quote_always)
     
-    # Only 3 strings should be quoted
+    # Test for the appropriate number of quotes
     with open(filename) as f:
         star_content = f.read()
-        assert star_content.count('"') == 6
+        assert star_content.count(quotechar) == num_quotes
 
     s = StarParser(filename)
+    assert df.loc[0, "a_number"] == s.data_blocks[""].loc[0, "a_number"]
+    assert df.loc[0, "string_without_space"] == s.data_blocks[""].loc[0, "string_without_space"]
     assert df.loc[0, "string_space"] == s.data_blocks[""].loc[0, "string_space"]
     assert df.loc[0, "just_space"] == s.data_blocks[""].loc[0, "just_space"]
     assert math.isnan(s.data_blocks[""].loc[0, "empty_string"])
 
 
-@pytest.mark.parametrize("quotechar", ["'",'"'])
-def test_string_quoting_simple_datablock(quotechar, tmp_path):
+@pytest.mark.parametrize("quotechar, quote_always, num_quotes", 
+                         [('"', False, 6),
+                          ('"', True, 8),
+                          ("'", False, 6),
+                          ("'", True, 8)
+                         ])
+def test_string_quoting_simple_datablock(quotechar, quote_always,num_quotes, tmp_path):
     o = {
+        "a_number": 1,
         "string_without_space": "nospace",
         "string_space": "String with space",
         "just_space": " ",
@@ -101,12 +114,12 @@ def test_string_quoting_simple_datablock(quotechar, tmp_path):
     }
 
     filename = tmp_path / "test.star"
-    StarWriter(o, filename, quotechar=quotechar)
-    # Only 3 strings should be quoted
+    StarWriter(o, filename, quotechar=quotechar, quote_always=quote_always)
+    
+    # Test for the appropriate number of quotes
     with open(filename) as f:
         star_content = f.read()
-        assert star_content.count(quotechar) == 6
+        assert star_content.count(quotechar) == num_quotes
 
     s = StarParser(filename)
-    assert o["string_space"] == s.data_blocks[""]["string_space"]
-
+    assert o == s.data_blocks[""]
