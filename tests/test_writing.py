@@ -1,5 +1,6 @@
 from os.path import join as join_path
 from tempfile import TemporaryDirectory
+import time
 import math 
 
 import pandas as pd
@@ -9,7 +10,7 @@ from starfile.parser import StarParser
 from starfile.writer import StarWriter
 
 from .constants import loop_simple, postprocess, test_data_directory, test_df
-
+from .utils import generate_large_star_file, remove_large_star_file
 
 def test_write_simple_block():
     s = StarParser(postprocess)
@@ -97,6 +98,14 @@ def test_string_quoting_loop_datablock(quotechar, quote_always, num_quotes, tmp_
     assert df.loc[0, "just_space"] == s.data_blocks[""].loc[0, "just_space"]
     assert math.isnan(s.data_blocks[""].loc[0, "empty_string"])
 
+def test_writing_speed():
+    start = time.time()
+    generate_large_star_file()
+    end = time.time()
+    remove_large_star_file()
+
+    # Check that execution takes less than a second
+    assert end - start < 1
 
 @pytest.mark.parametrize("quotechar, quote_always, num_quotes", 
                          [('"', False, 6),
