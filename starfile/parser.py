@@ -107,8 +107,7 @@ class StarParser:
                 StringIO(loop_data.replace("'",'"')),
                 delim_whitespace=True,
                 header=None,
-                comment='#',
-                keep_default_na=False
+                comment='#'
             )
             df = df.apply(pd.to_numeric, errors='ignore')
             df.columns = loop_column_names
