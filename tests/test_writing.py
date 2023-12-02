@@ -68,3 +68,21 @@ def test_can_write_non_zero_indexed_one_row_dataframe():
         "1\t2\t3"
     )
     assert (expected in output)
+
+def test_string_quoting(tmp_path):
+    df = pd.DataFrame([["String with space", " ", '"Already quoted string"']], columns=["string_space", "just_space", "already_quoted"])
+
+    filename = tmp_path / "test.star"
+    StarWriter(df, filename, force_loop=True)
+    s = StarParser(filename)
+    print(s)
+    assert False
+
+def test_string_quoting_simple_datablock(tmp_path):
+    df = pd.DataFrame([["String with space", " ", '"Already quoted string"']], columns=["string_space", "just_space", "already_quoted"])
+
+    filename = tmp_path / "test.star"
+    StarWriter(df, filename)
+    s = StarParser(filename)
+    print(s)
+    assert False
