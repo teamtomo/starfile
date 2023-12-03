@@ -244,10 +244,10 @@ def test_empty_loop_block():
 
 
 
-@pytest.mark.parametrize("quotechar, filename", [("'",basic_single_quote), 
+@pytest.mark.parametrize("quote_character, filename", [("'",basic_single_quote), 
                                                  ('"',basic_double_quote), 
                                                  ])
-def test_quote_basic(quotechar,filename):
+def test_quote_basic(quote_character,filename):
     import math
     parser = StarParser(filename)
     assert len(parser.data_blocks) == 1
@@ -256,15 +256,22 @@ def test_quote_basic(quotechar,filename):
     assert parser.data_blocks['']['whitespace_string'] == " "
     assert parser.data_blocks['']['empty_string'] == ""
 
-@pytest.mark.parametrize("quotechar, filename", [("'",loop_single_quote), 
+@pytest.mark.parametrize("quote_character, filename", [("'",loop_single_quote), 
                                                  ('"',loop_double_quote), 
                                                  ])
-def test_quote_loop(quotechar,filename):
+def test_quote_loop(quote_character,filename):
     import math
     parser = StarParser(filename)
     assert len(parser.data_blocks) == 1
     assert parser.data_blocks[''].loc[0,'no_quote_string'] == "noquote"
     assert parser.data_blocks[''].loc[0,'quote_string'] == "quote string"
     assert parser.data_blocks[''].loc[0,'whitespace_string'] == " "
-    # Not optimal, but the way to_numeric behaves
-    assert math.isnan(parser.data_blocks[''].loc[0,'empty_string'])
+    assert parser.data_blocks[''].loc[0,'empty_string'] == ""
+
+    assert parser.data_blocks[''].dtypes['number_and_string'] == object
+    assert parser.data_blocks[''].dtypes['number_and_empty'] == 'float64'
+    assert parser.data_blocks[''].dtypes['number'] == 'float64'
+    assert parser.data_blocks[''].dtypes['empty_string_and_normal_string'] == object
+
+    assert math.isnan(parser.data_blocks[''].loc[1,'number_and_empty'])
+    assert parser.data_blocks[''].loc[0,'empty_string_and_normal_string'] == ''

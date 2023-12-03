@@ -107,9 +107,13 @@ class StarParser:
                 StringIO(loop_data.replace("'",'"')),
                 delim_whitespace=True,
                 header=None,
-                comment='#'
+                comment='#',
+                keep_default_na=False
             )
-            df = df.apply(pd.to_numeric, errors='ignore')
+            df_numeric = df.apply(pd.to_numeric, errors='ignore')
+            # Replace columns that are all NaN with the original string columns
+            df_numeric.loc[:, df_numeric.isna().all()] = df.loc[:, df_numeric.isna().all()]
+            df = df_numeric
             df.columns = loop_column_names
         return df
 

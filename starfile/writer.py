@@ -25,8 +25,8 @@ class StarWriter:
         float_format: str = '%.6f',
         separator: str = '\t',
         na_rep: str = '<NA>',
-        quotechar: str = '"',
-        quote_always: bool = False,
+        quote_character: str = '"',
+        quote_all_strings: bool = False,
     ):
         # coerce data
         self.data_blocks = self.coerce_data_blocks(data_blocks)
@@ -36,8 +36,8 @@ class StarWriter:
         self.float_format = float_format
         self.sep = separator
         self.na_rep = na_rep
-        self.quotechar = quotechar
-        self.quote_always = quote_always
+        self.quote_character = quote_character
+        self.quote_all_strings = quote_all_strings
         self.buffer = TextBuffer()
         self.backup_if_file_exists()
         self.write()
@@ -73,8 +73,8 @@ class StarWriter:
                     file=self.filename,
                     block_name=block_name,
                     data=block,
-                    quotechar=self.quotechar,
-                    quote_always=self.quote_always
+                    quote_character=self.quote_character,
+                    quote_all_strings=self.quote_all_strings
                 )
             elif isinstance(block, pd.DataFrame):
                 write_loop_block(
@@ -84,8 +84,8 @@ class StarWriter:
                     float_format=self.float_format,
                     separator=self.sep,
                     na_rep=self.na_rep,
-                    quotechar=self.quotechar,
-                    quote_always=self.quote_always
+                    quote_character=self.quote_character,
+                    quote_all_strings=self.quote_all_strings
                 )
 
     def backup_if_file_exists(self):
@@ -133,12 +133,12 @@ def write_simple_block(
     file: Path,
     block_name: str,
     data: Dict[str, Union[str, int, float]],
-    quotechar: str = '"',
-    quote_always: bool = False
+    quote_character: str = '"',
+    quote_all_strings: bool = False
 ):  
     quoted_data = {
-        k: f"{quotechar}{v}{quotechar}" 
-        if isinstance(v, str) and (quote_always or " " in v or v == "") 
+        k: f"{quote_character}{v}{quote_character}" 
+        if isinstance(v, str) and (quote_all_strings or " " in v or v == "") 
         else v
         for k, v
         in data.items()    
@@ -163,8 +163,8 @@ def write_loop_block(
     float_format: str = '%.6f',
     separator: str = '\t',
     na_rep: str = '<NA>',
-    quotechar: str = '"',
-    quote_always: bool = False
+    quote_character: str = '"',
+    quote_all_strings: bool = False
 ):
     # write header
     header_lines = [
@@ -178,8 +178,8 @@ def write_loop_block(
         f.write('\n'.join(header_lines))
         f.write('\n')
 
-    df = df.applymap(lambda x: f'{quotechar}{x}{quotechar}' 
-                     if isinstance(x, str) and (quote_always or " " in x or x == "") 
+    df = df.applymap(lambda x: f'{quote_character}{x}{quote_character}' 
+                     if isinstance(x, str) and (quote_all_strings or " " in x or x == "") 
                      else x)
 
     # write data
