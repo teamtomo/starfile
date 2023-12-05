@@ -22,6 +22,7 @@ def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = Fals
     default behaviour in the case of only one data block being present in the STAR file is to
     return only a dataframe, this can be changed by setting 'always_dict=True'
     """
+
     parser = StarParser(filename, n_blocks_to_read=read_n_blocks)
     if len(parser.data_blocks) == 1 and always_dict is False:
         return list(parser.data_blocks.values())[0]
@@ -35,6 +36,8 @@ def write(
     float_format: str = '%.6f',
     sep: str = '\t',
     na_rep: str = '<NA>',
+    quote_character: str = '"',
+    quote_all_strings: bool = False,
     **kwargs,
 ):
     """Write data blocks as STAR files."""
@@ -43,5 +46,7 @@ def write(
         filename=filename,
         float_format=float_format,
         na_rep=na_rep,
-        separator=sep
+        separator=sep,
+        quote_character=quote_character,
+        quote_all_strings=quote_all_strings,
     )

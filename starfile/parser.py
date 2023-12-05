@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import deque
 from io import StringIO
 from linecache import getline
+import shlex
 
 import numpy as np
 import pandas as pd
@@ -71,7 +72,7 @@ class StarParser:
             if self.current_line.startswith('data'):
                 break
             elif self.current_line.startswith('_'):  # '_foo bar'
-                k, v = self.current_line.split()
+                k, v = shlex.split(self.current_line)
                 block[k[1:]] = numericise(v)
             self.current_line_number += 1
         return block
@@ -103,12 +104,16 @@ class StarParser:
             df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
             df = pd.read_csv(
-                StringIO(loop_data),
+                StringIO(loop_data.replace("'",'"')),
                 delim_whitespace=True,
                 header=None,
-                comment='#'
+                comment='#',
+                keep_default_na=False
             )
-            df = df.apply(pd.to_numeric, errors='ignore')
+            df_numeric = df.apply(pd.to_numeric, errors='ignore')
+            # Replace columns that are all NaN with the original string columns
+            df_numeric.loc[:, df_numeric.isna().all()] = df.loc[:, df_numeric.isna().all()]
+            df = df_numeric
             df.columns = loop_column_names
         return df
 
