@@ -178,9 +178,9 @@ def write_loop_block(
         f.write('\n'.join(header_lines))
         f.write('\n')
 
-    df = df.applymap(lambda x: f'{quote_character}{x}{quote_character}' 
-                     if isinstance(x, str) and (quote_all_strings or " " in x or x == "") 
-                     else x)
+    df = df.map(lambda x: f'{quote_character}{x}{quote_character}' 
+                if isinstance(x, str) and (quote_all_strings or " " in x or x == "") 
+                else x)
 
     # write data
     df.to_csv(
