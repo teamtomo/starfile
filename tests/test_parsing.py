@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from src.starfile import StarParser
+from starfile import StarParser
 from .constants import (
     loop_simple,
     postprocess,

@@ -10,7 +10,7 @@ import pandas as pd
 from pathlib import Path
 from typing import TYPE_CHECKING, Union, Optional, Dict, Tuple
 
-from src.starfile.typing import DataBlock
+from starfile.typing import DataBlock
 
 if TYPE_CHECKING:
     from os import PathLike

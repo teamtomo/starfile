@@ -5,8 +5,8 @@ import time
 import pandas as pd
 import pytest
 
-from src.starfile import StarParser
-from src.starfile import StarWriter
+from starfile import StarParser
+from starfile import StarWriter
 
 from .constants import loop_simple, postprocess, test_data_directory, test_df
 from .utils import generate_large_star_file, remove_large_star_file
