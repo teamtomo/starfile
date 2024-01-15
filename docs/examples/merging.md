@@ -60,7 +60,7 @@ In pandas, this is implemented as
 
 ```python
 
-from src import starfile
+import starfile
 
 star = starfile.read('particles.star')
 df = star['particles'].merge(star['optics'], on='rlnOpticsGroup')

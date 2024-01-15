@@ -27,7 +27,7 @@ Read the file
 
 ```python
 
-from src import starfile
+import starfile
 
 df = starfile.read('particles.star')
 ```

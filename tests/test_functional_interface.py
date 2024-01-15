@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from src import starfile
+import starfile
 
 from .constants import loop_simple, postprocess, test_df, test_data_directory
 

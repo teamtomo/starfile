@@ -53,7 +53,7 @@ of data blocks.
 
 ```python
 
-from src import starfile
+import starfile
 
 star = starfile.read('particles.star')
 optics_df = star['optics']
@@ -73,7 +73,7 @@ Writing a file containing multiple data blocks is similar, simply pass a diction
 
 ```python
 
-from src import starfile
+import starfile
 
 starfile.write(
     {'optics': optics_df, 'particles': particle_df}, 'new_file.star'

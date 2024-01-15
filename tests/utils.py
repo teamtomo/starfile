@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from src import starfile
+import starfile
 from .constants import test_data_directory
 
 million_row_file = test_data_directory / '1m_row.star'
