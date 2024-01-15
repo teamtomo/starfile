@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from starfile.parser import StarParser
+from src.starfile import StarParser
 from .constants import (
     loop_simple,
     postprocess,
@@ -248,7 +248,6 @@ def test_empty_loop_block():
                                                  ('"',basic_double_quote), 
                                                  ])
 def test_quote_basic(quote_character,filename):
-    import math
     parser = StarParser(filename)
     assert len(parser.data_blocks) == 1
     assert parser.data_blocks['']['no_quote_string'] == "noquote"

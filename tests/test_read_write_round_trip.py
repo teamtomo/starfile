@@ -1,6 +1,6 @@
 from .constants import two_single_line_loop_blocks, postprocess
 
-import starfile
+from src import starfile
 import pandas as pd
 
 

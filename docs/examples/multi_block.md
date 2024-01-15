@@ -52,7 +52,8 @@ In this case, a dictionary of dataframes or dictionaries is returned. The keys o
 of data blocks.
 
 ```python
-import starfile
+
+from src import starfile
 
 star = starfile.read('particles.star')
 optics_df = star['optics']
@@ -71,8 +72,8 @@ particle_df = star['particles']
 Writing a file containing multiple data blocks is similar, simply pass a dictionary of entries.
 
 ```python
-import starfile
 
+from src import starfile
 
 starfile.write(
     {'optics': optics_df, 'particles': particle_df}, 'new_file.star'
