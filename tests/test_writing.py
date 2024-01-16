@@ -1,7 +1,6 @@
 from os.path import join as join_path
 from tempfile import TemporaryDirectory
 import time
-import math 
 
 import pandas as pd
 import pytest

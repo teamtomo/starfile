@@ -59,7 +59,9 @@ In pandas, this is implemented as
 [`DataFrame.merge()`](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html).
 
 ```python
+
 import starfile
+
 star = starfile.read('particles.star')
 df = star['particles'].merge(star['optics'], on='rlnOpticsGroup')
 ```

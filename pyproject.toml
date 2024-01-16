@@ -1,5 +1,151 @@
+# https://peps.python.org/pep-0517/
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm>=6.2"]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
 
-[tool.setuptools_scm]
-write_to = "starfile/_version.py"
+# https://hatch.pypa.io/latest/config/metadata/
+[tool.hatch.version]
+source = "vcs"
+
+# read more about configuring hatch at:
+# https://hatch.pypa.io/latest/config/build/
+[tool.hatch.build.targets.wheel]
+only-include = ["src"]
+sources = ["src"]
+
+# https://peps.python.org/pep-0621/
+[project]
+name = "starfile"
+dynamic = ["version"]
+description = "STAR file I/O in Python"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "BSD-3-Clause" }
+authors = [{ name = "Alister Burt", email = "alisterburt@gmail.com" }]
+# https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+# add your package dependencies here
+dependencies = [
+    "numpy",
+    "pandas>=2.1.1",
+    "typing-extensions",
+]
+
+# https://peps.python.org/pep-0621/#dependencies-optional-dependencies
+# "extras" (e.g. for `pip install .[test]`)
+[project.optional-dependencies]
+# add dependencies used for testing here
+test = ["pytest", "pytest-cov"]
+# add anything else you like to have in your dev environment here
+dev = [
+    "black",
+    "ipython",
+    "mypy",
+    "pdbpp",  # https://github.com/pdbpp/pdbpp
+    "pre-commit",
+    "rich",  # https://github.com/Textualize/rich
+    "ruff",
+]
+
+[project.urls]
+homepage = "https://github.com/teamtomo/starfile"
+repository = "https://github.com/teamtomo/starfile"
+
+# Entry points
+# https://peps.python.org/pep-0621/#entry-points
+# same as console_scripts entry point
+# [project.scripts]
+# starfile-cli = "starfile:main_cli"
+
+# [project.entry-points."some.group"]
+# tomatoes = "starfile:main_tomatoes"
+
+# https://docs.astral.sh/ruff
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+src = ["src"]
+# https://docs.astral.sh/ruff/rules
+select = [
+    "E",    # style errors
+    "W",    # style warnings
+    "F",    # flakes
+    "D",    # pydocstyle
+    "I",    # isort
+    "UP",   # pyupgrade
+    "C4",   # flake8-comprehensions
+    "B",    # flake8-bugbear
+    "A001", # flake8-builtins
+    "RUF",  # ruff-specific rules
+    "TCH",  # flake8-type-checking
+    "TID",  # flake8-tidy-imports
+]
+
+[tool.ruff.lint]
+pydocstyle = { convention = "numpy" }
+extend-select = [
+    "D417", # Missing argument descriptions in Docstrings
+]
+extend-ignore = [
+    "D401", # First line should be in imperative mood (remove to opt in)
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*.py" = ["D", "S"]
+"setup.py" = ["D"]
+
+# https://mypy.readthedocs.io/en/stable/config_file.html
+[tool.mypy]
+files = "src/**/"
+strict = true
+disallow_any_generics = false
+disallow_subclassing_any = false
+show_error_codes = true
+pretty = true
+
+# # module specific overrides
+# [[tool.mypy.overrides]]
+# module = ["numpy.*",]
+# ignore_errors = true
+
+# https://docs.pytest.org/en/6.2.x/customize.html
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = ["tests"]
+filterwarnings = ["error"]
+
+# https://coverage.readthedocs.io/en/6.4/config.html
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@overload",
+    "except ImportError",
+    "\\.\\.\\.",
+    "raise NotImplementedError()",
+    "pass",
+]
+show_missing = true
+
+[tool.coverage.run]
+source = ["starfile"]
+
+# https://github.com/mgedmin/check-manifest#configuration
+# add files that you want check-manifest to explicitly ignore here
+# (files that are in the repo but shouldn't go in the package)
+[tool.check-manifest]
+ignore = [
+    ".pre-commit-config.yaml",
+    ".ruff_cache/**/*",
+    "tests/**/*",
+]

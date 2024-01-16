@@ -26,7 +26,9 @@ _rlnMicrographName #7
 Read the file
 
 ```python
+
 import starfile
+
 df = starfile.read('particles.star')
 ```
 

@@ -1,0 +1,11 @@
+# Do not edit - changes here will be overwritten by Copier
+_commit: v1
+_src_path: gh:pydev-guide/pyrepo-copier
+author_email: alisterburt@gmail.com
+author_name: Alister Burt
+github_username: teamtomo
+mode: tooling
+module_name: starfile
+project_name: starfile
+project_short_description: STAR file I/O in Python
+
