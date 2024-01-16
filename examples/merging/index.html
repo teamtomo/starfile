@@ -464,6 +464,7 @@ _rlnNrOfSignificantSamples #21
 In pandas, this is implemented as 
 <a href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.merge.html"><code>DataFrame.merge()</code></a>.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">starfile</span>
+
 <span class="n">star</span> <span class="o">=</span> <span class="n">starfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;particles.star&#39;</span><span class="p">)</span>
 <span class="n">df</span> <span class="o">=</span> <span class="n">star</span><span class="p">[</span><span class="s1">&#39;particles&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">star</span><span class="p">[</span><span class="s1">&#39;optics&#39;</span><span class="p">],</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;rlnOpticsGroup&#39;</span><span class="p">)</span>
 </code></pre></div>
