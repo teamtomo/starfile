@@ -97,16 +97,22 @@ class StarParser:
         loop_data = '\n'.join(loop_data)
         if loop_data[-2:] != '\n':
             loop_data += '\n'
-
         # put string data into a dataframe
         if loop_data == '\n':
             n_cols = len(loop_column_names)
             df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
+            columns_to_read_as_str = ['rlnTomoName'] #Force these columns to be read as string
+            csv_columns_to_read_as_str = {}
+            for str_column in columns_to_read_as_str:
+                if str_column in loop_column_names:
+                    column_idx = loop_column_names.index(str_column)
+                    csv_columns_to_read_as_str[column_idx] = str            
             df = pd.read_csv(
                 StringIO(loop_data.replace("'",'"')),
                 delim_whitespace=True,
                 header=None,
+                dtype=csv_columns_to_read_as_str,
                 comment='#',
                 keep_default_na=False
             )
