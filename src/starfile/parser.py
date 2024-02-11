@@ -104,8 +104,8 @@ class StarParser:
             df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
             df = pd.read_csv(
-                StringIO(loop_data.replace("'",'"')),
-                delim_whitespace=True,
+                StringIO(loop_data.replace("'", '"')),
+                sep='\s+',
                 header=None,
                 comment='#',
                 keep_default_na=False
