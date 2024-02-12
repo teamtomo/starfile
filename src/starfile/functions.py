@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from os import PathLike
 
 
-def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = False):
+def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = False, parse_as_string: List[str] = None):
     """
     Read a star file into a pandas dataframe or dict of pandas dataframes
 
@@ -23,7 +23,7 @@ def read(filename: PathLike, read_n_blocks: int = None, always_dict: bool = Fals
     return only a dataframe, this can be changed by setting 'always_dict=True'
     """
 
-    parser = StarParser(filename, n_blocks_to_read=read_n_blocks)
+    parser = StarParser(filename, n_blocks_to_read=read_n_blocks, parse_as_string=parse_as_string)
     if len(parser.data_blocks) == 1 and always_dict is False:
         return list(parser.data_blocks.values())[0]
     else:
