@@ -15,6 +15,11 @@ from starfile.typing import DataBlock
 if TYPE_CHECKING:
     from os import PathLike
 
+def _apply_numeric(col: pd.Series) -> pd.Series:
+    try:
+        return pd.to_numeric(col)
+    except ValueError:
+        return col
 
 class StarParser:
     filename: Path
@@ -104,15 +109,15 @@ class StarParser:
             df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
             df = pd.read_csv(
-                StringIO(loop_data.replace("'",'"')),
-                delim_whitespace=True,
+                StringIO(loop_data.replace("'", '"')),
+                delimiter=r'\s+',
                 header=None,
                 comment='#',
                 keep_default_na=False
             )
-            df_numeric = df.apply(pd.to_numeric, errors='ignore')
+            df_numeric = df.apply(_apply_numeric)
             # Replace columns that are all NaN with the original string columns
-            df_numeric.loc[:, df_numeric.isna().all()] = df.loc[:, df_numeric.isna().all()]
+            df_numeric[df_numeric.columns[df_numeric.isna().all()]] = df[df_numeric.columns[df_numeric.isna().all()]]
             df = df_numeric
             df.columns = loop_column_names
         return df
