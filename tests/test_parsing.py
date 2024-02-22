@@ -243,11 +243,10 @@ def test_empty_loop_block():
     assert len(parser.data_blocks) == 1
 
 
-
-@pytest.mark.parametrize("quote_character, filename", [("'",basic_single_quote), 
-                                                 ('"',basic_double_quote), 
-                                                 ])
-def test_quote_basic(quote_character,filename):
+@pytest.mark.parametrize("quote_character, filename", [("'", basic_single_quote),
+                                                       ('"', basic_double_quote),
+                                                       ])
+def test_quote_basic(quote_character, filename):
     parser = StarParser(filename)
     assert len(parser.data_blocks) == 1
     assert parser.data_blocks['']['no_quote_string'] == "noquote"
@@ -255,22 +254,36 @@ def test_quote_basic(quote_character,filename):
     assert parser.data_blocks['']['whitespace_string'] == " "
     assert parser.data_blocks['']['empty_string'] == ""
 
-@pytest.mark.parametrize("quote_character, filename", [("'",loop_single_quote), 
-                                                 ('"',loop_double_quote), 
-                                                 ])
-def test_quote_loop(quote_character,filename):
+
+@pytest.mark.parametrize("quote_character, filename", [("'", loop_single_quote),
+                                                       ('"', loop_double_quote),
+                                                       ])
+def test_quote_loop(quote_character, filename):
     import math
     parser = StarParser(filename)
     assert len(parser.data_blocks) == 1
-    assert parser.data_blocks[''].loc[0,'no_quote_string'] == "noquote"
-    assert parser.data_blocks[''].loc[0,'quote_string'] == "quote string"
-    assert parser.data_blocks[''].loc[0,'whitespace_string'] == " "
-    assert parser.data_blocks[''].loc[0,'empty_string'] == ""
+    assert parser.data_blocks[''].loc[0, 'no_quote_string'] == "noquote"
+    assert parser.data_blocks[''].loc[0, 'quote_string'] == "quote string"
+    assert parser.data_blocks[''].loc[0, 'whitespace_string'] == " "
+    assert parser.data_blocks[''].loc[0, 'empty_string'] == ""
 
     assert parser.data_blocks[''].dtypes['number_and_string'] == object
     assert parser.data_blocks[''].dtypes['number_and_empty'] == 'float64'
     assert parser.data_blocks[''].dtypes['number'] == 'float64'
     assert parser.data_blocks[''].dtypes['empty_string_and_normal_string'] == object
 
-    assert math.isnan(parser.data_blocks[''].loc[1,'number_and_empty'])
-    assert parser.data_blocks[''].loc[0,'empty_string_and_normal_string'] == ''
+    assert math.isnan(parser.data_blocks[''].loc[1, 'number_and_empty'])
+    assert parser.data_blocks[''].loc[0, 'empty_string_and_normal_string'] == ''
+
+
+def test_parse_as_string():
+    parser = StarParser(postprocess, parse_as_string=['rlnFinalResolution', 'rlnResolution'])
+
+    # check 'rlnFinalResolution' is parsed as string in general (basic) block
+    block = parser.data_blocks['general']
+    assert type(block['rlnFinalResolution']) == str
+
+    # check 'rlnResolution' is parsed as string in fsc (loop) block
+    df = parser.data_blocks['fsc']
+    assert df['rlnResolution'].dtype == 'object'
+

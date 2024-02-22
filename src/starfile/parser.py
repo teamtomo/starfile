@@ -8,18 +8,13 @@ import shlex
 import numpy as np
 import pandas as pd
 from pathlib import Path
-from typing import TYPE_CHECKING, Union, Optional, Dict, Tuple
+from typing import TYPE_CHECKING, Union, Optional, Dict, Tuple, List
 
 from starfile.typing import DataBlock
 
 if TYPE_CHECKING:
     from os import PathLike
 
-def _apply_numeric(col: pd.Series) -> pd.Series:
-    try:
-        return pd.to_numeric(col)
-    except ValueError:
-        return col
 
 class StarParser:
     filename: Path
@@ -27,8 +22,14 @@ class StarParser:
     n_blocks_to_read: int
     current_line_number: int
     data_blocks: Dict[DataBlock]
+    parse_as_string: List[str]
 
-    def __init__(self, filename: PathLike, n_blocks_to_read: Optional[int] = None):
+    def __init__(
+        self,
+        filename: PathLike,
+        n_blocks_to_read: Optional[int] = None,
+        parse_as_string: List[str] = [],
+    ):
         # set filename, with path checking
         filename = Path(filename)
         if not filename.exists():
@@ -39,6 +40,7 @@ class StarParser:
         self.data_blocks = {}
         self.n_lines_in_file = count_lines(self.filename)
         self.n_blocks_to_read = n_blocks_to_read
+        self.parse_as_string = parse_as_string
 
         # parse file
         self.current_line_number = 0
@@ -78,7 +80,15 @@ class StarParser:
                 break
             elif self.current_line.startswith('_'):  # '_foo bar'
                 k, v = shlex.split(self.current_line)
-                block[k[1:]] = numericise(v)
+                column_name = k[1:]
+                parse_column_as_string = (
+                    self.parse_as_string is not None
+                    and any(column_name == col for col in self.parse_as_string)
+                )
+                if parse_column_as_string is True:
+                    block[column_name] = v
+                else:
+                    block[column_name] = numericise(v)
             self.current_line_number += 1
         return block
 
@@ -108,18 +118,27 @@ class StarParser:
             n_cols = len(loop_column_names)
             df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
+            column_name_to_index = {col: idx for idx, col in enumerate(loop_column_names)}
             df = pd.read_csv(
                 StringIO(loop_data.replace("'", '"')),
                 delimiter=r'\s+',
                 header=None,
                 comment='#',
-                keep_default_na=False
+                dtype={column_name_to_index[k]: str for k in self.parse_as_string if k in loop_column_names},
+                keep_default_na=False,
+                engine='c',
             )
-            df_numeric = df.apply(_apply_numeric)
-            # Replace columns that are all NaN with the original string columns
-            df_numeric[df_numeric.columns[df_numeric.isna().all()]] = df[df_numeric.columns[df_numeric.isna().all()]]
-            df = df_numeric
             df.columns = loop_column_names
+
+            # Numericise all columns in temporary copy
+            df_numeric = df.apply(_apply_numeric)
+
+            # Replace columns that are all NaN with the original columns
+            df_numeric[df_numeric.columns[df_numeric.isna().all()]] = df[df_numeric.columns[df_numeric.isna().all()]]
+
+            # Replace columns that should be strings
+            for col in df.columns:
+                df[col] = df_numeric[col] if col not in self.parse_as_string else df[col]
         return df
 
 
@@ -150,3 +169,10 @@ def numericise(value: str) -> Union[str, int, float]:
             # If it's not a float either, leave it as a string
             value = value
     return value
+
+
+def _apply_numeric(col: pd.Series) -> pd.Series:
+    try:
+        return pd.to_numeric(col)
+    except ValueError:
+        return col
