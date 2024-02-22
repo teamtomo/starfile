@@ -28,14 +28,12 @@ class StarParser:
         self,
         filename: PathLike,
         n_blocks_to_read: Optional[int] = None,
-        parse_as_string: Optional[Union[str, List[str]]] = None
+        parse_as_string: List[str] = [],
     ):
         # set filename, with path checking
         filename = Path(filename)
         if not filename.exists():
             raise FileNotFoundError(filename)
-        if isinstance(parse_as_string, str):
-            parse_as_string = [parse_as_string]
         self.filename = filename
 
         # setup for parsing
@@ -81,7 +79,7 @@ class StarParser:
             if self.current_line.startswith('data'):
                 break
             elif self.current_line.startswith('_'):  # '_foo bar'
-                k, v = self.current_line.split()
+                k, v = shlex.split(self.current_line)
                 column_name = k[1:]
                 parse_column_as_string = (
                     self.parse_as_string is not None
@@ -120,23 +118,27 @@ class StarParser:
             n_cols = len(loop_column_names)
             df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
+            column_name_to_index = {col: idx for idx, col in enumerate(loop_column_names)}
             df = pd.read_csv(
                 StringIO(loop_data.replace("'", '"')),
                 delimiter=r'\s+',
                 header=None,
-                dtype={k: 'str' for k in self.parse_as_string}
-                if self.parse_as_string is not None else None,
                 comment='#',
-                keep_default_na=False
+                dtype={column_name_to_index[k]: str for k in self.parse_as_string if k in loop_column_names},
+                keep_default_na=False,
+                engine='c',
             )
+            df.columns = loop_column_names
+
+            # Numericise all columns in temporary copy
             df_numeric = df.apply(_apply_numeric)
-            # Replace columns that are all NaN with the original string columns
+
+            # Replace columns that are all NaN with the original columns
             df_numeric[df_numeric.columns[df_numeric.isna().all()]] = df[df_numeric.columns[df_numeric.isna().all()]]
 
             # Replace columns that should be strings
-            # todo:
-            df = df_numeric
-            df.columns = loop_column_names
+            for col in df.columns:
+                df[col] = df_numeric[col] if col not in self.parse_as_string else df[col]
         return df
 
 
