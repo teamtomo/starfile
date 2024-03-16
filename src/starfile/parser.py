@@ -31,6 +31,7 @@ class StarParser:
         filename: PathLike,
         n_blocks_to_read: Optional[int] = None,
         parse_as_string: list[str] = [],
+        polars: bool = False,
     ):
         # set filename, with path checking
         filename = Path(filename)
@@ -47,6 +48,8 @@ class StarParser:
         # parse file
         self.current_line_number = 0
         self.parse_file()
+
+        self.polars = polars
 
     @property
     def current_line(self) -> str:
@@ -148,7 +151,9 @@ class StarParser:
             for col in df.columns:
                 if col not in self.parse_as_string:
                     df = df.replace(col, df_numeric[col])
-        return df
+        if self.polars:
+            return df
+        return df.to_pandas()
 
 
 def count_lines(file: Path) -> int:
