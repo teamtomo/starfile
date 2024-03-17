@@ -173,15 +173,18 @@ def write_loop_block(
         f.write("\n".join(header_lines))
         f.write("\n")
 
-    df = df.map(
-        lambda x: f"{quote_character}{x}{quote_character}"
-        if isinstance(x, str) and (quote_all_strings or " " in x or x == "")
-        else x
-    )
-
     # write data
     if isinstance(df, pd.DataFrame):
         df = pl.from_pandas(df)
+
+    df = df.with_columns(
+        pl.col(pl.String).map_elements(
+            lambda x: f"{quote_character}{x}{quote_character}"
+            if (quote_all_strings or " " in x or x == "")
+            else x
+        )
+    )
+
     with open(file, "a") as fobj:
         df.write_csv(
             fobj,
