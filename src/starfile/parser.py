@@ -45,11 +45,11 @@ class StarParser:
         self.n_blocks_to_read = n_blocks_to_read
         self.parse_as_string = parse_as_string
 
+        self.polars = polars
+
         # parse file
         self.current_line_number = 0
         self.parse_file()
-
-        self.polars = polars
 
     @property
     def current_line(self) -> str:
@@ -96,7 +96,7 @@ class StarParser:
             self.current_line_number += 1
         return block
 
-    def _parse_loop_block(self) -> pd.DataFrame:
+    def _parse_loop_block(self) -> pd.DataFrame | pl.DataFrame:
         # parse loop header
         loop_column_names = deque()
         self.current_line_number += 1
@@ -120,37 +120,37 @@ class StarParser:
         # put string data into a dataframe
         if loop_data == "\n":
             n_cols = len(loop_column_names)
-            df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
+            df = pl.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
             column_name_to_index = {
                 col: idx for idx, col in enumerate(loop_column_names)
             }
-            whitespace_regex = re.compile(r"[^\S\r\n]")
+            whitespace_regex = re.compile(r"[ \t]+")
             loop_data = whitespace_regex.sub(" ", loop_data).strip()
+            endline_regex = re.compile(r"[\n\r]+")
+            loop_data = endline_regex.sub("\n", loop_data).strip()
             df = pl.read_csv(
                 StringIO(loop_data.replace("'", '"')),
                 separator=" ",
                 has_header=False,
                 comment_prefix="#",
                 dtypes={
-                    column_name_to_index[k]: str
-                    for k in self.parse_as_string
-                    if k in loop_column_names
+                    k: pl.String for k in self.parse_as_string if k in loop_column_names
                 },
+                truncate_ragged_lines=True,
+                null_values="",
             )
             df.columns = loop_column_names
 
-            # Numericise all columns in temporary copy
-            df_numeric = df.apply(_apply_numeric)
-            df_numeric.columns = loop_column_names
-
-            # Replace columns that are all NaN with the original columns
-            df_numeric = df.with_columns(pl.all().is_null())
+            # If th column type is string then use empty strings rather than null
+            df = df.with_columns(pl.col(pl.String).fill_null(""))
 
             # Replace columns that should be strings
             for col in df.columns:
-                if col not in self.parse_as_string:
-                    df = df.replace(col, df_numeric[col])
+                if col in self.parse_as_string:
+                    df = df.with_columns(
+                        pl.col(col).cast(pl.String).fill_null("").alias(col)
+                    )
         if self.polars:
             return df
         return df.to_pandas()
