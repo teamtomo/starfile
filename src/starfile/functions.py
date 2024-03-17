@@ -55,7 +55,7 @@ def read(
 def write(
     data: Union[DataBlock, dict[str, DataBlock], list[DataBlock]],
     filename: PathLike,
-    float_format: str = "%.6f",
+    float_format: int = 6,
     sep: str = "\t",
     na_rep: str = "<NA>",
     quote_character: str = '"',
@@ -71,8 +71,8 @@ def write(
         If a dictionary of datablocks are passed the keys will be the data block names.
     filename: PathLike
         Path where the file will be saved.
-    float_format: str
-        Float format string which will be passed to pandas.
+    float_format: int
+        Number of decimal places to write floats to.
     sep: str
         Separator between values, will be passed to pandas.
     na_rep: str
