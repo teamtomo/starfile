@@ -45,7 +45,9 @@ class StarWriter:
     def coerce_data_blocks(
         self, data_blocks: Union[DataBlock, list[DataBlock], dict[str, DataBlock]]
     ) -> dict[str, DataBlock]:
-        if isinstance(data_blocks, pd.DataFrame):
+        if isinstance(data_blocks, pd.DataFrame) or isinstance(
+            data_blocks, pl.DataFrame
+        ):
             return coerce_dataframe(data_blocks)
         elif isinstance(data_blocks, dict):
             return coerce_dict(data_blocks)
@@ -57,6 +59,9 @@ class StarWriter:
                 {pd.DataFrame}, \
                 {Dict[str, pd.DataFrame]} \
                 or {List[pd.DataFrame]}, \
+                or {pl.DataFrame}, \
+                {Dict[str, pl.DataFrame]} \
+                or {List[pl.DataFrame]}, \
                 got {type(data_blocks)}"
             )
 
@@ -75,7 +80,7 @@ class StarWriter:
                     quote_character=self.quote_character,
                     quote_all_strings=self.quote_all_strings,
                 )
-            elif isinstance(block, pd.DataFrame):
+            elif isinstance(block, pd.DataFrame) or isinstance(block, pl.DataFrame):
                 write_loop_block(
                     file=self.filename,
                     block_name=block_name,
@@ -94,7 +99,7 @@ class StarWriter:
             self.filename.rename(backup_path)
 
 
-def coerce_dataframe(df: pd.DataFrame) -> dict[str, DataBlock]:
+def coerce_dataframe(df: pd.DataFrame | pl.DataFrame) -> dict[str, DataBlock]:
     return {"": df}
 
 
@@ -151,7 +156,7 @@ def write_simple_block(
 def write_loop_block(
     file: Path,
     block_name: str,
-    df: pd.DataFrame,
+    df: pd.DataFrame | pl.DataFrame,
     float_format: int = 6,
     separator: str = "\t",
     na_rep: str = "<NA>",
@@ -175,9 +180,10 @@ def write_loop_block(
     )
 
     # write data
-    df_pl = pl.from_pandas(df)
+    if isinstance(df, pd.DataFrame):
+        df = pl.from_pandas(df)
     with open(file, "a") as fobj:
-        df_pl.write_csv(
+        df.write_csv(
             fobj,
             separator=separator,
             include_header=False,
