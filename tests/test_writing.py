@@ -8,7 +8,13 @@ import pytest
 from starfile.parser import StarParser
 from starfile.writer import StarWriter
 
-from .constants import loop_simple, postprocess, test_data_directory, test_df
+from .constants import (
+    loop_simple,
+    postprocess,
+    test_data_directory,
+    test_df,
+    test_df_pl,
+)
 from .utils import generate_large_star_file, remove_large_star_file
 
 
@@ -36,13 +42,17 @@ def test_write_multiblock(polars):
     assert output_file.exists()
 
 
-def test_from_single_dataframe():
+@pytest.mark.parametrize("polars", [True, False])
+def test_from_single_dataframe(polars):
     output_file = test_data_directory / "from_df.star"
 
-    StarWriter(test_df, output_file)
+    if polars:
+        StarWriter(test_df_pl, output_file)
+    else:
+        StarWriter(test_df, output_file)
     assert output_file.exists()
 
-    s = StarParser(output_file)
+    s = StarParser(output_file, polars=polars)
 
 
 @pytest.mark.parametrize("polars", [True, False])

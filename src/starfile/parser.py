@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import re
 import shlex
 from collections import deque
+from functools import lru_cache
 from io import StringIO
 from linecache import getline
 from pathlib import Path
@@ -51,15 +51,15 @@ class StarParser:
         self.current_line_number = 0
         self.parse_file()
 
-    @property
-    def current_line(self) -> str:
-        return getline(str(self.filename), self.current_line_number).strip()
+    @lru_cache(maxsize=25)
+    def _get_line(self, line_number: int) -> str:
+        return " ".join(getline(str(self.filename), line_number).split())
 
     def parse_file(self):
         while self.current_line_number <= self.n_lines_in_file:
             if len(self.data_blocks) == self.n_blocks_to_read:
                 break
-            elif self.current_line.startswith("data_"):
+            elif self._get_line(self.current_line_number).startswith("data_"):
                 block_name, block = self._parse_data_block()
                 self.data_blocks[block_name] = block
             else:
@@ -67,24 +67,26 @@ class StarParser:
 
     def _parse_data_block(self) -> tuple[str, DataBlock]:
         # current line starts with 'data_foo'
-        block_name = self.current_line[5:]  # 'data_foo' -> 'foo'
+        block_name = self._get_line(self.current_line_number)[5:]  # 'data_foo' -> 'foo'
         self.current_line_number += 1
 
         # iterate over file,
         while self.current_line_number <= self.n_lines_in_file:
             self.current_line_number += 1
-            if self.current_line.startswith("loop_"):
+            current_line = self._get_line(self.current_line_number)
+            if current_line.startswith("loop_"):
                 return block_name, self._parse_loop_block()
-            elif self.current_line.startswith("_"):  # line is simple block
+            elif current_line.startswith("_"):  # line is simple block
                 return block_name, self._parse_simple_block()
 
     def _parse_simple_block(self) -> dict[str, Union[str, int, float]]:
         block = {}
         while self.current_line_number <= self.n_lines_in_file:
-            if self.current_line.startswith("data"):
+            c = self._get_line(self.current_line_number)
+            if c.startswith("data"):
                 break
-            elif self.current_line.startswith("_"):  # '_foo bar'
-                k, v = shlex.split(self.current_line)
+            elif c.startswith("_"):  # '_foo bar'
+                k, v = shlex.split(c)
                 column_name = k[1:]
                 parse_column_as_string = self.parse_as_string is not None and any(
                     column_name == col for col in self.parse_as_string
@@ -101,17 +103,22 @@ class StarParser:
         loop_column_names = deque()
         self.current_line_number += 1
 
-        while self.current_line.startswith("_"):
-            column_name = self.current_line.split()[0][1:]
+        while self._get_line(self.current_line_number).startswith("_"):
+            column_name = self._get_line(self.current_line_number).split()[0][1:]
             loop_column_names.append(column_name)
             self.current_line_number += 1
 
         # now parse the loop block data
         loop_data = deque()
         while self.current_line_number <= self.n_lines_in_file:
-            if self.current_line.startswith("data_"):
+            current_line = self._get_line(self.current_line_number)
+            if current_line.startswith("data_"):
                 break
-            loop_data.append(self.current_line)
+            previous_line = self._get_line(self.current_line_number - 1)
+            if not (current_line.isspace() and previous_line.isspace()) and (
+                current_line and previous_line
+            ):
+                loop_data.append(current_line)
             self.current_line_number += 1
         loop_data = "\n".join(loop_data)
         if loop_data[-2:] != "\n":
@@ -122,13 +129,6 @@ class StarParser:
             n_cols = len(loop_column_names)
             df = pl.DataFrame(np.zeros(shape=(0, n_cols)))
         else:
-            column_name_to_index = {
-                col: idx for idx, col in enumerate(loop_column_names)
-            }
-            whitespace_regex = re.compile(r"[ \t]+")
-            loop_data = whitespace_regex.sub(" ", loop_data).strip()
-            endline_regex = re.compile(r"[\n\r]+")
-            loop_data = endline_regex.sub("\n", loop_data).strip()
             df = pl.read_csv(
                 StringIO(loop_data.replace("'", '"')),
                 separator=" ",
@@ -142,7 +142,7 @@ class StarParser:
             )
             df.columns = loop_column_names
 
-            # If th column type is string then use empty strings rather than null
+            # If the column type is string then use empty strings rather than null
             df = df.with_columns(pl.col(pl.String).fill_null(""))
 
             # Replace columns that should be strings
@@ -183,10 +183,3 @@ def numericise(value: str) -> Union[str, int, float]:
             # If it's not a float either, leave it as a string
             value = value
     return value
-
-
-def _apply_numeric(col: pd.Series) -> pd.Series:
-    try:
-        return pd.to_numeric(col)
-    except ValueError:
-        return col
