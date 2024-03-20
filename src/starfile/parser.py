@@ -138,7 +138,7 @@ class StarParser:
                     k: pl.String for k in self.parse_as_string if k in loop_column_names
                 },
                 truncate_ragged_lines=True,
-                null_values="",
+                null_values=["", "<NA>"],
             )
             df.columns = loop_column_names
 
