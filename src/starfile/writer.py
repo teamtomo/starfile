@@ -109,7 +109,7 @@ def coerce_dict(
     """Coerce dict into dict of data blocks."""
     # check if data is already Dict[str, DataBlock]
     for k, v in data_blocks.items():
-        if type(v) in (dict, pd.DataFrame):  #
+        if type(v) in (dict, pd.DataFrame, pl.DataFrame):  #
             return data_blocks
     # coerce if not
     return {"": data_blocks}
