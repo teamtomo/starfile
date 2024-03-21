@@ -7,5 +7,5 @@ import polars as pl
 from typing_extensions import TypeAlias
 
 DataBlock: TypeAlias = Union[
-    pd.DataFrame | pl.DataFrame, Dict[str, Union[str, int, float]]
+    Union[pd.DataFrame, pl.DataFrame], Dict[str, Union[str, int, float]]
 ]
