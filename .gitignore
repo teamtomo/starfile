@@ -17,3 +17,4 @@ package.sh
 MANIFEST
 
 __pycache__/
+/tests/data/*.star~
