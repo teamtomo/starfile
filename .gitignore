@@ -15,3 +15,5 @@
 /m2relion/
 package.sh
 MANIFEST
+
+__pycache__/

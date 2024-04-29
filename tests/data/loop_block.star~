@@ -1,0 +1,36 @@
+# Created by the starfile Python package (version 0.5.6) at 21:27:25 on 29/04/2024
+
+
+data_
+
+loop_
+_rlnCoordinateX #1
+_rlnCoordinateY #2
+_rlnCoordinateZ #3
+_rlnMicrographName #4
+_rlnMagnification #5
+_rlnDetectorPixelSize #6
+_rlnCtfMaxResolution #7
+_rlnImageName #8
+_rlnCtfImage #9
+_rlnAngleRot #10
+_rlnAngleTilt #11
+_rlnAnglePsi #12
+1572.444000	1084.500000	964.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000000_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000000_ctf_5.00A.mrc	0	0	0
+1507.500000	1104.357000	967.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000001_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000001_ctf_5.00A.mrc	0	0	0
+1512.432000	973.500000	934.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000002_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000002_ctf_5.00A.mrc	0	0	0
+1560.385000	1063.500000	961.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000003_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000003_ctf_5.00A.mrc	0	0	0
+1537.500000	1060.500000	966.260000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000004_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000004_ctf_5.00A.mrc	0	0	0
+1054.500000	667.500000	606.260000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000005_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000005_ctf_5.00A.mrc	0	0	0
+1072.500000	649.500000	645.280000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000006_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000006_ctf_5.00A.mrc	0	0	0
+1035.357000	568.500000	739.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000007_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000007_ctf_5.00A.mrc	0	0	0
+1018.500000	556.500000	753.239000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000008_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000008_ctf_5.00A.mrc	0	0	0
+1029.341000	565.500000	706.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000009_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000009_ctf_5.00A.mrc	0	0	0
+1027.500000	564.390000	700.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000010_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000010_ctf_5.00A.mrc	0	0	0
+1005.325000	544.500000	724.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000011_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000011_ctf_5.00A.mrc	0	0	0
+1024.500000	558.388000	727.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000012_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000012_ctf_5.00A.mrc	0	0	0
+1024.500000	558.379000	730.500000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000013_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000013_ctf_5.00A.mrc	0	0	0
+766.500000	544.500000	915.303000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000014_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000014_ctf_5.00A.mrc	0	0	0
+970.500000	592.500000	582.261000	tomo_ts01.mrc_15.00Apx.mrc	10000.000000	5.000000	7.400000	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000015_5.00A.mrc	F:/WM5984_180924_DCheR_minicells/frames/subtomo/tomo_ts01.mrc/tomo_ts01.mrc_0000015_ctf_5.00A.mrc	0	0	0
+
+

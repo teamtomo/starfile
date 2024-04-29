@@ -37,6 +37,8 @@ def test_write_overwrites_with_backup():
     starfile.write(test_df, output_file)
     backup = test_data_directory / 'test_overwrite_backup.star~'
     assert backup.exists()
+    starfile.write(test_df, output_file)
+    assert backup.exists()
 
 
 def test_read_non_existent_file():

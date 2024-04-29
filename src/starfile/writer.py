@@ -92,6 +92,8 @@ class StarWriter:
         if self.filename.exists():
             new_name = self.filename.name + '~'
             backup_path = self.filename.resolve().parent / new_name
+            if backup_path.exists():
+                backup_path.unlink()
             self.filename.rename(backup_path)
 
 
