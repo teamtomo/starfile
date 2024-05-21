@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import linecache
 from collections import deque
 from io import StringIO
 from linecache import getline
@@ -45,6 +46,7 @@ class StarParser:
         # parse file
         self.current_line_number = 0
         self.parse_file()
+        linecache.clearcache()
 
     @property
     def current_line(self) -> str:
