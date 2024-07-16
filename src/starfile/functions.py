@@ -81,4 +81,4 @@ def write(
         separator=sep,
         quote_character=quote_character,
         quote_all_strings=quote_all_strings,
-    )
+    ).write()

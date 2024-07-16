@@ -40,7 +40,6 @@ class StarWriter:
         self.quote_all_strings = quote_all_strings
         self.buffer = TextBuffer()
         self.backup_if_file_exists()
-        self.write()
 
     def coerce_data_blocks(
         self,
