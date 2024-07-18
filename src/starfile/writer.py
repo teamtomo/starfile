@@ -60,15 +60,16 @@ class StarWriter:
                 got {type(data_blocks)}'
             )
 
-    def file_contents(self) -> Generator[str, None, None]:
-        yield f'{package_info()}\n'
-        yield '\n' * 2
-        yield from self.data_block_generator()
+    def lines(self) -> Generator[str, None, None]:
+        yield package_info()
+        yield ''
+        yield ''
+        for line in self.data_block_generator():
+            yield line
 
     def write(self):
         with open(self.filename, mode='w+') as f:
-            for item in self.file_contents():
-                f.write(item)
+            f.writelines(line + '\n' for line in self.lines())
 
     def data_block_generator(self) -> Generator[str, None, None]:
         for block_name, block in self.data_blocks.items():
@@ -128,22 +129,27 @@ def package_info():
     return f'# Created by the starfile Python package (version {__version__}) at {time} on {date}'
 
 
+def quote(x, *,
+          quote_character: str = '"',
+          quote_all_strings: bool = False) -> str:
+    if isinstance(x, str) and (quote_all_strings or ' ' in x or not x):
+        return f'{quote_character}{x}{quote_character}'
+    return x
+
+
 def simple_block(
     block_name: str,
     data: Dict[str, Union[str, int, float]],
     quote_character: str = '"',
     quote_all_strings: bool = False
 ) -> Generator[str, None, None]:
-    yield f'data_{block_name}\n\n'
-    quoted_data = {
-        k: f"{quote_character}{v}{quote_character}"
-        if isinstance(v, str) and (quote_all_strings or " " in v or v == "")
-        else v
-        for k, v in data.items()
-    }
-    for k, v in quoted_data.items():
-        yield f'_{k}\t\t\t{v}\n'
-    yield '\n' * 2
+
+    yield f'data_{block_name}'
+    yield ''
+    for k, v in data.items():
+        yield f'_{k}\t\t\t{quote(v, quote_character=quote_character, quote_all_strings=quote_all_strings)}'
+    yield ''
+    yield ''
 
 
 def loop_block(
@@ -155,23 +161,20 @@ def loop_block(
     quote_character: str = '"',
     quote_all_strings: bool = False
 ) -> Generator[str, None, None]:
-    # write header
-    header_lines = [
-        f'_{column_name} #{idx}'
-        for idx, column_name
-        in enumerate(df.columns, 1)
-    ]
-    yield f'data_{block_name}\n\n'
-    yield 'loop_\n'
-    for line in header_lines:
-        yield line + '\n'
 
-    df = df.map(lambda x: f'{quote_character}{x}{quote_character}'
-                if isinstance(x, str) and (quote_all_strings or " " in x or x == "")
-                else x)
+    # Header
+    yield f'data_{block_name}'
+    yield ''
+    yield 'loop_'
+    for idx, column_name in enumerate(df.columns, 1):
+        yield f'_{column_name} #{idx}'
 
-    # write data
-    yield df.to_csv(
+    # Data
+    for line in df.map(lambda x:
+        quote(x,
+              quote_character=quote_character,
+              quote_all_strings=quote_all_strings)
+    ).to_csv(
         mode='a',
         sep=separator,
         header=False,
@@ -179,5 +182,8 @@ def loop_block(
         float_format=float_format,
         na_rep=na_rep,
         quoting=csv.QUOTE_NONE
-    )
-    yield '\n' * 2
+    ).split('\n'):
+        yield line
+
+    yield ''
+    yield ''
