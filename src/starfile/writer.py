@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Union, Dict, List, Generator
+from typing import TYPE_CHECKING, Union, Dict, List, Generator, Optional
 from importlib.metadata import version
 import csv
 
@@ -21,7 +21,7 @@ class StarWriter:
     def __init__(
         self,
         data_blocks: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
-        filename: PathLike,
+        filename: Optional[PathLike] = None,
         float_format: str = '%.6f',
         separator: str = '\t',
         na_rep: str = '<NA>',
@@ -31,8 +31,8 @@ class StarWriter:
         # coerce data
         self.data_blocks = self.coerce_data_blocks(data_blocks)
 
-        # write
-        self.filename = Path(filename)
+        if filename is not None:
+            self.filename = Path(filename)
         self.float_format = float_format
         self.sep = separator
         self.na_rep = na_rep
@@ -68,6 +68,8 @@ class StarWriter:
             yield line
 
     def write(self):
+        if self.filename is None:
+            raise Exception('Cannot write nameless file!')
         with open(self.filename, mode='w+') as f:
             f.writelines(line + '\n' for line in self.lines())
 
