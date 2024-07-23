@@ -81,4 +81,39 @@ def write(
         separator=sep,
         quote_character=quote_character,
         quote_all_strings=quote_all_strings,
+    ).write()
+
+
+def to_string(
+    data: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
+    float_format: str = '%.6f',
+    sep: str = '\t',
+    na_rep: str = '<NA>',
+    quote_character: str = '"',
+    quote_all_strings: bool = False,
+    **kwargs
+):
+    """Represent data in the STAR format.
+
+    Parameters
+    ----------
+    data: DataBlock | Dict[str, DataBlock] | List[DataBlock]
+        Data to represent. DataBlocks are dictionaries or dataframes.
+        If a dictionary of datablocks are passed the keys will be the data block names.
+    float_format: str
+        Float format string which will be passed to pandas.
+    sep: str
+        Separator between values, will be passed to pandas.
+    na_rep: str
+        Representation of null values, will be passed to pandas.
+    """
+    writer = StarWriter(
+        data,
+        filename=None,
+        float_format=float_format,
+        na_rep=na_rep,
+        separator=sep,
+        quote_character=quote_character,
+        quote_all_strings=quote_all_strings,
     )
+    return ''.join(line + '\n' for line in writer.lines())

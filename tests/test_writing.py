@@ -14,28 +14,28 @@ from .utils import generate_large_star_file, remove_large_star_file
 def test_write_simple_block():
     s = StarParser(postprocess)
     output_file = test_data_directory / 'basic_block.star'
-    StarWriter(s.data_blocks, output_file)
+    StarWriter(s.data_blocks, output_file).write()
     assert output_file.exists()
 
 
 def test_write_loop():
     s = StarParser(loop_simple)
     output_file = test_data_directory / 'loop_block.star'
-    StarWriter(s.data_blocks, output_file)
+    StarWriter(s.data_blocks, output_file).write()
     assert output_file.exists()
 
 
 def test_write_multiblock():
     s = StarParser(postprocess)
     output_file = test_data_directory / 'multiblock.star'
-    StarWriter(s.data_blocks, output_file)
+    StarWriter(s.data_blocks, output_file).write()
     assert output_file.exists()
 
 
 def test_from_single_dataframe():
     output_file = test_data_directory / 'from_df.star'
 
-    StarWriter(test_df, output_file)
+    StarWriter(test_df, output_file).write()
     assert output_file.exists()
 
     s = StarParser(output_file)
@@ -45,7 +45,7 @@ def test_create_from_dataframes():
     dfs = [test_df, test_df]
 
     output_file = test_data_directory / 'from_list.star'
-    StarWriter(dfs, output_file)
+    StarWriter(dfs, output_file).write()
     assert output_file.exists()
 
     s = StarParser(output_file)
@@ -59,7 +59,7 @@ def test_can_write_non_zero_indexed_one_row_dataframe():
 
     with TemporaryDirectory() as directory:
         filename = join_path(directory, "test.star")
-        StarWriter(df, filename)
+        StarWriter(df, filename).write()
         with open(filename) as output_file:
             output = output_file.read()
 
@@ -83,7 +83,7 @@ def test_string_quoting_loop_datablock(quote_character, quote_all_strings, num_q
                        columns=["a_number","string_without_space", "string_space", "just_space", "empty_string"])
 
     filename = tmp_path / "test.star"
-    StarWriter(df, filename, quote_character=quote_character, quote_all_strings=quote_all_strings)
+    StarWriter(df, filename, quote_character=quote_character, quote_all_strings=quote_all_strings).write()
     
     # Test for the appropriate number of quotes
     with open(filename) as f:
@@ -118,7 +118,7 @@ def test_string_quoting_simple_datablock(quote_character, quote_all_strings,num_
     }
 
     filename = tmp_path / "test.star"
-    StarWriter(o, filename, quote_character=quote_character, quote_all_strings=quote_all_strings)
+    StarWriter(o, filename, quote_character=quote_character, quote_all_strings=quote_all_strings).write()
     
     # Test for the appropriate number of quotes
     with open(filename) as f:
@@ -127,3 +127,8 @@ def test_string_quoting_simple_datablock(quote_character, quote_all_strings,num_
 
     s = StarParser(filename)
     assert o == s.data_blocks[""]
+
+
+def test_no_filename_error():
+    with pytest.raises(ValueError):
+        StarWriter(test_df).write()

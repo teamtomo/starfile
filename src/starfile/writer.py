@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Union, Dict, List
+from typing import TYPE_CHECKING, Union, Dict, List, Generator, Optional
 from importlib.metadata import version
 import csv
 
@@ -21,7 +21,7 @@ class StarWriter:
     def __init__(
         self,
         data_blocks: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
-        filename: PathLike,
+        filename: Optional[PathLike] = None,
         float_format: str = '%.6f',
         separator: str = '\t',
         na_rep: str = '<NA>',
@@ -31,8 +31,10 @@ class StarWriter:
         # coerce data
         self.data_blocks = self.coerce_data_blocks(data_blocks)
 
-        # write
-        self.filename = Path(filename)
+        if filename is not None:
+            self.filename = Path(filename)
+        else:
+            self.filename = None
         self.float_format = float_format
         self.sep = separator
         self.na_rep = na_rep
@@ -40,7 +42,6 @@ class StarWriter:
         self.quote_all_strings = quote_all_strings
         self.buffer = TextBuffer()
         self.backup_if_file_exists()
-        self.write()
 
     def coerce_data_blocks(
         self,
@@ -61,24 +62,31 @@ class StarWriter:
                 got {type(data_blocks)}'
             )
 
-    def write(self):
-        write_package_info(self.filename)
-        write_blank_lines(self.filename, n=2)
-        self.write_data_blocks()
+    def lines(self) -> Generator[str, None, None]:
+        yield package_info()
+        yield ''
+        yield ''
+        for line in self.data_block_generator():
+            yield line
 
-    def write_data_blocks(self):
+    def write(self):
+        if self.filename is None:
+            raise ValueError('Cannot write nameless file!')
+        with open(self.filename, mode='w+') as f:
+            f.writelines(line + '\n' for line in self.lines())
+
+    def data_block_generator(self) -> Generator[str, None, None]:
         for block_name, block in self.data_blocks.items():
             if isinstance(block, dict):
-                write_simple_block(
-                    file=self.filename,
+                for line in simple_block(
                     block_name=block_name,
                     data=block,
                     quote_character=self.quote_character,
                     quote_all_strings=self.quote_all_strings
-                )
+                ):
+                    yield line
             elif isinstance(block, pd.DataFrame):
-                write_loop_block(
-                    file=self.filename,
+                for line in loop_block(
                     block_name=block_name,
                     df=block,
                     float_format=self.float_format,
@@ -86,10 +94,11 @@ class StarWriter:
                     na_rep=self.na_rep,
                     quote_character=self.quote_character,
                     quote_all_strings=self.quote_all_strings
-                )
+                ):
+                    yield line
 
     def backup_if_file_exists(self):
-        if self.filename.exists():
+        if self.filename and self.filename.exists():
             new_name = self.filename.name + '~'
             backup_path = self.filename.resolve().parent / new_name
             if backup_path.exists():
@@ -118,48 +127,36 @@ def coerce_list(data_blocks: List[DataBlock]) -> Dict[str, DataBlock]:
     return {f'{idx}': df for idx, df in enumerate(data_blocks)}
 
 
-def write_blank_lines(file: Path, n: int):
-    with open(file, mode='a') as f:
-        f.write('\n' * n)
-
-
-def write_package_info(file: Path):
+def package_info():
     date = datetime.now().strftime('%d/%m/%Y')
     time = datetime.now().strftime('%H:%M:%S')
-    line = f'# Created by the starfile Python package (version {__version__}) at {time} on {date}'
-    with open(file, mode='w+') as f:
-        f.write(f'{line}\n')
+    return f'# Created by the starfile Python package (version {__version__}) at {time} on {date}'
 
 
-def write_simple_block(
-    file: Path,
+def quote(x, *,
+          quote_character: str = '"',
+          quote_all_strings: bool = False) -> str:
+    if isinstance(x, str) and (quote_all_strings or ' ' in x or not x):
+        return f'{quote_character}{x}{quote_character}'
+    return x
+
+
+def simple_block(
     block_name: str,
     data: Dict[str, Union[str, int, float]],
     quote_character: str = '"',
     quote_all_strings: bool = False
-):  
-    quoted_data = {
-        k: f"{quote_character}{v}{quote_character}" 
-        if isinstance(v, str) and (quote_all_strings or " " in v or v == "") 
-        else v
-        for k, v
-        in data.items()    
-    }
-    formatted_lines = '\n'.join(
-        [
-            f'_{k}\t\t\t{v}'
-            for k, v
-            in quoted_data.items()
-        ]
-    )
-    with open(file, mode='a') as f:
-        f.write(f'data_{block_name}\n\n')
-        f.write(formatted_lines)
-        f.write('\n\n\n')
+) -> Generator[str, None, None]:
+
+    yield f'data_{block_name}'
+    yield ''
+    for k, v in data.items():
+        yield f'_{k}\t\t\t{quote(v, quote_character=quote_character, quote_all_strings=quote_all_strings)}'
+    yield ''
+    yield ''
 
 
-def write_loop_block(
-    file: Path,
+def loop_block(
     block_name: str,
     df: pd.DataFrame,
     float_format: str = '%.6f',
@@ -167,26 +164,21 @@ def write_loop_block(
     na_rep: str = '<NA>',
     quote_character: str = '"',
     quote_all_strings: bool = False
-):
-    # write header
-    header_lines = [
-        f'_{column_name} #{idx}'
-        for idx, column_name
-        in enumerate(df.columns, 1)
-    ]
-    with open(file, mode='a') as f:
-        f.write(f'data_{block_name}\n\n')
-        f.write('loop_\n')
-        f.write('\n'.join(header_lines))
-        f.write('\n')
+) -> Generator[str, None, None]:
 
-    df = df.map(lambda x: f'{quote_character}{x}{quote_character}' 
-                if isinstance(x, str) and (quote_all_strings or " " in x or x == "") 
-                else x)
+    # Header
+    yield f'data_{block_name}'
+    yield ''
+    yield 'loop_'
+    for idx, column_name in enumerate(df.columns, 1):
+        yield f'_{column_name} #{idx}'
 
-    # write data
-    df.to_csv(
-        path_or_buf=file,
+    # Data
+    for line in df.map(lambda x:
+        quote(x,
+              quote_character=quote_character,
+              quote_all_strings=quote_all_strings)
+    ).to_csv(
         mode='a',
         sep=separator,
         header=False,
@@ -194,5 +186,8 @@ def write_loop_block(
         float_format=float_format,
         na_rep=na_rep,
         quoting=csv.QUOTE_NONE
-    )
-    write_blank_lines(file, n=2)
+    ).split('\n'):
+        yield line
+
+    yield ''
+    yield ''

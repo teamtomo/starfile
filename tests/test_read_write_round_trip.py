@@ -42,8 +42,8 @@ def test_round_trip_postprocess(tmp_path):
             assert _actual == _expected
 
 
-def test_write_read_write_read():
-    filename = 'tmp.star'
+def test_write_read_write_read(tmp_path):
+    filename = tmp_path / 'tmp.star'
     df_a = pd.DataFrame({'a': [0, 1], 'b': [2, 3]})
     starfile.write(df_a, filename)
 
