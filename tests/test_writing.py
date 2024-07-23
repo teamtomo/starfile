@@ -127,3 +127,8 @@ def test_string_quoting_simple_datablock(quote_character, quote_all_strings,num_
 
     s = StarParser(filename)
     assert o == s.data_blocks[""]
+
+
+def test_no_filename_error():
+    with pytest.raises(ValueError):
+        StarWriter(test_df).write()

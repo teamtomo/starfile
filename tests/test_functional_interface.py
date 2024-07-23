@@ -47,3 +47,11 @@ def test_read_non_existent_file():
 
     with pytest.raises(FileNotFoundError):
         starfile.read(f)
+
+
+def test_generate_string():
+    star_string = starfile.to_string(test_df)
+    output_file = test_data_directory / "test_write.star"
+    starfile.write(test_df, output_file, overwrite=True)
+    with open(output_file, "r") as f:
+        assert f.read() == star_string

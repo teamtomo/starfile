@@ -33,6 +33,8 @@ class StarWriter:
 
         if filename is not None:
             self.filename = Path(filename)
+        else:
+            self.filename = None
         self.float_format = float_format
         self.sep = separator
         self.na_rep = na_rep
@@ -69,7 +71,7 @@ class StarWriter:
 
     def write(self):
         if self.filename is None:
-            raise Exception('Cannot write nameless file!')
+            raise ValueError('Cannot write nameless file!')
         with open(self.filename, mode='w+') as f:
             f.writelines(line + '\n' for line in self.lines())
 
@@ -96,7 +98,7 @@ class StarWriter:
                     yield line
 
     def backup_if_file_exists(self):
-        if self.filename.exists():
+        if self.filename and self.filename.exists():
             new_name = self.filename.name + '~'
             backup_path = self.filename.resolve().parent / new_name
             if backup_path.exists():

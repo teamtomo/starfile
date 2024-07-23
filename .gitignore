@@ -10,6 +10,7 @@
 /tests/data/from_list.star
 /tests/data/test_overwrite_flag.star
 /tests/data/test_write_with_float_format.star
+/tests/data/test_overwrite_backup.star
 /build/
 /dist/
 /m2relion/
