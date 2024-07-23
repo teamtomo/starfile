@@ -83,3 +83,18 @@ For more advanced usage please check out the examples.
 ```shell
 pip install starfile
 ```
+---
+
+# API
+
+## starfile.read()
+
+::: starfile.read
+
+## starfile.write()
+
+::: starfile.write
+
+## starfile.to_string()
+
+::: starfile.to_string
