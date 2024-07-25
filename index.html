@@ -50,6 +50,8 @@
       
     
     
+      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+    
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -469,8 +471,491 @@ _rlnMicrographName #7
 <p>For more advanced usage please check out the examples.</p>
 <hr />
 <h1 id="installation">Installation</h1>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>starfile
-</code></pre></div>
+<h2 id="pip-install-starfile"><div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>starfile
+</code></pre></div></h2>
+<h1 id="api">API</h1>
+<h2 id="starfileread">starfile.read()</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="starfile.read"></a>
+    <div class="doc doc-contents first">
+
+      <p>Read data from a STAR file.</p>
+<p>Basic data blocks are read as dictionaries. Loop blocks are read as pandas
+dataframes. When multiple data blocks are present a dictionary of datablocks is
+returned. When a single datablock is present only the block is returned by default.
+To force returning a dectionary even when only one datablock is present set
+<code>always_dict=True</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>filename</code></td>
+            <td>
+                  <code><span title="os.PathLike">PathLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>File from which to read data.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>read_n_blocks</code></td>
+            <td>
+                  <code><span title="typing.Optional">Optional</span>[int]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Limit reading the file to the first n data blocks.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>always_dict</code></td>
+            <td>
+                  <code>bool</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Always return a dictionary, even when only a single data block is present.</p>
+              </div>
+            </td>
+            <td>
+                  <code>False</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>parse_as_string</code></td>
+            <td>
+                  <code><span title="typing.List">List</span>[str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A list of keys or column names which will not be coerced to numeric values.</p>
+              </div>
+            </td>
+            <td>
+                  <code>[]</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src/starfile/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">read</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+    <span class="n">read_n_blocks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">always_dict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">parse_as_string</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read data from a STAR file.</span>
+
+<span class="sd">    Basic data blocks are read as dictionaries. Loop blocks are read as pandas</span>
+<span class="sd">    dataframes. When multiple data blocks are present a dictionary of datablocks is</span>
+<span class="sd">    returned. When a single datablock is present only the block is returned by default.</span>
+<span class="sd">    To force returning a dectionary even when only one datablock is present set</span>
+<span class="sd">    `always_dict=True`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename: PathLike</span>
+<span class="sd">        File from which to read data.</span>
+<span class="sd">    read_n_blocks: int | None</span>
+<span class="sd">        Limit reading the file to the first n data blocks.</span>
+<span class="sd">    always_dict: bool</span>
+<span class="sd">        Always return a dictionary, even when only a single data block is present.</span>
+<span class="sd">    parse_as_string: list[str]</span>
+<span class="sd">        A list of keys or column names which will not be coerced to numeric values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">StarParser</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">n_blocks_to_read</span><span class="o">=</span><span class="n">read_n_blocks</span><span class="p">,</span> <span class="n">parse_as_string</span><span class="o">=</span><span class="n">parse_as_string</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">data_blocks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">always_dict</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">data_blocks</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">data_blocks</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h2 id="starfilewrite">starfile.write()</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="starfile.write"></a>
+    <div class="doc doc-contents first">
+
+      <p>Write data to disk in the STAR format.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="starfile.typing.DataBlock">DataBlock</span>, <span title="typing.Dict">Dict</span>[str, <span title="starfile.typing.DataBlock">DataBlock</span>], <span title="typing.List">List</span>[<span title="starfile.typing.DataBlock">DataBlock</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Data to be saved to file. DataBlocks are dictionaries or dataframes.
+If a dictionary of datablocks are passed the keys will be the data block names.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>filename</code></td>
+            <td>
+                  <code><span title="os.PathLike">PathLike</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Path where the file will be saved.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>float_format</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Float format string which will be passed to pandas.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;%.6f&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sep</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Separator between values, will be passed to pandas.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;\t&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>na_rep</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Representation of null values, will be passed to pandas.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&lt;NA&gt;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src/starfile/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">write</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataBlock</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">]],</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
+    <span class="n">float_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.6f</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">na_rep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;NA&gt;&#39;</span><span class="p">,</span>
+    <span class="n">quote_character</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+    <span class="n">quote_all_strings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write data to disk in the STAR format.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: DataBlock | Dict[str, DataBlock] | List[DataBlock]</span>
+<span class="sd">        Data to be saved to file. DataBlocks are dictionaries or dataframes.</span>
+<span class="sd">        If a dictionary of datablocks are passed the keys will be the data block names.</span>
+<span class="sd">    filename: PathLike</span>
+<span class="sd">        Path where the file will be saved.</span>
+<span class="sd">    float_format: str</span>
+<span class="sd">        Float format string which will be passed to pandas.</span>
+<span class="sd">    sep: str</span>
+<span class="sd">        Separator between values, will be passed to pandas.</span>
+<span class="sd">    na_rep: str</span>
+<span class="sd">        Representation of null values, will be passed to pandas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">StarWriter</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
+        <span class="n">float_format</span><span class="o">=</span><span class="n">float_format</span><span class="p">,</span>
+        <span class="n">na_rep</span><span class="o">=</span><span class="n">na_rep</span><span class="p">,</span>
+        <span class="n">separator</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span>
+        <span class="n">quote_character</span><span class="o">=</span><span class="n">quote_character</span><span class="p">,</span>
+        <span class="n">quote_all_strings</span><span class="o">=</span><span class="n">quote_all_strings</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div><h2 id="starfileto_string">starfile.to_string()</h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+<a id="starfile.to_string"></a>
+    <div class="doc doc-contents first">
+
+      <p>Represent data in the STAR format.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code>data</code></td>
+            <td>
+                  <code><span title="typing.Union">Union</span>[<span title="starfile.typing.DataBlock">DataBlock</span>, <span title="typing.Dict">Dict</span>[str, <span title="starfile.typing.DataBlock">DataBlock</span>], <span title="typing.List">List</span>[<span title="starfile.typing.DataBlock">DataBlock</span>]]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Data to represent. DataBlocks are dictionaries or dataframes.
+If a dictionary of datablocks are passed the keys will be the data block names.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>float_format</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Float format string which will be passed to pandas.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;%.6f&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>sep</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Separator between values, will be passed to pandas.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;\t&#39;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code>na_rep</code></td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Representation of null values, will be passed to pandas.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;&lt;NA&gt;&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>src/starfile/functions.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataBlock</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">]],</span>
+    <span class="n">float_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.6f</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">na_rep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;NA&gt;&#39;</span><span class="p">,</span>
+    <span class="n">quote_character</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+    <span class="n">quote_all_strings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent data in the STAR format.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: DataBlock | Dict[str, DataBlock] | List[DataBlock]</span>
+<span class="sd">        Data to represent. DataBlocks are dictionaries or dataframes.</span>
+<span class="sd">        If a dictionary of datablocks are passed the keys will be the data block names.</span>
+<span class="sd">    float_format: str</span>
+<span class="sd">        Float format string which will be passed to pandas.</span>
+<span class="sd">    sep: str</span>
+<span class="sd">        Separator between values, will be passed to pandas.</span>
+<span class="sd">    na_rep: str</span>
+<span class="sd">        Representation of null values, will be passed to pandas.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">StarWriter</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">,</span>
+        <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">float_format</span><span class="o">=</span><span class="n">float_format</span><span class="p">,</span>
+        <span class="n">na_rep</span><span class="o">=</span><span class="n">na_rep</span><span class="p">,</span>
+        <span class="n">separator</span><span class="o">=</span><span class="n">sep</span><span class="p">,</span>
+        <span class="n">quote_character</span><span class="o">=</span><span class="n">quote_character</span><span class="p">,</span>
+        <span class="n">quote_all_strings</span><span class="o">=</span><span class="n">quote_all_strings</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">line</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">writer</span><span class="o">.</span><span class="n">lines</span><span class="p">())</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
 
 
 
