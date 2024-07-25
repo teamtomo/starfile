@@ -60,4 +60,4 @@ starfile.write(df, 'modified_particles.star')
 ```
 
 For files containing multiple data blocks, please see the
-[multiple data block](./examples/multi_block.md) example.
+[multiple data block](./multi_block.md) example.
