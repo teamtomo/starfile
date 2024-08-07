@@ -163,7 +163,8 @@ def loop_block(
     separator: str = '\t',
     na_rep: str = '<NA>',
     quote_character: str = '"',
-    quote_all_strings: bool = False
+    quote_all_strings: bool = False,
+    include_line_num: bool = True,
 ) -> Generator[str, None, None]:
 
     # Header
@@ -171,7 +172,7 @@ def loop_block(
     yield ''
     yield 'loop_'
     for idx, column_name in enumerate(df.columns, 1):
-        yield f'_{column_name} #{idx}'
+        yield f'_{column_name} #{idx}' if include_line_num else f'_{column_name}'
 
     # Data
     for line in df.map(lambda x:
