@@ -55,7 +55,7 @@ def write(
     na_rep: str = '<NA>',
     quote_character: str = '"',
     quote_all_strings: bool = False,
-    include_field_num: bool = True,
+    include_field_numbers: bool = True,
     **kwargs
 ):
     """Write data to disk in the STAR format.
@@ -73,7 +73,7 @@ def write(
         Separator between values, will be passed to pandas.
     na_rep: str
         Representation of null values, will be passed to pandas.
-    include_field_num: bool
+    include_field_numbers: bool
         Whether field numbers should be included after field names in the ouput file. 
         Default is True which includes field numbers (i.e. `_rlnImageName #1`) and is 
         compatible with RELION and Python STOPGAP. False excludes field numbers (i.e. 
@@ -87,7 +87,7 @@ def write(
         separator=sep,
         quote_character=quote_character,
         quote_all_strings=quote_all_strings,
-        include_field_num=include_field_num,
+        include_field_numbers=include_field_numbers,
     ).write()
 
 
