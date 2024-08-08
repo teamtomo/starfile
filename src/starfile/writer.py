@@ -27,6 +27,7 @@ class StarWriter:
         na_rep: str = '<NA>',
         quote_character: str = '"',
         quote_all_strings: bool = False,
+        include_field_numbers: bool = True,
     ):
         # coerce data
         self.data_blocks = self.coerce_data_blocks(data_blocks)
@@ -40,6 +41,7 @@ class StarWriter:
         self.na_rep = na_rep
         self.quote_character = quote_character
         self.quote_all_strings = quote_all_strings
+        self.include_field_numbers = include_field_numbers
         self.buffer = TextBuffer()
         self.backup_if_file_exists()
 
@@ -93,7 +95,8 @@ class StarWriter:
                     separator=self.sep,
                     na_rep=self.na_rep,
                     quote_character=self.quote_character,
-                    quote_all_strings=self.quote_all_strings
+                    quote_all_strings=self.quote_all_strings,
+                    include_field_numbers=self.include_field_numbers,
                 ):
                     yield line
 
@@ -163,7 +166,8 @@ def loop_block(
     separator: str = '\t',
     na_rep: str = '<NA>',
     quote_character: str = '"',
-    quote_all_strings: bool = False
+    quote_all_strings: bool = False,
+    include_field_numbers: bool = True,
 ) -> Generator[str, None, None]:
 
     # Header
@@ -171,7 +175,7 @@ def loop_block(
     yield ''
     yield 'loop_'
     for idx, column_name in enumerate(df.columns, 1):
-        yield f'_{column_name} #{idx}'
+        yield f'_{column_name} #{idx}' if include_field_numbers else f'_{column_name}'
 
     # Data
     for line in df.map(lambda x:
