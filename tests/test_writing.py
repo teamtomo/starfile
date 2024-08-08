@@ -72,18 +72,18 @@ def test_can_write_non_zero_indexed_one_row_dataframe():
     assert (expected in output)
 
 
-@pytest.mark.parametrize("include_field_num, expected", 
+@pytest.mark.parametrize("include_field_number, expected", 
                          [
                              (True, "_Brand #1\n_Price #2\n"),
                              (False, "_Brand\n_Price\n"),
                          ])
-def test_include_exclude_field_numbers(include_field_num, expected):
+def test_include_exclude_field_numbers(include_field_number, expected):
     with TemporaryDirectory() as directory:
         filename = join_path(directory, "test.star")
         StarWriter(
             test_df, 
             filename, 
-            include_field_num=include_field_num
+            include_field_number=include_field_number
         ).write()
         with open(filename) as output_file:
             output = output_file.read()
