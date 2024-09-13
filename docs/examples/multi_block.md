@@ -65,7 +65,7 @@ particle_df = star['particles']
     `starfile.read` can be forced to always return a dictionary of entries.
 
     ```python
-    starfile.read('particles.star', force_dict=True)
+    starfile.read('particles.star', always_dict=True)
     ```
 
 ## Writing
