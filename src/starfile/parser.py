@@ -129,6 +129,7 @@ class StarParser:
                 comment='#',
                 dtype={column_name_to_index[k]: str for k in self.parse_as_string if k in loop_column_names},
                 keep_default_na=False,
+                na_values=['nan','NaN','<NA>'],
                 engine='c',
             )
             df.columns = loop_column_names

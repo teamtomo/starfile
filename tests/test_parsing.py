@@ -287,3 +287,18 @@ def test_parse_as_string():
     df = parser.data_blocks['fsc']
     assert df['rlnResolution'].dtype == 'object'
 
+
+def test_parse_na():
+    import tempfile
+    import starfile
+    parts = pd.DataFrame({"property1":np.arange(10), "property2": np.random.rand(10)})
+    parts["property2"].values[-1] *= np.nan
+    data = {
+        "particles":parts
+    }
+
+    with tempfile.NamedTemporaryFile(mode="w") as tmpfile:
+        starfile.write(data, tmpfile.name) 
+        tmpfile.seek(0)
+        data = starfile.read(tmpfile.name)
+        assert data["property2"].dtype == "float64"
