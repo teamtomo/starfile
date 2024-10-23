@@ -116,9 +116,10 @@ class StarParser:
             loop_data += '\n'
 
         # put string data into a dataframe
-        if loop_data == '\n':
+        if loop_data.startswith('\n'):
             n_cols = len(loop_column_names)
             df = pd.DataFrame(np.zeros(shape=(0, n_cols)))
+            df.columns = loop_column_names
         else:
             column_name_to_index = {col: idx for idx, col in enumerate(loop_column_names)}
             df = pd.read_csv(
