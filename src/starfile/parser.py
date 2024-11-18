@@ -65,7 +65,6 @@ class StarParser:
     def _parse_data_block(self) -> Tuple[str, DataBlock]:
         # current line starts with 'data_foo'
         block_name = self.current_line[5:]  # 'data_foo' -> 'foo'
-        self.current_line_number += 1
 
         # iterate over file,
         while self.current_line_number <= self.n_lines_in_file:
