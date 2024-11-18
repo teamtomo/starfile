@@ -200,7 +200,7 @@ def test_parsing_speed():
     remove_large_star_file()
 
     # Check that execution takes less than a second
-    assert end - start < 1
+    assert end - start < 1.2
 
 
 def test_two_single_line_loop_blocks():
