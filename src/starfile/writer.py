@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from datetime import datetime
-from pathlib import Path
-from typing import TYPE_CHECKING, Union, Dict, List, Generator, Optional
-from importlib.metadata import version
 import csv
-
 import pandas as pd
+from datetime import datetime
+from importlib.metadata import version
+from pathlib import Path
 
-from .utils import TextBuffer
+from typing import TYPE_CHECKING, Union, Dict, List, Generator, Optional
 from .typing import DataBlock
+from .utils import TextBuffer
 
 if TYPE_CHECKING:
     from os import PathLike
@@ -41,7 +40,6 @@ class StarWriter:
         self.quote_character = quote_character
         self.quote_all_strings = quote_all_strings
         self.buffer = TextBuffer()
-        self.backup_if_file_exists()
 
     def coerce_data_blocks(
         self,
@@ -97,14 +95,6 @@ class StarWriter:
                 ):
                     yield line
 
-    def backup_if_file_exists(self):
-        if self.filename and self.filename.exists():
-            new_name = self.filename.name + '~'
-            backup_path = self.filename.resolve().parent / new_name
-            if backup_path.exists():
-                backup_path.unlink()
-            self.filename.rename(backup_path)
-
 
 def coerce_dataframe(df: pd.DataFrame) -> Dict[str, DataBlock]:
     return {'': df}
@@ -133,9 +123,11 @@ def package_info():
     return f'# Created by the starfile Python package (version {__version__}) at {time} on {date}'
 
 
-def quote(x, *,
-          quote_character: str = '"',
-          quote_all_strings: bool = False) -> str:
+def quote(
+    x, *,
+    quote_character: str = '"',
+    quote_all_strings: bool = False
+) -> str:
     if isinstance(x, str) and (quote_all_strings or ' ' in x or not x):
         return f'{quote_character}{x}{quote_character}'
     return x
@@ -147,7 +139,6 @@ def simple_block(
     quote_character: str = '"',
     quote_all_strings: bool = False
 ) -> Generator[str, None, None]:
-
     yield f'data_{block_name}'
     yield ''
     for k, v in data.items():
@@ -165,7 +156,6 @@ def loop_block(
     quote_character: str = '"',
     quote_all_strings: bool = False
 ) -> Generator[str, None, None]:
-
     # Header
     yield f'data_{block_name}'
     yield ''
@@ -175,10 +165,10 @@ def loop_block(
 
     # Data
     for line in df.map(lambda x:
-        quote(x,
-              quote_character=quote_character,
-              quote_all_strings=quote_all_strings)
-    ).to_csv(
+                       quote(x,
+                             quote_character=quote_character,
+                             quote_all_strings=quote_all_strings)
+                       ).to_csv(
         mode='a',
         sep=separator,
         header=False,
