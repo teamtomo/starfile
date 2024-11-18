@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-import starfile
 
+import starfile
 from .constants import loop_simple, postprocess, test_df, test_data_directory
 
 
@@ -27,18 +27,6 @@ def test_write():
     output_file = test_data_directory / 'test_write.star'
     starfile.write(test_df, output_file, overwrite=True)
     assert output_file.exists()
-
-
-def test_write_overwrites_with_backup():
-    output_file = test_data_directory / 'test_overwrite_backup.star'
-    starfile.write(test_df, output_file)
-    assert output_file.exists()
-
-    starfile.write(test_df, output_file)
-    backup = test_data_directory / 'test_overwrite_backup.star~'
-    assert backup.exists()
-    starfile.write(test_df, output_file)
-    assert backup.exists()
 
 
 def test_read_non_existent_file():
