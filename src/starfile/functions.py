@@ -116,4 +116,4 @@ def to_string(
         quote_character=quote_character,
         quote_all_strings=quote_all_strings,
     )
-    return ''.join(line + '\n' for line in writer.lines())
+    return writer.to_string()
