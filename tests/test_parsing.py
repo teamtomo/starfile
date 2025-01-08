@@ -1,3 +1,4 @@
+from pathlib import Path
 import time
 
 import pandas as pd
@@ -288,17 +289,15 @@ def test_parse_as_string():
     assert df['rlnResolution'].dtype == 'object'
 
 
-def test_parse_na():
-    import tempfile
+def test_parse_na(tmpdir):
     import starfile
-    parts = pd.DataFrame({"property1":np.arange(10), "property2": np.random.rand(10)})
+
+    parts = pd.DataFrame({"property1": np.arange(10), "property2": np.random.rand(10)})
     parts["property2"].values[-1] *= np.nan
     data = {
-        "particles":parts
+        "particles": parts
     }
-
-    with tempfile.NamedTemporaryFile(mode="w") as tmpfile:
-        starfile.write(data, tmpfile.name) 
-        tmpfile.seek(0)
-        data = starfile.read(tmpfile.name)
-        assert data["property2"].dtype == "float64"
+    tmpfile = Path(tmpdir) / "temp.star"
+    starfile.write(data, tmpfile) 
+    data = starfile.read(tmpfile)
+    assert data["property2"].dtype == "float64"

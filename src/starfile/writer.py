@@ -66,12 +66,14 @@ class StarWriter:
         yield ''
         for line in self.data_block_generator():
             yield line
+    
+    def to_string(self) -> str:
+        return ''.join(line + '\n' for line in self.lines())
 
     def write(self):
         if self.filename is None:
             raise ValueError('Cannot write nameless file!')
-        with open(self.filename, mode='w+') as f:
-            f.writelines(line + '\n' for line in self.lines())
+        self.filename.write_text(self.to_string())
 
     def data_block_generator(self) -> Generator[str, None, None]:
         for block_name, block in self.data_blocks.items():
@@ -176,7 +178,7 @@ def loop_block(
         float_format=float_format,
         na_rep=na_rep,
         quoting=csv.QUOTE_NONE
-    ).split('\n'):
+    ).splitlines():
         yield line
 
     yield ''
