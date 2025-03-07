@@ -103,6 +103,12 @@ class StarParser:
             loop_column_names.append(column_name)
             self.current_line_number += 1
 
+        # skip empty lines 
+        while self.current_line.strip() == '':
+            self.current_line_number += 1
+            if self.current_line_number > self.n_lines_in_file:
+                break
+
         # now parse the loop block data
         loop_data = deque()
         while self.current_line_number <= self.n_lines_in_file:
