@@ -99,6 +99,9 @@ class StarWriter:
 
 
 def coerce_dataframe(df: pd.DataFrame) -> Dict[str, DataBlock]:
+    if hasattr(df, 'name') and df.name:
+        # if the DataFrame has a name, use it as the key
+        return {df.name: df}
     return {'': df}
 
 
