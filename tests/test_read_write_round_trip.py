@@ -2,7 +2,7 @@ import time
 
 import pandas.testing
 
-from .constants import two_single_line_loop_blocks, postprocess
+from .constants import two_single_line_loop_blocks, postprocess, loop_simple
 
 import starfile
 import pandas as pd
@@ -52,3 +52,15 @@ def test_write_read_write_read(tmp_path):
 
     df_b_read = starfile.read(filename)
     pandas.testing.assert_frame_equal(df_b, df_b_read)
+
+
+def test_dataframe_name_magic(tmp_path):
+    function_read = starfile.read(loop_simple)
+    assert function_read.name == 'particles', "Expected the name of the DataFrame to be 'particles'."
+
+    starfile.write(function_read, tmp_path / 'tmp.star')
+
+    # Make sure tmp.star contains data_particles
+    with open(tmp_path / 'tmp.star') as f:
+        content = f.read()
+        assert 'data_particles' in content, "Expected 'data_particles' in the STAR file content."

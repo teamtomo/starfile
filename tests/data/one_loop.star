@@ -1,5 +1,5 @@
 
-data_
+data_particles
 
 loop_
 _rlnCoordinateX #1

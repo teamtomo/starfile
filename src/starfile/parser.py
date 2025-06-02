@@ -58,6 +58,8 @@ class StarParser:
                 break
             elif self.current_line.startswith('data_'):
                 block_name, block = self._parse_data_block()
+                if isinstance(block, pd.DataFrame):
+                    block.name = block_name
                 self.data_blocks[block_name] = block
             else:
                 self.current_line_number += 1
