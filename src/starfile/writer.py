@@ -169,18 +169,25 @@ def loop_block(
         yield f'_{column_name} #{idx}'
 
     # Data
-    for line in df.map(lambda x:
-                       quote(x,
-                             quote_character=quote_character,
-                             quote_all_strings=quote_all_strings)
-                       ).to_csv(
-        mode='a',
-        sep=separator,
+    #
+    # ``separator`` is intentionally not used here: fixed-width output is
+    # produced by pandas.to_string rather than delimited output from to_csv.
+    for line in df.map(
+        lambda x: quote(
+            x,
+            quote_character=quote_character,
+            quote_all_strings=quote_all_strings
+        )
+    ).to_string(
         header=False,
         index=False,
-        float_format=float_format,
         na_rep=na_rep,
-        quoting=csv.QUOTE_NONE
+        float_format=lambda x: float_format % x,
+        max_rows=None,
+        max_cols=None,
+        line_width=None,
+        max_colwidth=None,
+        show_dimensions=False,
     ).splitlines():
         yield line
 
