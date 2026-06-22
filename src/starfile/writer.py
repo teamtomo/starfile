@@ -66,7 +66,7 @@ class StarWriter:
 
     def coerce_data_blocks(
         self, data_blocks: DataBlock | list[DataBlock] | dict[str, DataBlock]
-    ) -> dict[str, DataBlock]:
+    ) -> dict[str, Any]:  # NOTE: The DataBlock typehint here should be valid!
         """Take single, list of, or dict of data blocks and transform to dictionary."""
         if isinstance(data_blocks, pd.DataFrame):
             return coerce_dataframe(data_blocks)
@@ -129,7 +129,7 @@ def coerce_dataframe(df: pd.DataFrame) -> dict[str, DataBlock]:
 
 def coerce_dict(
     data_blocks: DataBlock | dict[str, DataBlock],
-) -> dict[str, DataBlock]:
+) -> dict[str, Any]:  # NOTE: The DataBlock typehint here should be valid!
     """Coerce dict into dict of data blocks."""
     # check if data is already Dict[str, DataBlock]
     for _, v in data_blocks.items():
