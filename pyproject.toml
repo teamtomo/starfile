@@ -19,7 +19,7 @@ name = "starfile"
 dynamic = ["version"]
 description = "STAR file I/O in Python"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = { text = "BSD-3-Clause" }
 authors = [{ name = "Alister Burt", email = "alisterburt@gmail.com" }]
 # https://pypi.org/classifiers/
@@ -27,10 +27,10 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: BSD License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent",
     "Typing :: Typed",
 ]
 # add your package dependencies here
@@ -41,13 +41,14 @@ dependencies = [
     "typing-extensions",
 ]
 
-# https://peps.python.org/pep-0621/#dependencies-optional-dependencies
-# "extras" (e.g. for `pip install .[test]`)
-[project.optional-dependencies]
+# https://peps.python.org/pep-0735/
+# dependency groups (e.g. for `uv sync --group test`)
+[dependency-groups]
 # add dependencies used for testing here
 test = ["pytest", "pytest-cov"]
 # add anything else you like to have in your dev environment here
 dev = [
+    { include-group = "test" },
     "black",
     "ipython",
     "mypy",
@@ -73,8 +74,11 @@ repository = "https://github.com/teamtomo/starfile"
 # https://docs.astral.sh/ruff
 [tool.ruff]
 line-length = 88
-target-version = "py38"
+target-version = "py312"
 src = ["src"]
+
+[tool.ruff.lint]
+pydocstyle = { convention = "numpy" }
 # https://docs.astral.sh/ruff/rules
 select = [
     "E",    # style errors
@@ -90,9 +94,6 @@ select = [
     "TCH",  # flake8-type-checking
     "TID",  # flake8-tidy-imports
 ]
-
-[tool.ruff.lint]
-pydocstyle = { convention = "numpy" }
 extend-select = [
     "D417", # Missing argument descriptions in Docstrings
 ]
@@ -100,9 +101,8 @@ extend-ignore = [
     "D401", # First line should be in imperative mood (remove to opt in)
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*.py" = ["D", "S"]
-"setup.py" = ["D"]
 
 # https://mypy.readthedocs.io/en/stable/config_file.html
 [tool.mypy]
