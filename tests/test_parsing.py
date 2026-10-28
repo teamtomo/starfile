@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import numpy as np
 import pytest
+from pandas.api.types import is_string_dtype
 
 from starfile.parser import StarParser
 from .constants import (
@@ -268,10 +269,10 @@ def test_quote_loop(quote_character, filename):
     assert parser.data_blocks[''].loc[0, 'whitespace_string'] == " "
     assert parser.data_blocks[''].loc[0, 'empty_string'] == ""
 
-    assert parser.data_blocks[''].dtypes['number_and_string'] == object
+    assert is_string_dtype(parser.data_blocks[''].dtypes['number_and_string'])
     assert parser.data_blocks[''].dtypes['number_and_empty'] == 'float64'
     assert parser.data_blocks[''].dtypes['number'] == 'float64'
-    assert parser.data_blocks[''].dtypes['empty_string_and_normal_string'] == object
+    assert is_string_dtype(parser.data_blocks[''].dtypes['empty_string_and_normal_string'])
 
     assert math.isnan(parser.data_blocks[''].loc[1, 'number_and_empty'])
     assert parser.data_blocks[''].loc[0, 'empty_string_and_normal_string'] == ''
@@ -286,14 +287,14 @@ def test_parse_as_string():
 
     # check 'rlnResolution' is parsed as string in fsc (loop) block
     df = parser.data_blocks['fsc']
-    assert df['rlnResolution'].dtype == 'object'
+    assert is_string_dtype(df['rlnResolution'])
 
 
 def test_parse_na(tmpdir):
     import starfile
 
     parts = pd.DataFrame({"property1": np.arange(10), "property2": np.random.rand(10)})
-    parts["property2"].values[-1] *= np.nan
+    parts.loc[parts.index[-1], "property2"] = np.nan
     data = {
         "particles": parts
     }
