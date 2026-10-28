@@ -1,32 +1,29 @@
+"""High-level interface for reading and writing STAR files."""
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Dict, List, Union, Optional
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    import pandas as pd
     from os import PathLike
+
+    from .typing import DataBlock
 
 from .parser import StarParser
 from .writer import StarWriter
-from .typing import DataBlock
-
-if TYPE_CHECKING:
-    import pandas as pd
-    from os import PathLike
 
 
 def read(
     filename: PathLike,
-    read_n_blocks: Optional[int] = None,
+    read_n_blocks: int | None = None,
     always_dict: bool = False,
-    parse_as_string: List[str] = []
-) -> Union[DataBlock, Dict[DataBlock]]:
+    parse_as_string: list[str] | None = None,
+) -> DataBlock | dict[str, DataBlock]:
     """Read data from a STAR file.
 
     Basic data blocks are read as dictionaries. Loop blocks are read as pandas
     dataframes. When multiple data blocks are present a dictionary of datablocks is
     returned. When a single datablock is present only the block is returned by default.
-    To force returning a dectionary even when only one datablock is present set
+    To force returning a dictionary even when only one datablock is present set
     `always_dict=True`.
 
     Parameters
@@ -40,23 +37,26 @@ def read(
     parse_as_string: list[str]
         A list of keys or column names which will not be coerced to numeric values.
     """
-    parser = StarParser(filename, n_blocks_to_read=read_n_blocks, parse_as_string=parse_as_string)
+    if parse_as_string is None:
+        parse_as_string = []
+    parser = StarParser(
+        filename, n_blocks_to_read=read_n_blocks, parse_as_string=parse_as_string
+    )
     if len(parser.data_blocks) == 1 and always_dict is False:
-        return list(parser.data_blocks.values())[0]
-    else:
-        return parser.data_blocks
+        return next(iter(parser.data_blocks.values()))
+    return parser.data_blocks
 
 
 def write(
-    data: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
+    data: DataBlock | dict[str, DataBlock] | list[DataBlock],
     filename: PathLike,
-    float_format: str = '%.6f',
-    sep: str = '\t',
-    na_rep: str = '<NA>',
+    float_format: str = "%.6f",
+    sep: str = "\t",
+    na_rep: str = "<NA>",
     quote_character: str = '"',
     quote_all_strings: bool = False,
-    **kwargs
-):
+    **kwargs: object,
+) -> None:
     """Write data to disk in the STAR format.
 
     Parameters
@@ -85,14 +85,14 @@ def write(
 
 
 def to_string(
-    data: Union[DataBlock, Dict[str, DataBlock], List[DataBlock]],
-    float_format: str = '%.6f',
-    sep: str = '\t',
-    na_rep: str = '<NA>',
+    data: DataBlock | dict[str, DataBlock] | list[DataBlock],
+    float_format: str = "%.6f",
+    sep: str = "\t",
+    na_rep: str = "<NA>",
     quote_character: str = '"',
     quote_all_strings: bool = False,
-    **kwargs
-):
+    **kwargs: object,
+) -> str:
     """Represent data in the STAR format.
 
     Parameters

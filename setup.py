@@ -1,7 +1,7 @@
 """
-PEP 517 doesn’t support editable installs
+PEP 517 doesn't support editable installs
 so this file is currently here to support "pip install -e ."
-"""
+"""  # noqa: RUF002
 from setuptools import setup
 
 setup(
