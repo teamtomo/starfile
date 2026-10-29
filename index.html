@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -499,10 +499,10 @@ _rlnMicrographName #7
 <p>Read the file</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">starfile</span>
 
-<span class="n">df</span> <span class="o">=</span> <span class="n">starfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;particles.star&#39;</span><span class="p">)</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">starfile</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">'particles.star'</span><span class="p">)</span>
 </code></pre></div>
 <p>Interact with the data</p>
-<p><div class="highlight"><pre><span></span><code><span class="n">df</span><span class="p">[</span><span class="s1">&#39;rlnCoordinateX&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">10</span>
+<p><div class="highlight"><pre><span></span><code><span class="n">df</span><span class="p">[</span><span class="s1">'rlnCoordinateX'</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">10</span>
 <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
 </code></pre></div>
 <div class="highlight"><pre><span></span><code>   rlnCoordinateX  rlnCoordinateY  rlnCoordinateZ  rlnAngleRot  rlnAngleTilt  rlnAnglePsi rlnMicrographName
@@ -513,7 +513,7 @@ _rlnMicrographName #7
 4        96.18780        80.12540       204.55875       14.910        163.26     -16.0300   01_10.00Apx.mrc
 </code></pre></div></p>
 <p>Save the (modified) data to file</p>
-<div class="highlight"><pre><span></span><code><span class="n">starfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;modified_particles.star&#39;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">starfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">'modified_particles.star'</span><span class="p">)</span>
 </code></pre></div>
 <p>For more advanced usage please check out the examples.</p>
 <hr />
@@ -655,7 +655,7 @@ To force returning a dectionary even when only one datablock is present set
     <span class="n">always_dict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">parse_as_string</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Read data from a STAR file.</span>
+<span class="w">    </span><span class="sd">"""Read data from a STAR file.</span>
 
 <span class="sd">    Basic data blocks are read as dictionaries. Loop blocks are read as pandas</span>
 <span class="sd">    dataframes. When multiple data blocks are present a dictionary of datablocks is</span>
@@ -673,7 +673,7 @@ To force returning a dectionary even when only one datablock is present set
 <span class="sd">        Always return a dictionary, even when only a single data block is present.</span>
 <span class="sd">    parse_as_string: list[str]</span>
 <span class="sd">        A list of keys or column names which will not be coerced to numeric values.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">StarParser</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">n_blocks_to_read</span><span class="o">=</span><span class="n">read_n_blocks</span><span class="p">,</span> <span class="n">parse_as_string</span><span class="o">=</span><span class="n">parse_as_string</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">data_blocks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">always_dict</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">data_blocks</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
@@ -831,14 +831,14 @@ If a dictionary of datablocks are passed the keys will be the data block names.<
 <span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataBlock</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">]],</span>
     <span class="n">filename</span><span class="p">:</span> <span class="n">PathLike</span><span class="p">,</span>
-    <span class="n">float_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.6f</span><span class="s1">&#39;</span><span class="p">,</span>
-    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
-    <span class="n">na_rep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;NA&gt;&#39;</span><span class="p">,</span>
-    <span class="n">quote_character</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+    <span class="n">float_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'</span><span class="si">%.6f</span><span class="s1">'</span><span class="p">,</span>
+    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">,</span>
+    <span class="n">na_rep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'&lt;NA&gt;'</span><span class="p">,</span>
+    <span class="n">quote_character</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'"'</span><span class="p">,</span>
     <span class="n">quote_all_strings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write data to disk in the STAR format.</span>
+<span class="w">    </span><span class="sd">"""Write data to disk in the STAR format.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -853,7 +853,7 @@ If a dictionary of datablocks are passed the keys will be the data block names.<
 <span class="sd">        Separator between values, will be passed to pandas.</span>
 <span class="sd">    na_rep: str</span>
 <span class="sd">        Representation of null values, will be passed to pandas.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">StarWriter</span><span class="p">(</span>
         <span class="n">data</span><span class="p">,</span>
         <span class="n">filename</span><span class="o">=</span><span class="n">filename</span><span class="p">,</span>
@@ -996,14 +996,14 @@ If a dictionary of datablocks are passed the keys will be the data block names.<
 <span class="normal">118</span>
 <span class="normal">119</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">to_string</span><span class="p">(</span>
     <span class="n">data</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DataBlock</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">DataBlock</span><span class="p">]],</span>
-    <span class="n">float_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.6f</span><span class="s1">&#39;</span><span class="p">,</span>
-    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span>
-    <span class="n">na_rep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&lt;NA&gt;&#39;</span><span class="p">,</span>
-    <span class="n">quote_character</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+    <span class="n">float_format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'</span><span class="si">%.6f</span><span class="s1">'</span><span class="p">,</span>
+    <span class="n">sep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">,</span>
+    <span class="n">na_rep</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'&lt;NA&gt;'</span><span class="p">,</span>
+    <span class="n">quote_character</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">'"'</span><span class="p">,</span>
     <span class="n">quote_all_strings</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represent data in the STAR format.</span>
+<span class="w">    </span><span class="sd">"""Represent data in the STAR format.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1016,7 +1016,7 @@ If a dictionary of datablocks are passed the keys will be the data block names.<
 <span class="sd">        Separator between values, will be passed to pandas.</span>
 <span class="sd">    na_rep: str</span>
 <span class="sd">        Representation of null values, will be passed to pandas.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">writer</span> <span class="o">=</span> <span class="n">StarWriter</span><span class="p">(</span>
         <span class="n">data</span><span class="p">,</span>
         <span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -1087,10 +1087,10 @@ If a dictionary of datablocks are passed the keys will be the data block names.<
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.expand", "search.highlight", "search.suggest", "content.tabs.link"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.expand", "search.highlight", "search.suggest", "content.tabs.link"], "search": "assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>
