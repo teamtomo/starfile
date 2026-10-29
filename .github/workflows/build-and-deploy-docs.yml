@@ -12,22 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.10"
-
-      - name: Install dependencies
-        run: |
-          # pip install -e .
-          pip install mkdocs mkdocs-material mkdocstrings[python]
+          python-version: "3.12"
 
       # Build the book
+      # mkdocs is pinned below 2.0, which removes the plugin system mkdocs-material relies on
       - name: Build the book
         run: |
-          mkdocs build
+          uvx --from "mkdocs<2" --with mkdocs-material --with "mkdocstrings[python]" mkdocs build
 
       # Push the site to github-pages
       - name: GitHub Pages action

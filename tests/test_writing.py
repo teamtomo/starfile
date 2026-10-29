@@ -64,13 +64,15 @@ def test_can_write_non_zero_indexed_one_row_dataframe():
         with open(filename) as output_file:
             output = output_file.read()
 
-    expected = (
+    expected_header = (
         "_A #1\n"
         "_B #2\n"
         "_C #3\n"
-        "1\t2\t3"
     )
-    assert (expected in output)
+    assert (expected_header in output)
+    # default writer output is fixed-width, so don't depend on the separator
+    data_line = output.split(expected_header)[1].splitlines()[0]
+    assert data_line.split() == ["1", "2", "3"]
 
 
 @pytest.mark.parametrize("quote_character, quote_all_strings, num_quotes",
