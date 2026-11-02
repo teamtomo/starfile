@@ -72,6 +72,11 @@ def write(
         Separator between values, will be passed to pandas.
     na_rep: str
         Representation of null values, will be passed to pandas.
+    quote_character: str
+        Character used to quote strings. Strings that are empty or contain a
+        space are always quoted.
+    quote_all_strings: bool
+        Quote every string value, not only those that need it.
     """
     StarWriter(
         data,
@@ -106,6 +111,11 @@ def to_string(
         Separator between values, will be passed to pandas.
     na_rep: str
         Representation of null values, will be passed to pandas.
+    quote_character: str
+        Character used to quote strings. Strings that are empty or contain a
+        space are always quoted.
+    quote_all_strings: bool
+        Quote every string value, not only those that need it.
     """
     writer = StarWriter(
         data,
